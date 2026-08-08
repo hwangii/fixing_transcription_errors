@@ -1,0 +1,120 @@
+# ============================================================
+# .gitignore for a Stata + LaTeX (+ Python) research project
+# Track: code (.do, .py), .tex source, and small look-up tables.
+# Ignore: data, logs, build artifacts, and large binaries.
+# ============================================================
+
+# ---------- Data (keep raw/large data OUT of git) ----------
+# Stata / tabular / binary datasets are usually large and re-createable.
+# If you WANT to track a specific file, add an exception, e.g.:
+#   !CODE/crosswalks/statefip_lookup.dta
+*.dta
+*.dtas
+*.csv
+*.tsv
+*.txt
+*.xlsx
+*.xls
+*.parquet
+*.feather
+*.sas7bdat
+*.RData
+*.rds
+*.json.gz
+
+# Common data folders (adjust names to your layout)
+DATA/
+data/
+RAW/
+raw/
+raw_data/
+output_data/
+derived/
+build/
+extracts/
+temp/
+tmp/
+
+# ---------- Large media / scraped images & archives ----------
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.jpg
+*.jpeg
+*.png
+*.tif
+*.tiff
+*.bmp
+
+# ---------- Stata ----------
+*.log          # Stata (and LaTeX) logs
+*.smcl         # Stata formatted logs
+*.stswap       # Stata autosave/recovery
+*.gph          # Stata graph files (regenerated from .do)
+sigma.dta
+_stata_temp*/
+
+# ---------- LaTeX build artifacts ----------
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.synctex(busy)
+*.toc
+*.vrb
+*.xdv
+*.brf
+*.dvi
+*.spl
+*.thm
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+# Keep the compiled paper by default. To ignore built PDFs instead,
+# delete the two lines below and uncomment "*.pdf".
+# *.pdf
+!*.pdf
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.env
+
+# ---------- Editors / OS ----------
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Claude / Cowork ----------
+# Share team settings (.claude/settings.json) but keep personal overrides local.
+.claude/settings.local.json
+.claude/*.local.json
+CLAUDE.local.md
