@@ -1,17 +1,25 @@
 set scheme s1mono 
 set seed 1000
 
-local code "D:\Dropbox\fixing_transcription_errors\CODE\"
+/**********************************************************************/
+/*ROOT PATHS: THESE ARE THE ONLY THREE LINES TO CHANGE IF FOLDERS MOVE.*/
+/*Dropbox moved to the SNU ECON team folder; the code and the Overleaf */
+/*project are now git repos under D:\repos\.                           */
+/**********************************************************************/
+local dropbox "D:\SNU ECON Dropbox\sam hwang\"
+local code "D:\repos\fixing_transcription_errors\CODE\"
+local overleaf "D:\repos\6638fa0fd89fbec05130caeb\"
+
+local code_trans "`code'"
+local original "`dropbox'fixing_transcription_errors\DATA\ORIGINAL\"
+local trans_intermediate "`dropbox'fixing_transcription_errors\DATA\INTERMEDIATE\"
+local intermediate "`dropbox'enum_date\DATA\INTERMEDIATE\"
+local christian_torben "`dropbox'fixing_transcription_errors\DATA\TRANSCRIPTIONS\"
+local intermediate_tr "`dropbox'fixing_transcription_errors\DATA\INTERMEDIATE\"
 local original_ed "F:\enum_date\DATA\ORIGINAL\"
-local original "D:\Dropbox\fixing_transcription_errors\DATA\ORIGINAL\"
-local trans_intermediate "D:\Dropbox\fixing_transcription_errors\DATA\INTERMEDIATE\"
 local intermediate_nondb "F:\enum_date\DATA\INTERMEDIATE\"
-local intermediate "D:\Dropbox\enum_date\DATA\INTERMEDIATE\"
-local figure "D:\Dropbox\Apps\Overleaf\error_correction\figures\"
-local christian_torben "D:\Dropbox\fixing_transcription_errors\DATA\TRANSCRIPTIONS\"
-local intermediate_tr "D:\Dropbox\fixing_transcription_errors\DATA\INTERMEDIATE\"
 local trans_intermediate_f "F:\fixing_transcription_errors\DATA\INTERMEDIATE\"
-local code_trans "D:\Dropbox\fixing_transcription_errors\CODE\"
+local figure "`overleaf'figures\"
 
 local beg_yr=1930
 local label_size="1.05"
@@ -197,8 +205,15 @@ graph export `"`figure'legibility_performance2.pdf"', as(pdf) replace
 
 
 
-/*
 /*******************************************************************************************************/
+/*BUILD temp.dta: THE INPUT FOR BOTH BALANCE TABLES.                                                   */
+/*                                                                                                     */
+/*This loop was commented out and the temp.dta it produced has since been deleted, so both balance     */
+/*tables below are unbuildable without it. Re-enabled.                                                 */
+/*                                                                                                     */
+/*It is a full-count pass over all 50 state files, so it is slow and only needs re-running when the     */
+/*merged_<state>1940.dta files change. To skip it on a rerun, wrap it back in a block comment.         */
+/*                                                                                                     */
 /*At the county level, the share of records with transcription disagreement ranges from [X]\% to [Y]\%,*/
 /*with notably higher rates occurring in urban areas ([Z]\% average disagreement),                     */
 /*counties with above-median Black population ([W]\% average disagreement),                            */
@@ -260,11 +275,10 @@ foreach curstatestr in `full_stlist' {
 		}
 		
 		save `"`trans_intermediate_f'temp.dta"',replace
-		
+
 	}
 
 }
-*/
 
 
 
@@ -286,21 +300,38 @@ related_to_head northeast_bpl midwest_bpl south_bpl west_bpl white_color farmer 
 #delimit cr
 */
 
-/*COMPARISON, WITH NORTHEAST, NO DIFF*/
+/*******************************************************************************/
+/*TABLE: SOCIO-DEMOGRAPHIC CHARACTERISTICS OF THE ANALYSIS SAMPLE VS THE        */
+/*POPULATION (tab:sample_characteristics in the paper). ALL STATES.             */
+/*                                                                             */
+/*Was: US | Northeast | Rhode Island. The Rhode Island column is dropped now    */
+/*that the analysis sample is national. The Northeast column went with it -- it */
+/*only ever existed as the intermediate reference between the US and RI, and    */
+/*with RI gone it compares nothing. To put it back, re-insert                   */
+/*"(mean if northeast==1)" as the second estimate.                             */
+/*                                                                             */
+/*The two columns are now:                                                     */
+/*  col 1  the full population -- every record in temp.dta                     */
+/*  col 2  the analysis sample -- records that are linked across the two        */
+/*         transcriptions with all four names present, i.e. exactly the records */
+/*         on which "incongruent" is defined and the paper's results rest.      */
+/*Written to a NEW filename so the Rhode Island version is not clobbered.       */
+/*******************************************************************************/
 capture label var white_color "White-collar occupation"
 capture label var skilled "Skilled occupation"
 capture label var unskilled "Unskilled occupation"
 
 keep if age>=10 & female==0
-gen northeast = inlist(statefip, 9, 23, 25, 33, 34, 36, 42, 44, 50)
-gen ri=statefip==44
+
+gen in_analysis_sample=incongruent!=.
+label var in_analysis_sample "In analysis sample"
 
 #delimit;
 
-balancetable (mean) (mean if northeast==1) (mean if ri==1) incongruent black american_indian asian 
+balancetable (mean) (mean if in_analysis_sample==1) incongruent black american_indian asian
 northeast_bpl midwest_bpl south_bpl west_bpl foreign_born father_foreign_born
 urban farm
-no_ed grad_elem white_color skilled unskilled farmer incwage using `"`figure'balance_rhode_island.tex"', varlabels replace;
+no_ed grad_elem white_color skilled unskilled farmer incwage using `"`figure'balance_allstates.tex"', varlabels replace;
 
 #delimit cr
 
@@ -315,14 +346,15 @@ capture label var white_color "White-collar occupation"
 capture label var skilled "Skilled occupation"
 capture label var unskilled "Unskilled occupation"
 
-keep if age>=10 & female==0 & statefip==44
+/*ALL STATES: the "& statefip==44" restriction to Rhode Island is retired.*/
+keep if age>=10 & female==0
 
 #delimit;
 
-balancetable incongruent black american_indian asian 
+balancetable incongruent black american_indian asian
 northeast_bpl midwest_bpl south_bpl west_bpl foreign_born father_foreign_born
-urban farm 
-no_ed grad_elem white_color skilled unskilled farmer incwage using `"`figure'incongruent_rhode_island.tex"', varlabels replace;
+urban farm
+no_ed grad_elem white_color skilled unskilled farmer incwage using `"`figure'incongruent_allstates.tex"', varlabels replace;
 
 #delimit cr
 
@@ -645,3 +677,7 @@ bysort censuscounty eventdistrict: egen sh_difficult=mean(difficult_to_link)
 ttest legibility if rep==1,by(lowest_quartile_leg)
 ttest base_linkage_rate if rep==1,by(lowest_quartile_leg)
 ttest sh_difficult if rep==1,by(lowest_quartile_leg)
+*/
+/*^^ This closing delimiter was missing: the block comment opened above ran off
+  the end of the file. Harmless while nothing below it mattered, but the file
+  now has to run to completion for the balance tables, so it is closed here.*/
