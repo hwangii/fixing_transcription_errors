@@ -53,14 +53,30 @@ $SchemaF   = Join-Path $ReviewDir "schema\verdict.schema.json"
 
 if (-not (Test-Path $Reports)) { New-Item -ItemType Directory -Force $Reports | Out-Null }
 
-# --- Node/Codex on PATH (portable install lives in the user profile) ----------
+# --- Locate Codex -------------------------------------------------------------
+# Prefer the NATIVE codex.exe over the npm-generated shim. The shim pipes through
+# node (`$input | & node ...`), which leaves stdio non-TTY: that breaks the
+# interactive TUI outright ("stdout is not a terminal") and is a prime suspect
+# for the command rejections seen in non-interactive runs on this machine.
 $NodeDir = "C:\Users\hwangii\nodejs"
 if (Test-Path $NodeDir) {
     if ($env:Path -notlike "*$NodeDir*") { $env:Path = "$NodeDir;" + $env:Path }
 }
-$codex = Get-Command codex -ErrorAction SilentlyContinue
-if ($null -eq $codex) {
-    Write-Error "codex not found on PATH. Install: npm install -g @openai/codex"
+
+$CodexExe = $null
+$vendorGlob = Join-Path $NodeDir "node_modules\@openai\codex\node_modules\@openai\codex-win32-*\vendor\*\bin\codex.exe"
+$native = Get-Item -Path $vendorGlob -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($null -ne $native) {
+    $CodexExe = $native.FullName
+} else {
+    # Fall back to whatever `codex` resolves to, preferring a real .exe.
+    $onPath = Get-Command codex -All -ErrorAction SilentlyContinue |
+              Where-Object { $_.Source -like "*.exe" } | Select-Object -First 1
+    if ($null -eq $onPath) { $onPath = Get-Command codex -ErrorAction SilentlyContinue }
+    if ($null -ne $onPath) { $CodexExe = $onPath.Source }
+}
+if ([string]::IsNullOrWhiteSpace($CodexExe)) {
+    Write-Error "codex not found. Install: npm install -g @openai/codex"
     exit 1
 }
 
@@ -69,7 +85,7 @@ if ($null -eq $codex) {
 # failing with a wall of 401s that does not name the actual problem.
 $prevEAP = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
-$loginState = & codex login status 2>&1 | Out-String
+$loginState = & $CodexExe login status 2>&1 | Out-String
 $loginRc = $LASTEXITCODE
 $ErrorActionPreference = $prevEAP
 if ($loginRc -ne 0 -or $loginState -match 'Not logged in') {
@@ -214,7 +230,7 @@ $prevEAP = $ErrorActionPreference
 $ErrorActionPreference = 'Continue'
 $rc = 0
 try {
-    $prompt | & codex @codexArgs
+    $prompt | & $CodexExe @codexArgs
     $rc = $LASTEXITCODE
 } catch {
     Write-Warning "codex invocation failed: $($_.Exception.Message)"

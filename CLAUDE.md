@@ -59,34 +59,52 @@ are wired into `_master_for_creating_training_dataset.do`.
 - Ask before deleting or consolidating superseded script variants; provenance of
   which file produced which conference version matters.
 
-## Known issue: Codex review is blocked on this machine
+## Codex on this machine: use the native binary
 
-As of 2026-09-12, `Run-Review.ps1` **does not work on this box**. Codex installs,
-authenticates, and starts a session, but in non-interactive `codex exec` every
-attempt to spawn a process is refused with `CreateProcess ... Rejected ...
-blocked by policy`, so it cannot read any file and returns an empty review.
+`Run-Review.ps1` works. It did not, for most of 2026-09-12, and the cause is
+worth knowing because it is invisible from the error messages.
 
-Ruled out, so do not re-test these:
+**Root cause: the npm shim.** `npm i -g @openai/codex` puts `codex.ps1` on PATH,
+and that shim pipes through node (`$input | & node ...`). The pipe leaves stdio
+non-TTY, which breaks Codex two different ways:
 
-| Suspect | Result |
-|---|---|
-| OS-level sandbox | Works — `codex sandbox pwsh/cmd/git` all run fine |
-| Workspace cloud policy | Only pins a model; no exec restrictions |
-| PowerShell 5.1 | Installed 7.6.6 at `C:\Users\hwangii\pwsh7`; Codex used it, still refused |
-| Project `.rules` | `--ignore-rules` changed nothing |
-| Approval policy | `-c approval_policy="never"` worked once, not reproducibly |
-| Missing helpers / antivirus | All helper binaries present; no Defender detections |
+- Interactive `codex` refuses to start: `Error: stdout is not a terminal`.
+- Non-interactive `codex exec` fails to spawn any subprocess, reporting
+  `CreateProcess ... Rejected ... blocked by policy` for powershell, cmd, bash,
+  `rg` and `git` alike - so it reads nothing and returns an empty review.
 
-What remains is Codex's Windows sandbox layer itself — likely a privileged
-one-time setup that cannot run without admin, on an OS (Server 2019, build
-17763) that OpenAI does not support. Not fixable from this account.
+That second message reads like a sandbox or OS-support problem and is not one.
+Hours went into chasing it as such. Ruled out along the way, so do not re-test:
+the OS-level sandbox (`codex sandbox pwsh/cmd/git` all run fine), the workspace
+cloud policy (it only pins a model), PowerShell 5.1 (7.6.6 is installed at
+`C:\Users\hwangii\pwsh7`; Codex used it and still failed), `.rules` files, and
+antivirus.
 
-**The schema earns its keep here.** Because every failed run reported empty
-findings *alongside* a populated `review_limits`, the reports read as "could not
-review" rather than as a clean bill of health. Never treat an empty findings list
-as a pass without reading `review_limits`.
+**The fix:** call the native `codex.exe` under the npm package's
+`vendor\...\bin\`, never the shim. `Run-Review.ps1` resolves this itself, and
+that directory is first on the user PATH so bare `codex` also gets the .exe.
 
-Workarounds, in order of preference: run `codex` interactively (a human answers
-the approval prompts that the non-interactive path auto-rejects); or fall back to
-copy-paste review packets, which involve no sandbox. The checklists, `SCOPE.md`,
-and the severity/disposition discipline work unchanged with either.
+Two settings that matter, already in the script: `--sandbox read-only`, and
+`-c approval_policy="never"` because a non-interactive run has nobody to answer
+an approval prompt.
+
+## Reading a report
+
+`review_limits` is not boilerplate. An empty findings list next to a populated
+`review_limits` means *could not review*, not *passed* - that distinction is the
+main reason the schema exists.
+
+Codex is wrong often enough to matter, and is most dangerous when confident. On
+2026-09-13 it reported, as `major` / `verified`, that the `display` command at
+`CODE/comparing_model_transcription_with_anc_fs_SSHA2025.do:62` was invalid
+syntax printing nothing. Tested in Stata/MP 15.1: it returns rc=0 and prints all
+five values, because a comma in `display` separates directives and adds a space.
+The commas are load-bearing - without them the values run together as `10020`.
+**Verify Stata-specific findings against Stata before acting.** Batch mode on
+Stata 15 is `/b`, not `/e`:
+
+```
+& "C:\Program Files (x86)\Stata15\StataMP-64.exe" /b do test.do
+```
+
+It leaves a GUI process running after a batch job; close it when done.
