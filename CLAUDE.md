@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+> **Moving machines?** Read [HANDOFF.md](HANDOFF.md) first — current state,
+> what is open, and the two traps that cost hours (the npm shim, and Codex
+> being confidently wrong about Stata).
+
 ## Project
 
 Research code for a paper on fixing transcription errors in US census records

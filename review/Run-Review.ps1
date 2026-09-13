@@ -54,29 +54,53 @@ $SchemaF   = Join-Path $ReviewDir "schema\verdict.schema.json"
 if (-not (Test-Path $Reports)) { New-Item -ItemType Directory -Force $Reports | Out-Null }
 
 # --- Locate Codex -------------------------------------------------------------
-# Prefer the NATIVE codex.exe over the npm-generated shim. The shim pipes through
-# node (`$input | & node ...`), which leaves stdio non-TTY: that breaks the
-# interactive TUI outright ("stdout is not a terminal") and is a prime suspect
-# for the command rejections seen in non-interactive runs on this machine.
-$NodeDir = "C:\Users\hwangii\nodejs"
-if (Test-Path $NodeDir) {
-    if ($env:Path -notlike "*$NodeDir*") { $env:Path = "$NodeDir;" + $env:Path }
+# Use the NATIVE codex.exe, never the npm-generated `codex.ps1` shim. The shim
+# pipes through node (`$input | & node ...`), leaving stdio non-TTY, which breaks
+# Codex two ways: the interactive TUI refuses to start ("stdout is not a
+# terminal"), and `codex exec` cannot spawn ANY subprocess -- it reports
+# "CreateProcess ... Rejected ... blocked by policy" and returns an empty review.
+# That message looks like a sandbox problem and is not one. See CLAUDE.md.
+#
+# Nothing here is machine-specific: candidate npm prefixes are discovered, so
+# this works on any host with Codex installed.
+
+$prefixes = New-Object System.Collections.Generic.List[string]
+foreach ($p in @(
+        (Join-Path $env:USERPROFILE "nodejs"),
+        (Join-Path $env:APPDATA "npm"),
+        "C:\Program Files\nodejs")) {
+    if (-not [string]::IsNullOrWhiteSpace($p) -and (Test-Path $p)) { $prefixes.Add($p) }
+}
+$npmCmd = Get-Command npm -ErrorAction SilentlyContinue
+if ($null -ne $npmCmd) { $prefixes.Add((Split-Path -Parent $npmCmd.Source)) }
+
+# Put a discovered node dir on PATH so `git`/`npm` helpers resolve as expected.
+foreach ($p in $prefixes) {
+    if ($env:Path -notlike "*$p*") { $env:Path = "$p;" + $env:Path }
 }
 
 $CodexExe = $null
-$vendorGlob = Join-Path $NodeDir "node_modules\@openai\codex\node_modules\@openai\codex-win32-*\vendor\*\bin\codex.exe"
-$native = Get-Item -Path $vendorGlob -ErrorAction SilentlyContinue | Select-Object -First 1
-if ($null -ne $native) {
-    $CodexExe = $native.FullName
-} else {
-    # Fall back to whatever `codex` resolves to, preferring a real .exe.
+foreach ($p in $prefixes) {
+    $glob = Join-Path $p "node_modules\@openai\codex\node_modules\@openai\codex-win32-*\vendor\*\bin\codex.exe"
+    $hit = Get-Item -Path $glob -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($null -ne $hit) { $CodexExe = $hit.FullName; break }
+}
+if ([string]::IsNullOrWhiteSpace($CodexExe)) {
+    # Fall back to PATH, but insist on a real .exe -- a .ps1/.cmd hit is the shim.
     $onPath = Get-Command codex -All -ErrorAction SilentlyContinue |
               Where-Object { $_.Source -like "*.exe" } | Select-Object -First 1
-    if ($null -eq $onPath) { $onPath = Get-Command codex -ErrorAction SilentlyContinue }
     if ($null -ne $onPath) { $CodexExe = $onPath.Source }
 }
 if ([string]::IsNullOrWhiteSpace($CodexExe)) {
-    Write-Error "codex not found. Install: npm install -g @openai/codex"
+    Write-Error @"
+Native codex.exe not found.
+
+Install:  npm install -g @openai/codex
+Then:     codex login --device-auth
+
+If `codex` is on PATH but only as codex.ps1/.cmd, that is the npm shim and it
+does not work -- locate codex.exe under the package's vendor\ directory.
+"@
     exit 1
 }
 
