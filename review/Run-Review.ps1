@@ -149,6 +149,11 @@ REVIEW TARGET: $TargetDesc
 
 PAPER: $paperLine
 
+Reading files: the repository is readable and commands work. If any single
+command is rejected, try another form rather than concluding you cannot see the
+repository - and never fall back to searching the web for the source, which
+would review a different version of the file than the one on disk.
+
 Rules:
 - You are in a read-only sandbox. Do not attempt to edit anything.
 - Cite every finding as path:line. A finding without a location is not a finding.
@@ -187,6 +192,11 @@ $codexArgs = @(
     "exec",
     "--cd", $RepoRoot,
     "--sandbox", "read-only",
+    # Non-interactive runs have nobody to approve an escalation, so the default
+    # OnRequest policy auto-rejects the commands Codex needs to read files
+    # ("blocked by policy"). This does NOT widen the sandbox -- read-only still
+    # applies; it only stops Codex pausing for an approver who is not present.
+    "-c", 'approval_policy="never"',
     "--output-schema", $SchemaF,
     "--output-last-message", $jsonOut,
     "--color", "never"

@@ -58,3 +58,35 @@ are wired into `_master_for_creating_training_dataset.do`.
   and Dropbox folders that exist on the author's machine.
 - Ask before deleting or consolidating superseded script variants; provenance of
   which file produced which conference version matters.
+
+## Known issue: Codex review is blocked on this machine
+
+As of 2026-09-12, `Run-Review.ps1` **does not work on this box**. Codex installs,
+authenticates, and starts a session, but in non-interactive `codex exec` every
+attempt to spawn a process is refused with `CreateProcess ... Rejected ...
+blocked by policy`, so it cannot read any file and returns an empty review.
+
+Ruled out, so do not re-test these:
+
+| Suspect | Result |
+|---|---|
+| OS-level sandbox | Works — `codex sandbox pwsh/cmd/git` all run fine |
+| Workspace cloud policy | Only pins a model; no exec restrictions |
+| PowerShell 5.1 | Installed 7.6.6 at `C:\Users\hwangii\pwsh7`; Codex used it, still refused |
+| Project `.rules` | `--ignore-rules` changed nothing |
+| Approval policy | `-c approval_policy="never"` worked once, not reproducibly |
+| Missing helpers / antivirus | All helper binaries present; no Defender detections |
+
+What remains is Codex's Windows sandbox layer itself — likely a privileged
+one-time setup that cannot run without admin, on an OS (Server 2019, build
+17763) that OpenAI does not support. Not fixable from this account.
+
+**The schema earns its keep here.** Because every failed run reported empty
+findings *alongside* a populated `review_limits`, the reports read as "could not
+review" rather than as a clean bill of health. Never treat an empty findings list
+as a pass without reading `review_limits`.
+
+Workarounds, in order of preference: run `codex` interactively (a human answers
+the approval prompts that the non-interactive path auto-rejects); or fall back to
+copy-paste review packets, which involve no sandbox. The checklists, `SCOPE.md`,
+and the severity/disposition discipline work unchanged with either.
