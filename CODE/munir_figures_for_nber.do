@@ -328,10 +328,20 @@ label var in_analysis_sample "In analysis sample"
 
 #delimit;
 
+/*wide(mean) -- print only the means, dropping the standard-deviation second
+                line, to match the Rhode Island table (which had been stripped
+                of them by hand).  NOTE: the "oneline" option does the same job
+                but only where a diff column exists; with this two-mean complex
+                syntax it fails with "variable diff* not found", so wide(mean)
+                is the right option here.
+  nonumbers  -- ctitles() ADDS a title row, it does not replace balancetable's
+                "(1) (2)" row; nonumbers is what removes that row.
+  leftctitle -- without it the corner cell is filled with the word "Variable".*/
 balancetable (mean) (mean if in_analysis_sample==1) incongruent black american_indian asian
 northeast_bpl midwest_bpl south_bpl west_bpl foreign_born father_foreign_born
 urban farm
-no_ed grad_elem white_color skilled unskilled farmer incwage using `"`figure'balance_allstates.tex"', varlabels replace;
+no_ed grad_elem white_color skilled unskilled farmer incwage using `"`figure'balance_allstates.tex"',
+varlabels replace wide(mean) nonumbers leftctitle("none") ctitles("US" "Analysis sample");
 
 #delimit cr
 
@@ -354,7 +364,10 @@ keep if age>=10 & female==0
 balancetable incongruent black american_indian asian
 northeast_bpl midwest_bpl south_bpl west_bpl foreign_born father_foreign_born
 urban farm
-no_ed grad_elem white_color skilled unskilled farmer incwage using `"`figure'incongruent_allstates.tex"', varlabels replace;
+no_ed grad_elem white_color skilled unskilled farmer incwage using `"`figure'incongruent_allstates.tex"',
+varlabels replace oneline nonumbers leftctitle("none")
+groups("Transcription" "\multirow{2}{*}{Diff.}", pattern(1 0 1) end("\cline{2-3}"))
+ctitles("Congruent" "Incongruent" "");
 
 #delimit cr
 
