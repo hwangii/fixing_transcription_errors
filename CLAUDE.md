@@ -6,9 +6,11 @@
 
 ## Working across two machines
 
-This project runs on **two servers**: one holds the datasets, the other is used
-for code. Both run Claude Code against the same GitHub repo, so both can create
-commits. The author is new to git and is reasonably worried about this.
+This project runs on **two servers, each holding a different and equally
+important dataset**. Neither is "the data machine" and neither is "the code
+machine": analysis happens on both, so both edit `CODE/`, and both run Claude
+Code against the same GitHub repo. The author is new to git and is reasonably
+worried about this.
 
 **Claude: enforce the protocol below. Do not assume the user remembers it.**
 
@@ -16,9 +18,16 @@ Three rules:
 
 1. **Pull before starting.** `.\Sync.ps1 -Pull`
 2. **Push before stopping.** `.\Sync.ps1 -Push -Message "what you did"`
-3. **Don't edit the same file on both machines at once.** The natural split is
-   analysis and data work where the data lives; review tooling and code edits
-   on the other.
+3. **Don't edit the same file on both machines at once.** Because both machines
+   do analysis, this cannot be split by directory. Split by *script*: each
+   machine owns the do-files for its own dataset. Shared files -- the master
+   do-file, anything under `review/`, `CLAUDE.md` -- are the ones that actually
+   collide, so push promptly after touching them.
+
+Note that **the data itself never travels through git** (it is gitignored, and
+rightly so). Only code and results move between machines. If a result computed
+on one server is needed on the other, it has to be a small tracked file, not a
+`.dta` -- say so explicitly rather than assuming the other machine can see it.
 
 `Sync.ps1` is deliberately conservative: it pulls `--ff-only` so it can never
 create a surprise merge, commits with `git add -u` so untracked data can never
@@ -34,6 +43,65 @@ If the branches have diverged, nothing is lost. Merge them normally. **Never**
 use `push --force`, `reset --hard`, or `clean` to resolve it — the repo's
 settings deny those commands, and that denial is a safety feature, not an
 obstacle to work around.
+
+## The paper draft: one file, two machines
+
+The draft lives in **Overleaf**, and a copy is worked on here. Both machines
+edit the **same `.tex`**, because updating it requires numbers from both
+datasets and neither machine has both.
+
+This is the most conflict-prone thing in the project. Treat it with more care
+than code.
+
+### Three copies exist, so name the source of truth
+
+Overleaf, machine A, and machine B are three editable copies of the same
+document. Git can see two of them. **Editing in the Overleaf web UI while
+uncommitted changes exist here will produce a divergence git cannot warn you
+about.** So:
+
+- The **repo is authoritative** while we are working. Overleaf is where the
+  draft is read, compiled, and shared with coauthors.
+- Before anyone edits in the Overleaf UI, the repo must be pushed and synced to
+  Overleaf. Afterwards, pull Overleaf's changes back before editing here again.
+- If you are unsure which copy is newest, **stop and ask**. Do not guess, and
+  do not overwrite one with the other to "make them match".
+
+### Rules for editing the shared .tex
+
+1. **Pull immediately before editing, push immediately after.** Not at the end
+   of the session -- immediately. A `.tex` left uncommitted for an hour while
+   the other machine edits it is the one thing that causes a painful merge.
+2. **One sentence per line.** Never wrap a paragraph into one long line, and
+   **never reflow or re-wrap existing text**. Git merges line by line: with one
+   sentence per line, two machines editing different sentences of the same
+   paragraph merge cleanly and automatically. Reflowing a paragraph rewrites
+   every line and turns a trivial merge into a whole-file conflict.
+3. **Never hand-copy the other machine's numbers.** Each machine writes the
+   results from *its own* dataset to its own `.tex` file, pulled into the draft
+   with `\input{}`. Nobody retypes a number computed somewhere they cannot see,
+   and the two machines never write the same results file.
+4. **Prefer splitting over sharing.** Same *document* does not require same
+   *file*. A `main.tex` that `\input{}`s one file per section lets each machine
+   own what it is writing, and conflicts largely stop happening. Propose this
+   whenever a section is being substantially rewritten.
+5. **Say what you changed** in the commit message, by section. "Edited draft"
+   is useless to the other machine; "rewrote results para on FS agreement" is
+   what lets the other side see a conflict coming.
+
+### Gitignore trap
+
+`.gitignore` excludes `*.txt`, `*.csv`, and `*.dta`. A Stata table written as
+`.txt` will be **silently untracked** and will never reach the other machine or
+Overleaf. Write anything the paper `\input{}`s as **`.tex`**, and after
+generating it run `git status` to confirm it is actually tracked.
+
+### Claude: enforce this
+
+Before editing the draft, run `.\Sync.ps1` and report where things stand. After
+editing, offer to push immediately and say plainly that an unpushed `.tex` is
+invisible to the other machine and to Overleaf. If both machines have touched
+the draft, read the other side's changes before writing, not after.
 
 ## Project
 

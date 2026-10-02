@@ -1,7 +1,8 @@
 # HANDOFF — state as of 2026-09-13
 
-Written for continuing this work **on the server where the data lives**. Read
-this first, then `CLAUDE.md`.
+Written for continuing this work on **either** of the two servers. Each holds a
+different and equally important dataset, so analysis runs on both and both edit
+`CODE/`. Read this first, then `CLAUDE.md`.
 
 ## What exists now
 
@@ -49,7 +50,7 @@ Then:
 
 ## Open items, most useful first
 
-### 1. Size the blank-string bug (needs the data — that's why you're moving)
+### 1. Size the blank-string bug (needs the 1940 transcription data)
 
 Both reviews flagged this, and the automated one rated it **major**. In
 `CODE/comparing_model_transcription_with_anc_fs_SSHA2025.do`, line 39 admits a
@@ -70,7 +71,8 @@ symmetrically across Ancestry and FamilySearch if their blank rates differ.
 ### 2. Verify the Hawaii restoration actually runs
 
 `"hi"` was uncommented in the state loop (it was the only commented-out state).
-**This is untested — the data was not on the machine where the edit was made.**
+**This is untested — the relevant data was not on the machine where the edit was
+made.**
 The loop does `cd `stabb''`; if there is no `hi` directory, `cd` fails, the
 matching `cd ..` never runs, and every *subsequent* state then resolves from the
 wrong working directory. That corrupts the whole run, not just Hawaii. Check the
