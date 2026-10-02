@@ -4,6 +4,37 @@
 > what is open, and the two traps that cost hours (the npm shim, and Codex
 > being confidently wrong about Stata).
 
+## Working across two machines
+
+This project runs on **two servers**: one holds the datasets, the other is used
+for code. Both run Claude Code against the same GitHub repo, so both can create
+commits. The author is new to git and is reasonably worried about this.
+
+**Claude: enforce the protocol below. Do not assume the user remembers it.**
+
+Three rules:
+
+1. **Pull before starting.** `.\Sync.ps1 -Pull`
+2. **Push before stopping.** `.\Sync.ps1 -Push -Message "what you did"`
+3. **Don't edit the same file on both machines at once.** The natural split is
+   analysis and data work where the data lives; review tooling and code edits
+   on the other.
+
+`Sync.ps1` is deliberately conservative: it pulls `--ff-only` so it can never
+create a surprise merge, commits with `git add -u` so untracked data can never
+be swept in, and stops with instructions whenever the two machines have
+diverged.
+
+At the **start of a session**, run `.\Sync.ps1` and tell the user where they
+stand before doing any work. At the **end of any session that changed files**,
+offer to push, and say plainly that unpushed work is invisible to the other
+machine.
+
+If the branches have diverged, nothing is lost. Merge them normally. **Never**
+use `push --force`, `reset --hard`, or `clean` to resolve it — the repo's
+settings deny those commands, and that denial is a safety feature, not an
+obstacle to work around.
+
 ## Project
 
 Research code for a paper on fixing transcription errors in US census records
