@@ -77,6 +77,29 @@ Every finding gets one of three dispositions, recorded in the report's companion
 
 A finding left with no disposition is the one that reaches the referee.
 
+## Two reviewers, two labs
+
+`Run-Review.ps1 -Reviewer codex|agy|both` runs one or both. They receive the
+**identical prompt** (saved as `reports/<base>-prompt.md`) and the same verdict
+schema, so their reports can be compared finding by finding. Agreement between
+models from different labs is evidence; disagreement is a question for you.
+
+| Reviewer | Vendor | How edits are prevented |
+|---|---|---|
+| `codex` | OpenAI Codex CLI | `--sandbox read-only` (OS-level; the `exec` path needs `-c approval_policy="never"` because nobody is present to approve) |
+| `agy` | Google Antigravity CLI | `--mode plan` disables the edit tools; headless runs cannot prompt, so `toolPermission` must be `always-proceed` and a **deny list** of write-capable shell commands is the backstop |
+
+The agy settings live outside the repo at
+`%USERPROFILE%\.gemini\antigravity-cli\settings.json`; `review/agy-settings.json`
+is the tested copy to install on a new machine. Without it, headless agy
+auto-denies its first shell command and returns an empty review that still
+reports `status: SUCCESS` — read `denied_actions` in the raw envelope, not just
+the status.
+
+Reviewing a tree outside this repo (a coauthor's package, say) uses `-Root`
+and `-ScopeFile review/scopes/<name>.md`; Codex gets disk-wide read access and
+agy gets `--add-dir`. Neither can write there.
+
 ## Honest limits
 
 - Codex **cannot run the pipeline.** Data is gitignored and often on other

@@ -47,6 +47,14 @@ scope file records which claims are already known to conflict.
 ## Rules
 
 - You are **read-only**. Do not create, edit, move or delete anything, anywhere.
+- **Terminal use is restricted.** In headless mode only directory listing and
+  text search commands are permitted (`dir`, `ls`, `type`, `cat`, `head`,
+  `tail`, `wc`, `grep`, `rg`, `findstr`, `Get-ChildItem`, `Get-Content`,
+  `Select-String`). Any other command — `git`, `stata`, `python`, `cd`,
+  pipelines into anything else — is auto-denied and will not be re-asked.
+  Prefer your built-in file-reading and search tools; if a command is denied,
+  continue with those rather than stopping. Never end the run without the
+  JSON verdict.
 - Cite every finding as `path:line`. A finding without a location is not a finding.
 - Mark `confidence` honestly: `verified` only for what you traced in source.
   You cannot run Stata, cannot open the data, and cannot regenerate HLINK links

@@ -343,16 +343,23 @@ function Invoke-AgyReview {
     Write-Host "  Antigravity review" -ForegroundColor Cyan
     Write-Host "  target : $Target$(if ($External) { "  (root: $Root)" })"
     Write-Host "  scope  : $($Scope -join ', ')"
-    Write-Host "  mode   : --mode plan (no edits), --sandbox"
+    Write-Host "  mode   : --mode plan (edit tools disabled); commands governed by settings.json allow/deny lists"
     Write-Host "  output : review/reports/$baseName-agy.{json,md}"
     Write-Host ""
 
     # agy takes the prompt on the command line; a long one hits Windows limits,
     # so it gets a one-line pointer to the saved prompt file instead.
     $pointer = "Read and follow every instruction in the file $promptFile. It tells you what to read, what to review, the rules, and the output format. Then return only the JSON object."
-    $args = @("-p", $pointer, "--mode", "plan", "--sandbox",
+    # No --sandbox: agy's terminal sandbox cannot execute commands on this host
+    # (Windows Server 2019) and the run dies with exit 2 and no output. Safety
+    # comes from --mode plan (edit tools disabled) plus the allow/deny lists in
+    # ~/.gemini/antigravity-cli/settings.json -- see review/agy-settings.json.
+    $agyModel = if ([string]::IsNullOrWhiteSpace($Model)) { "gemini-3.1-pro-high" } else { $Model }
+    $agyLog   = Join-Path $Reports "$baseName-agy.log"
+    $args = @("-p", $pointer, "--mode", "plan",
               "--json-schema", $SchemaF, "--output-format", "json",
-              "--effort", "high", "--print-timeout", "40m")
+              "--model", $agyModel, "--effort", "high",
+              "--print-timeout", "45m", "--log-file", $agyLog)
     if ($External) { $args += @("--add-dir", $Root) }
     if (-not [string]::IsNullOrWhiteSpace($PaperPath) -and (Test-Path $PaperPath)) {
         $args += @("--add-dir", (Split-Path -Parent (Resolve-Path $PaperPath).Path))
