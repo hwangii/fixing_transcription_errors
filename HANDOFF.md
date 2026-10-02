@@ -104,6 +104,43 @@ Branch is pushed; the PR was never created. `gh` is installed on the old
 machine but was never authenticated. Either run `gh auth login` and
 `gh pr create`, or open it in a browser from the compare URL.
 
+### 5. Act on the review of Deaglan's package (2026-10-02)
+
+His code is at `F:\Deaglan\Census_Transcriptions\` (not a git repo; see
+`review/scopes/deaglan-census-transcriptions.md`). Antigravity reviewed it
+with `Run-Review.ps1 -Reviewer agy -Root ... -ScopeFile ...`; every finding was
+verified against source by Claude — see
+`review/reports/2026-10-02_033757-Census_Transcriptions-full-agy.md`. The
+Codex pass on the identical prompt is still owed (needs `codex login`).
+
+What it means for the draft, in order:
+
+- **Do not use `deaglan_results/linkage_table_newlinks*.tex`.** Retired
+  script, different dedup rule, match rates of 116–119%. The current tables
+  are `output/tables/linkage_table_hlink*.tex` and `linkage_table_abe_jw*.tex`
+  in his package; the mortality table was never copied to Overleaf.
+- **"Directly Contradicted" undercounts wrong links.** The truth check is
+  1940-side only (`02_hlink/linkage_analysis_newlinks.do:295`); a wrong link
+  whose 1940 record is outside the truth set is called "Unverifiable". Do not
+  describe Contradicted as a false-positive rate without saying so, or ask for
+  a two-sided classification.
+- **"Match Rate" is pairs ÷ persons, not the share of people linked**
+  (`:270`; the link file is not one-to-one). Either describe it as such or
+  have it recomputed on `first40 == 1` — the flag already exists in
+  `build_matched_links.do:220`.
+- **Three tables, three denominators**: men-only census (ABE/JW), men and
+  women (HLINK), BUNMD death records (mortality). Captions say "all men" for
+  both census tables; the HLINK one is wrong and his §6 admits it. Never
+  present the three rates as one series.
+- **Age cutoff is 8 in his code, 10 in the draft.** Decision taken: the draft
+  follows the code. But the balance table's own script
+  (`CODE/munir_figures_for_nber.do:82,294,630`) uses 10, so the draft must
+  state each table's cutoff or the balance table must be regenerated at 8.
+  Also: `keep if age >= 8` retains *missing* ages (`:182`).
+- **The package's "byte-identical reproduction" claim is unverified** — the
+  master log has no comparison step. Either reproduce it with a `cf`/checksum
+  script or do not repeat the claim in the paper.
+
 ## Two warnings that cost real time
 
 **The npm shim.** `npm i -g @openai/codex` puts `codex.ps1` on PATH; it pipes
