@@ -269,7 +269,9 @@ denominator both filter on `congruent==0` (its `verified_clean` #1 matches my
 own read); ABE reconstruction test judged valid; `build_matched_links.do`
 judged an independent reconstruction, not a copy.
 
-### Not yet available
+### Codex pass
 
-The Codex report on the same prompt — pending the Codex sign-in — for the
-finding-by-finding comparison the protocol calls for.
+Completed later the same day: `2026-10-02_150627-Census_Transcriptions-full-codex.md`.
+Side-by-side: `2026-10-02-Census_Transcriptions-comparison.md`. Codex's
+`verified_clean` passes Question 3; finding #1 above still stands — see the
+adjudication in the Codex report.

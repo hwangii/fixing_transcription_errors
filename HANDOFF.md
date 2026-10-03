@@ -111,7 +111,10 @@ His code is at `F:\Deaglan\Census_Transcriptions\` (not a git repo; see
 with `Run-Review.ps1 -Reviewer agy -Root ... -ScopeFile ...`; every finding was
 verified against source by Claude — see
 `review/reports/2026-10-02_033757-Census_Transcriptions-full-agy.md`. The
-Codex pass on the identical prompt is still owed (needs `codex login`).
+Codex pass on the identical prompt is done and dispositioned:
+`review/reports/2026-10-02_150627-Census_Transcriptions-full-codex.md`, with a
+side-by-side in `2026-10-02-Census_Transcriptions-comparison.md` (made by
+`review/compare_reviews.py`). Four issues shared, four unique to each.
 
 What it means for the draft, in order:
 
@@ -140,6 +143,14 @@ What it means for the draft, in order:
 - **The package's "byte-identical reproduction" claim is unverified** — the
   master log has no comparison step. Either reproduce it with a `cf`/checksum
   script or do not repeat the claim in the paper.
+- **HLINK numerator counts links outside the denominator population**
+  (Codex #1). Small — full rates 58.08/59.55 → 58.06/59.52 — but wrong by
+  construction; enforce denominator membership before the table is used.
+- **"Added mortality links are more accurate" is unsupported** (Codex #5).
+  `DOCUMENTATION.md:213-214` draws it from agreement over *all* links; do not
+  repeat it without a retained/added/removed split.
+- **Mortality numerator has no sex/birth-year filter** while its denominator
+  does (Codex #3). Magnitude needs the data.
 
 ## Two warnings that cost real time
 
