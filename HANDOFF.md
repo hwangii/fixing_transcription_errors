@@ -100,9 +100,11 @@ paths and the `V2`/`V3`/`_nber`/`_SSHA2025` variants.
 
 ### 4. Open the pull request
 
-Branch is pushed; the PR was never created. `gh` is installed on the old
-machine but was never authenticated. Either run `gh auth login` and
-`gh pr create`, or open it in a browser from the compare URL.
+Done 2026-10-03: https://github.com/hwangii/fixing_transcription_errors/pull/1.
+`gh` is now authenticated on this server. Through Claude Code's `!` prefix,
+bare `gh auth login` hangs waiting for Enter; use
+`echo "" | gh auth login --hostname github.com --git-protocol https --web`
+and enter the printed code at github.com/login/device.
 
 ### 5. Act on the review of Deaglan's package (2026-10-02)
 
