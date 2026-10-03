@@ -50,46 +50,80 @@ Then:
 
 ## Open items, most useful first
 
-### 1. Size the blank-string bug (needs the 1940 transcription data)
+### 1. ~~Size the blank-string bug~~ — DONE 2026-10-02: negligible
 
-Both reviews flagged this, and the automated one rated it **major**. In
-`CODE/comparing_model_transcription_with_anc_fs_SSHA2025.do`, line 39 admits a
-record when *either* name field is non-empty, but lines 43-55 require *both*
-components to match — and Stata scores `"" == ""` as true. A surname-only
-record is therefore counted as a full-name match.
+Measured on the 1940 transcription data, 49 states, 121,129,456 records in the
+denominator of `comparing_model_transcription_with_anc_fs_SSHA2025.do`:
 
-```stata
-count if (namefrst!=""|namelast!="") & (fs_namefrst!=""|fs_namelast!="")
-count if (namefrst!=""|namelast!="") & (fs_namefrst!=""|fs_namelast!="") ///
-    & (namefrst=="" | namelast=="" | fs_namefrst=="" | fs_namelast=="")
-```
+| | records | share |
+|---|---|---|
+| ≥1 human name field blank (exposure) | 10,485 | 0.0087% |
+| agreements actually resting on `""==""` | 4,890 | 0.0040% |
 
-Second over first is the share of the denominator exposed. Negligible means a
-footnote; otherwise every agreement rate this script reports moves, and not
-symmetrically across Ancestry and FamilySearch if their blank rates differ.
+Both reviewers were right about the logic and wrong about the magnitude: this
+does not move any reported agreement rate at three decimal places. Worst state
+is `wv` at 0.026%. It is near-symmetric across sources (Ancestry blanks 8,928,
+FamilySearch 9,728), so it does not bias the Ancestry-vs-FamilySearch
+comparison either. **A footnote, not a correction.** Per-state detail was
+written to a scratchpad CSV; rerun the diagnostic if it is needed again.
 
-### 2. Verify the Hawaii restoration actually runs
+**But sizing it surfaced something larger in the same denominator.** The
+*model's* fields are blank far more often than the humans': `namefrst_ml` on
+2,420,641 records (2.0%) and `namelast_ml_ditto` on 3,832,347 (3.2%). Those
+records have no model transcription at all, and the script files them under
+"agrees with neither" — a different claim from "the model read it and
+disagreed". Restricting to records with all six fields non-empty:
 
-`"hi"` was uncommented in the state loop (it was the only commented-out state).
-**This is untested — the relevant data was not on the machine where the edit was
-made.**
-The loop does `cd `stabb''`; if there is no `hi` directory, `cd` fails, the
-matching `cd ..` never runs, and every *subsequent* state then resolves from the
-wrong working directory. That corrupts the whole run, not just Hawaii. Check the
-directory exists before trusting any output.
+| | as coded | strict (6 fields) |
+|---|---|---|
+| agrees with Ancestry only | 4.15% | 4.36% |
+| agrees with FamilySearch only | 15.01% | 15.81% |
+| agrees with both | 63.23% | 66.56% |
+| agrees with neither | 17.61% | 13.27% |
+| denominator | 121,129,456 | 115,057,761 |
 
-Consider making the loop fail loudly instead of drifting:
+6,066,244 records — **28.4% of the whole "agrees with neither" bucket** — are
+there only because the model produced nothing. Concentrated in the Northeast
+(`ct` 5.2%, `nj` 4.7%, `ri` 4.5%, `ma` 4.4%). Splitting "no model output" out
+of "agrees with neither" is real outstanding work, and unlike the blank-string
+bug it *does* move the numbers.
 
-```stata
-capture cd `"`stabb'"';
-if _rc {; display as error "missing state dir: `stabb'"; exit _rc; };
-```
+Note for the draft: `DHTS-2024-11-18.tex:283` ("the model agrees with
+Ancestry's transcription in 11\% of these cases and with FamilySearch's in
+47\%") is fed by this script and is Rhode-Island-era. Its denominator is the
+discordant subset, which has not been computed all-states; that needs one more
+pass over the 58 GB.
 
-Also: **Alaska is absent entirely** from the list, not commented out. And
-Hawaii and Alaska were *territories* in 1940 — if that was the original reason
-for excluding them, restoring Hawaii is a substantive choice about which
-population the paper describes, and belongs in the data section rather than in
-code.
+### 2. ~~Verify the Hawaii restoration~~ — DONE 2026-10-02: reverted
+
+**Hawaii cannot be in the loop, and the original `/*"hi"*/` was correct.**
+`hi\merged_data.dta` holds only the model columns — `filename`, `row`,
+`parsing_quality`, `non_ditto*`, `namefrst_ml`, `namelast_ml`,
+`namelast_ml_ditto`. It was never merged against the Ancestry and FamilySearch
+transcriptions, so `namefrst`, `namelast`, `fs_namefrst` and `fs_namelast` do
+not exist in it and the `use` cannot succeed.
+
+The failure mode was worse than the drift this item anticipated. Hawaii sits
+11th of 50 and the `use` had no `capture`, so the run died there with `r(111)`
+— and **in batch mode the log simply stops, recording no error at all**, with
+the totals (printed after the loop) never reaching the console. Ten states of
+work discarded, forty never attempted, no output, no explanation. Reproduced
+directly before reverting.
+
+Also note the guard this item proposed would **not** have caught it: it guards
+`cd`, and the `hi` directory exists. The contents are the problem. Both guards
+are now in place — directory *and* columns — and each skips the state loudly
+and keeps going, with a coverage line (`states attempted / contributed /
+skipped`) next to the totals so a partial run can never again look complete.
+Verified: `hi` and a synthetic `zz` both skip, the loop continues, and the
+totals for good states are byte-identical to an unguarded run.
+
+**Alaska is the opposite case.** `ak\merged_data.dta` is complete (all six
+fields, 14.7 MB) and is absent from the list entirely. So the exclusions were
+never about 1940 territorial status, as this item speculated — `ak` could
+legitimately be added; `hi` cannot until its merge is built. Adding `ak` is a
+substantive choice about which population the paper describes and belongs in
+the data section, not in code.
 
 ### 3. Run the dimensions nothing has touched
 
