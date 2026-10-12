@@ -17,8 +17,8 @@
 >   have the correct caption; use that one.
 > - **`current/` reuses the old `\label`s.** `\input` only one copy of each.
 >
-> Coverage is 48 states + DC (no Alaska, no Hawaii). The `newlinks*`
-> quarantine is still Sam's decision.
+> Coverage is 48 states + DC (no Alaska, no Hawaii). The `newlinks*` files
+> were moved to `deaglan_results/retired/` on 2026-10-12 (paper repo `a8de797`).
 
 **Written 2026-10-11 from the D:\repos machine, for Claude Code on the machine
 that holds `F:\Deaglan\Census_Transcriptions\`.**
