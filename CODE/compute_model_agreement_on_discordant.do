@@ -1,4 +1,6 @@
-/*ALL-STATES REPLACEMENT FOR DHTS-2024-11-18.tex LINES 281-283:              */
+/*REPLACEMENT FOR DHTS-2024-11-18.tex LINES 281-285, COVERING THE 48          */
+/*CONTIGUOUS STATES AND DC -- 49 JURISDICTIONS, NOT 50 STATES. SEE THE NOTE   */
+/*ON COVERAGE BELOW; DO NOT DESCRIBE THIS OUTPUT AS "ALL STATES".             */
 /*  "For records where human transcribers disagree, our model's transcription */
 /*   matches one of the two human transcriptions in 58% of cases... agrees    */
 /*   with Ancestry in 11%... FamilySearch in 47%... neither in 42%."          */
@@ -13,6 +15,11 @@
 /*              exactly, so records with NO model output count as "neither".  */
 /*  STRICT   -- all six name fields non-empty, so "neither" means the model   */
 /*              read it and genuinely disagreed with both humans.             */
+/*                                                                            */
+/*THE DRAFT USES THE STRICT VARIANT. THE AS-CODED ONE IS KEPT ONLY SO THE     */
+/*DIFFERENCE STAYS VISIBLE: IT COUNTS A BLANK-TO-BLANK FIELD COMPARISON AS    */
+/*AGREEMENT, BECAUSE STATA SCORES ""=="" AS TRUE. MEASURED AT 0.004% OF THE   */
+/*DENOMINATOR, BUT DO NOT PUBLISH IT AS A WHOLE-NAME AGREEMENT RATE.          */
 /*                                                                            */
 /*FORWARD SLASHES THROUGHOUT: A LOCAL ENDING IN "\" FOLLOWED BY A MACRO       */
 /*REFERENCE SILENTLY FAILS, BECAUSE STATA READS \` AS "DO NOT EXPAND".        */
@@ -94,6 +101,19 @@ foreach s in `states' {
 	}
 
 	display "DONE `s': discordant=`disc'  anc=`anc' fs=`fs' nei=`nei'"
+}
+
+/*COMPLETENESS ASSERTION. THE capture ABOVE KEEPS ONE BAD STATE FROM KILLING  */
+/*THE RUN, BUT WITHOUT THIS THE TOTALS AND THE CSV WOULD STILL BE WRITTEN AND */
+/*WOULD LOOK LIKE A FULL PASS. FAIL LOUDLY INSTEAD: A PARTIAL AGGREGATE THAT  */
+/*REACHES THE PAPER IS EXACTLY THE FAILURE THE HAWAII BUG ALREADY CAUSED ONCE.*/
+local nexpected : word count `states'
+if `nok'!=`nexpected' {
+	file close csv
+	capture erase `"`out'/model_vs_human_discordant.csv"'
+	display as error "INCOMPLETE RUN: `nok' of `nexpected' states contributed."
+	display as error "No totals written. Fix the failing state(s) and rerun."
+	exit 459
 }
 
 file write csv "TOTAL,`Tdisc',`Tanc',`Tfs',`Tboth',`Tnei',`Tdisc_s',`Tanc_s',`Tfs_s',`Tboth_s',`Tnei_s'" _n
