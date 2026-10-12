@@ -2,14 +2,27 @@ capture log close
 set scheme s1mono 
 set seed 1000
 
-local code "D:\Dropbox\fixing_transcription_errors\CODE\"
+/**********************************************************************/
+/*ROOT PATHS: THESE ARE THE ONLY THREE LINES TO CHANGE IF FOLDERS MOVE.*/
+/*Dropbox moved to the SNU ECON team folder; the code and the Overleaf */
+/*project are now git repos under D:\repos\.                           */
+/**********************************************************************/
+local dropbox "D:\SNU ECON Dropbox\sam hwang\"
+local code "D:\repos\fixing_transcription_errors\CODE\"
+local overleaf "D:\repos\6638fa0fd89fbec05130caeb\"
+
+local original "`dropbox'fixing_transcription_errors\DATA\ORIGINAL\"
+local intermediate "`dropbox'enum_date\DATA\INTERMEDIATE\"
+local christian_torben "`dropbox'fixing_transcription_errors\DATA\TRANSCRIPTIONS\"
+local intermediate_tr "`dropbox'fixing_transcription_errors\DATA\INTERMEDIATE\"
 local original_ed "F:\enum_date\DATA\ORIGINAL\"
-local original "D:\Dropbox\fixing_transcription_errors\DATA\ORIGINAL\"
 local intermediate_nondb "F:\enum_date\DATA\INTERMEDIATE\"
-local intermediate "D:\Dropbox\enum_date\DATA\INTERMEDIATE\"
-local figure "D:\Dropbox\Apps\Overleaf\error_correction\figures\"
-local christian_torben "D:\Dropbox\fixing_transcription_errors\DATA\TRANSCRIPTIONS\"
-local intermediate_tr "D:\Dropbox\fixing_transcription_errors\DATA\INTERMEDIATE\"
+local figure "`overleaf'figures\"
+
+/*SUFFIX ON THE 1930-1940 LINK FILES. The un-suffixed pair the older*/
+/*do-files referenced no longer exists; the "0" pair (2026-02-15) is*/
+/*the current one.                                                  */
+local linksuf "0"
 
 local beg_yr=1930
 local label_size="2"
@@ -49,7 +62,7 @@ merge 1:1 histid using `"`original_ed'all_states_socio_demo_char_for_SSHA2025.dt
 
 capture drop _merge
 rename histid id_B
-merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_ans_cleaned_noraceblock.dta"',keepusing(mi`beg_yr' mi1940 id_A fiveyr) keep(1 3)
+merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_ans_cleaned_noraceblock`linksuf'.dta"',keepusing(mi`beg_yr' mi1940 id_A fiveyr) keep(1 3)
 
 gen linked_before=_merge==3 & fiveyr==1
 gen validated_before=mi`beg_yr'==mi1940 if mi`beg_yr'!="" & mi1940!="" & linked_before==1
@@ -59,7 +72,7 @@ drop mi`beg_yr' mi1940 fiveyr _merge
 
 
 capture drop _merge
-merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_true_cleaned_noraceblock.dta"',keepusing(mi`beg_yr' mi1940 id_A fiveyr) keep(1 3)
+merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_true_cleaned_noraceblock`linksuf'.dta"',keepusing(mi`beg_yr' mi1940 id_A fiveyr) keep(1 3)
 
 gen linked_after=_merge==3 & fiveyr==1
 gen validated_after=mi`beg_yr'==mi1940 if mi`beg_yr'!="" & mi1940!="" & linked_after==1
@@ -88,41 +101,117 @@ save `"`intermediate'temp.dta"',replace
 /***********************************************************************************/
 use `"`intermediate'temp.dta"',clear
 
-drop if state_folder_name=="district-of-columbia"|state_folder_name=="minnesota"|state_folder_name=="mississippi"|state_folder_name=="missouri"
+/*SAMPLE: all states. Minnesota, Mississippi and Missouri (and DC) were
+  dropped for the SSHA2025 presentation because those extracts were not
+  ready in time; they are now, so the drop below is retired. If DC should
+  stay out for some other reason, restore just that one condition.*/
+//drop if state_folder_name=="district-of-columbia"|state_folder_name=="minnesota"|state_folder_name=="mississippi"|state_folder_name=="missouri"
 
 gen target=!(namefrst==fs_namefrst & namelast==fs_namelast)
 
-sum linked_before
-local lr_before=`r(mean)'
+/***********************************************************************/
+/*TABLE: QUALITY OF LINKED SAMPLES BEFORE AND AFTER TRANSCRIPTIONS ARE */
+/*IMPROVED (tab:avg_performance in the paper).                         */
+/*                                                                     */
+/*This used to be typed into the .tex by hand from the console output  */
+/*below, which is how the RI draft ended up with N's that did not match */
+/*the balance tables. It now writes itself to `figure'.                */
+/*                                                                     */
+/*Row definitions, matching the RI version of the table:               */
+/*  Linkage rate    -- denominator is every record in the sample, so   */
+/*                     the "# of records" column is identical before   */
+/*                     and after; only the rate moves.                 */
+/*  Share validated -- denominator is the linked records with a non-   */
+/*                     missing middle initial in BOTH years, which is  */
+/*                     itself larger after correction, so the "# of    */
+/*                     records" column moves too.                      */
+/***********************************************************************/
+capture file close avgperf
+file open avgperf using `"`figure'avg_performance_allstates.tex"', write replace text
 
-sum linked_after
-local lr_after=`r(mean)'
+file write avgperf "\begin{tabular}{@{\extracolsep{3pt}}ccccccc@{}}" _n
+file write avgperf "  \hline\hline" _n
+file write avgperf "  \multicolumn{2}{c}{} & \multicolumn{2}{c}{Before} & \multicolumn{2}{c}{After} & \multirow{2}{*}{\% change}\\" _n
+file write avgperf "  \cline{3-4}  \cline{5-6}" _n
+file write avgperf "  \multicolumn{2}{c}{} & \# of records & Rate (Share) & \# of records & Rate (Share) & \\" _n
+file write avgperf "  \hline" _n
 
-di "Pct increase in linkage rate: ",(`lr_after'/`lr_before')-1
+/*PANEL A: LINKAGE RATE*/
+foreach grp in target all {
 
-sum linked_before if target==1
-local lr_before=`r(mean)'
+	if `"`grp'"'=="target" {
+		local cond "if target==1"
+		local rowlab "\multirow{2}{*}{Linkage rate} & Target"
+	}
+	else {
+		local cond ""
+		local rowlab " & All"
+	}
 
-sum linked_after if target==1
-local lr_after=`r(mean)'
+	quietly count `cond'
+	local n_before=`r(N)'
+	local n_after=`r(N)'	/*SAME DENOMINATOR BEFORE AND AFTER*/
 
-di "Pct increase in linkage rate for target records: ",(`lr_after'/`lr_before')-1
+	quietly sum linked_before `cond'
+	local lr_before=`r(mean)'
 
-sum validated_before
-local sv_before=`r(mean)'
+	quietly sum linked_after `cond'
+	local lr_after=`r(mean)'
 
-sum validated_after
-local sv_after=`r(mean)'
+	local pct=100*((`lr_after'/`lr_before')-1)
 
-di "Pct increase in sh validated: ",(`sv_after'/`sv_before')-1
+	di "Linkage rate, `grp': `lr_before' -> `lr_after' (`pct'%)"
 
-sum validated_before if target==1
-local sv_before=`r(mean)'
+	local nb=trim(string(`n_before',"%15.0fc"))
+	local na=trim(string(`n_after',"%15.0fc"))
+	local rb=string(`lr_before',"%4.3f")
+	local ra=string(`lr_after',"%4.3f")
+	local pc=cond(`pct'>=0,"+","")+trim(string(round(`pct'),"%9.0f"))
 
-sum validated_after if target==1
-local sv_after=`r(mean)'
+	file write avgperf "  `rowlab' & `nb' & `rb' & `na' & `ra' & `pc'\%" "\\" _n
 
-di "Pct increase in sh validated for target records: ",(`sv_after'/`sv_before')-1
+}
+
+file write avgperf "  \hline" _n
+
+/*PANEL B: SHARE VALIDATED*/
+foreach grp in target all {
+
+	if `"`grp'"'=="target" {
+		local cond "if target==1"
+		local rowlab "\multirow{2}{*}{Share validated} & Target"
+	}
+	else {
+		local cond ""
+		local rowlab " & All"
+	}
+
+	quietly sum validated_before `cond'
+	local sv_before=`r(mean)'
+	local n_before=`r(N)'		/*LINKED RECORDS WITH NON-MISSING MIDDLE INITIALS, BEFORE*/
+
+	quietly sum validated_after `cond'
+	local sv_after=`r(mean)'
+	local n_after=`r(N)'		/*...AND AFTER*/
+
+	local pct=100*((`sv_after'/`sv_before')-1)
+
+	di "Share validated, `grp': `sv_before' -> `sv_after' (`pct'%)"
+
+	local nb=trim(string(`n_before',"%15.0fc"))
+	local na=trim(string(`n_after',"%15.0fc"))
+	local rb=string(`sv_before',"%4.3f")
+	local ra=string(`sv_after',"%4.3f")
+	local pc=cond(`pct'>=0,"+","")+trim(string(round(`pct'),"%9.0f"))
+
+	file write avgperf "  `rowlab' & `nb' & `rb' & `na' & `ra' & `pc'\%" "\\" _n
+
+}
+
+file write avgperf "  \hline\hline" _n
+file write avgperf "\end{tabular}" _n
+
+file close avgperf
 
 
 
@@ -135,10 +224,14 @@ rename (linked_before linked_after validated_before validated_after) (l1 l2 v1 v
 reshape long v l,i(state_folder_name county_folder_name eventdistrict) j(j)
 
 binsreg l legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Linkage rates") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow diamond_hollow) bycolors(red%50 blue%50) saving(1.gph,replace) /*plotxrange(0.4 1)*/
-graph export `"`figure'rhode_island_linkage_rate_hetero.pdf"', as(pdf) replace	
+/*NB: these single-panel exports used to be written under the rhode_island_*
+  names, which overwrote the Rhode-Island figures in the Overleaf folder with
+  all-states content. Renamed to all_states_* so the two samples cannot
+  clobber each other.*/
+graph export `"`figure'all_states_linkage_rate_hetero.pdf"', as(pdf) replace
 
 binsreg v legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Share validated") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow diamond_hollow) bycolors(red%50 blue%50) saving(2.gph,replace) /*plotxrange(0.4 1)*/
-graph export `"`figure'rhode_island_sh_validated_hetero.pdf"', as(pdf) replace	
+graph export `"`figure'all_states_sh_validated_hetero.pdf"', as(pdf) replace
 
 grc1leg 1.gph 2.gph,xcommon
 
@@ -158,7 +251,6 @@ binsreg v legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") yt
 grc1leg 1.gph 2.gph,xcommon
 
 graph export `"`figure'all_states_hetero_combinedV2.pdf"', as(pdf) replace
-*/
 
 
 
