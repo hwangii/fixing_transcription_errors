@@ -284,3 +284,66 @@ I1012 16:47:57.619694    1320 http_helpers.go:315] URL: https://daily-cloudcode-
 I1012 16:48:00.754573    1383 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xbc766ca08d73a962 ResponseID: rnHNasKxApGCmtkPvfaD6Ao
 I1012 16:48:06.971917    1426 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xf8224a194dd16695 ResponseID: sXHNavSYDfmUmtkPureTsQ4
 I1012 16:48:13.656865    1589 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xfe6a891e1305e2eb ResponseID: unHNavv7Je2mmtkPkKWXsAs
+I1012 16:48:16.696688    1566 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xc7c0d8a90d9c5d7a ResponseID: v3HNaqzrA5mtqtsP496GqAY
+I1012 16:48:22.646722    1738 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x5def834bdf6dde37 ResponseID: wnHNauZ7h6Tp2Q-Z-8HIDQ
+I1012 16:48:30.424154    1783 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x8c0391745ba4f16b ResponseID: x3HNasrSA9qO6dkPr7_t2A0
+I1012 16:48:34.918437    1833 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x2312aaf7cdd2b3e8 ResponseID: znHNaqjmON7BqtsPhbOImA4
+I1012 16:48:37.710688    1890 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x1d68d7034db69982 ResponseID: 03HNasqYFpLi8QHst-fIDw
+I1012 16:48:40.109914    1048 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x2c67fea82ea22986 ResponseID: 1nHNaqTECKO_qtsPyYu0gA8
+I1012 16:48:42.846111    1966 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xf50af3b311aefcfc ResponseID: 2HHNaryVIoek6dkPmfvByA0
+I1012 16:48:46.415673    1933 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xb1c57e52dda4c9eb ResponseID: 3HHNarePEvfBqtsPmfLjuAU
+I1012 16:48:51.356393    2129 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xdae4bb56f2651499 ResponseID: 3nHNarTTM5Oc6dkP0NKJ2A4
+I1012 16:48:55.936247    2184 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xaba1f583ec1b46c0 ResponseID: 43HNarrAM6ylmtkPpIvswAM
+I1012 16:48:59.939202    2235 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x5f78417a5e8ce6f0 ResponseID: 6HHNauWeG7SsqtsPh8622Qs
+I1012 16:49:03.772992    2295 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xc4e8701e21137d04 ResponseID: 7XHNaoOOG_fBqtsPmfLjuAU
+I1012 16:49:09.883846    2096 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xd6735f3e8c7c5fb3 ResponseID: 8XHNasfFDpGCmtkPvfaD6Ao
+I1012 16:49:15.174144    2412 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x3bcdc5f032b7abc0 ResponseID: 9nHNasLuFu6V6dkPwamUmQ8
+I1012 16:49:23.755498    2471 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x2e8653db0a2c2a40 ResponseID: -3HNavqlJcOi6dkPnZ3A2A4
+I1012 16:49:35.180344    2541 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x762ab53fd88a487b ResponseID: BHLNat3YD7PnqtsPxJzP0Ag
+I1012 16:49:52.437193    2596 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xf9e75e2a4fdfe42 ResponseID: D3LNarbCKc7jqtsPzIiMoAE
+I1012 16:49:55.887218    2522 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x18de65c1d0230ba6 ResponseID: IXLNaubxOMOi6dkPnZ3A2A4
+I1012 16:50:02.345152    2639 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x382f735411a9af6d ResponseID: JHLNat6mFuj9qtsP6_ye-A8
+I1012 16:50:10.570923    2802 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x1fc2ffbe16bb3b2 ResponseID: LnLNas-TG6jwqtsPy7eAuQ8
+I1012 16:50:16.360619    2709 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x5d5c81a44188c242 ResponseID: M3LNatTHB4KYqtsP2bC0qAo
+I1012 16:50:30.236458    2945 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x8443802615068b72 ResponseID: QnLNapaUK5qgqtsP77OREA
+I1012 16:50:32.931516    2996 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x4efde91bc437f57b ResponseID: RnLNatDPLd7BqtsPhbOImA4
+I1012 16:50:35.012716    3045 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x1145040f86173664 ResponseID: SXLNauvGG6WKqtsPrfLG0Q0
+I1012 16:50:37.345053    3111 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xa58d7c640713fda1 ResponseID: S3LNate_Hr6k6dkP-q-jgQ4
+I1012 16:50:40.233903    3147 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x8d2c2c9f776cc850 ResponseID: TXLNapj-M_amqtsPnda7iQs
+I1012 16:50:46.795612    3186 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x3c856420b0f37c7b ResponseID: UHLNavbOLJOc6dkP0NKJ2A4
+I1012 16:50:56.397422    2024 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x808adc96a0f34c62 ResponseID: WnLNapf4L8bxqtsP59KbwA8
+I1012 16:51:02.605841    3304 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x7c9ded95f229b92f ResponseID: ZHLNaqDmLrPnqtsPxJzP0Ag
+I1012 16:51:07.511431    3369 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xfdfe2827af5120d3 ResponseID: Z3LNao6IBsOi6dkPnZ3A2A4
+I1012 16:51:21.142815    3437 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xeaa9cadc70d3edf2 ResponseID: cXLNavjBBKaImtkPsOzbmA8
+I1012 16:51:24.987512    3506 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xc06567f67cd3df6a ResponseID: enLNatqaKpOc6dkP0NKJ2A4
+I1012 16:51:30.339506    3560 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xf8ecc78b719655e ResponseID: fnLNaqGaLp6yqtsPsZPhoA4
+I1012 16:51:35.846887    3612 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xc4cd22d9c13ce910 ResponseID: gnLNaqzLOrSsqtsPh8622Qs
+I1012 16:51:46.806700    3682 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xc60763bb66d782b1 ResponseID: iXLNapPeF8Gd6dkPmPbWmA4
+I1012 16:51:50.199702    3762 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xe7f0b0f43e30037b ResponseID: lHLNap7rDsGd6dkPmPbWmA4
+I1012 16:51:57.244423    3792 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x6c401800aba977c7 ResponseID: l3LNapicJquNmtkP45iBgAY
+I1012 16:52:10.115773    3873 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xb3fb107907a358ba ResponseID: pXLNaq_kN96P6dkP_IGH0Ak
+I1012 16:52:19.426753    3940 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x1fe99c47e642b9bf ResponseID: qnLNasHlKvqkqtsP0c2OoQM
+I1012 16:52:42.185489    3990 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x49f1d883fdaa1216 ResponseID: xHLNar3TJ76k6dkP-q-jgQ4
+I1012 16:52:45.850868    4068 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels Trace: 0xfe7b2078212d2385
+I1012 16:52:45.975649    4069 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0x1fed039d32523e16
+I1012 16:52:55.267613    4121 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x805b686d1bb9e6f7 ResponseID: z3LNap-DCMW1qtsPo6zPsQs
+I1012 16:53:08.807005    4233 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xb1cb06c715368f77 ResponseID: 4nLNap2ZJ8j7qtsPvuvNqQU
+I1012 16:53:15.386349    4276 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x94931146909a38e7 ResponseID: 5XLNatGGFIaO6dkPtceTiQg
+I1012 16:53:19.646442    4349 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x7134861ac5ae0d99 ResponseID: 7XLNasivH6ylmtkPpIvswAM
+I1012 16:53:27.447284    4427 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x80681d2716587ac5 ResponseID: 8XLNasLSEormqtsPj6v1kQw
+I1012 16:53:39.186566    4515 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x3b243360e505601d ResponseID: AHPNavuOA4aO6dkPtceTiQg
+I1012 16:53:43.306986    4563 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xec64f70be393d3bb ResponseID: A3PNao6RMbSsqtsPh8622Qs
+I1012 16:53:48.126776    4614 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x4678fc86c94a2a5c ResponseID: CXPNapinBbSsqtsPh8622Qs
+I1012 16:53:54.183482    4676 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xddf9ea16f97b32e2 ResponseID: DHPNao62Lc7pqtsPnOuKwAw
+I1012 16:54:02.396209    4853 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x4991407ccab5cc66 ResponseID: E3PNavrCO-ikqtsPnIuEoA0
+I1012 16:54:14.102480    4908 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x402f0bdb54c94fcc ResponseID: InPNarSHC--1qtsPvo3c6Q0
+I1012 16:54:17.363992    4967 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xf11f23506a3638f9 ResponseID: JnPNapviJ8Oi6dkPnZ3A2A4
+I1012 16:54:25.970360    4929 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x5b3b32955e23fdba ResponseID: KXPNasOaOd7BqtsPhbOImA4
+I1012 16:54:40.936798    5112 http_helpers.go:315] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xd6c34d3d61f70352 ResponseID: OnPNaqmLCoaO6dkPtceTiQg
+I1012 16:55:43.312166       1 manager.go:842] CLI store manager shutting down
+I1012 16:55:43.322914       1 conversation_manager.go:924] Stopping conversation stream
+I1012 16:55:43.322914     507 server.go:1340] Stream goroutine exited for 02cf2c7c-8c47-4d43-b991-c45e4d88f226, sending completion signal
+I1012 16:55:43.330278    5267 server.go:3063] Language server shutting down
+I1012 16:55:43.330278    5267 server.go:3068] Waiting for migrations to complete to prevent partial migration state...
+E1012 16:55:43.401735    5262 telemetry.go:81] error recording trajectory segment analytics: Post "https://daily-cloudcode-pa.googleapis.com/v1internal:recordTrajectoryAnalytics": context canceled
+E1012 16:55:43.481077     174 file_watcher.go:194] skipping empty or temp file: 
