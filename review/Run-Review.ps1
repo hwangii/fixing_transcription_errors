@@ -354,12 +354,34 @@ function Invoke-AgyReview {
     # (Windows Server 2019) and the run dies with exit 2 and no output. Safety
     # comes from --mode plan (edit tools disabled) plus the allow/deny lists in
     # ~/.gemini/antigravity-cli/settings.json -- see review/agy-settings.json.
-    $agyModel = if ([string]::IsNullOrWhiteSpace($Model)) { "gemini-3.1-pro-high" } else { $Model }
+    # MODEL CHOICE. The point of this system is a reviewer from a DIFFERENT lab
+    # than the model that wrote the code, so Claude Opus/Sonnet -- offered here
+    # since the 2026-10 lineup change -- are deliberately NOT used: they would
+    # make Claude review Claude. GPT-OSS duplicates Codex's lab. That leaves the
+    # Gemini family as the only genuinely independent option.
+    #
+    # gemini-3.1-pro-high was the default until 2026-10-12, when it stopped
+    # being offered ("not recognized as a known model"); run with a bad model to
+    # have agy print the current list. Note the tier suffix is load-bearing:
+    # "gemini-3.8-flash-high" rejects --effort, while bare "gemini-3.8-flash"
+    # REQUIRES it, which is what the conditional below handles.
+    $agyModel = if ([string]::IsNullOrWhiteSpace($Model)) { "gemini-3.8-flash-high" } else { $Model }
     $agyLog   = Join-Path $Reports "$baseName-agy.log"
     $args = @("-p", $pointer, "--mode", "plan",
               "--json-schema", $SchemaF, "--output-format", "json",
-              "--model", $agyModel, "--effort", "high",
+              "--model", $agyModel,
               "--print-timeout", "45m", "--log-file", $agyLog)
+    # --effort only when the model name does not already encode a tier. A model
+    # suffixed -low/-medium/-high/-xhigh/-max carries its own effort, and
+    # passing both is rejected outright:
+    #   "error: invalid model selection (--model "gemini-3.1-pro-high"
+    #    --effort "high"): --effort is not supported for model ..."
+    # which returns status=ERROR, 0 turns, and no report. This combination USED
+    # to be accepted on the same CLI build (1.3.3), so it is a server-side model
+    # config change, not a version bump -- do not "fix" it by pinning a version.
+    if ($agyModel -notmatch '-(low|medium|high|xhigh|max)$') {
+        $args += @("--effort", "high")
+    }
     if ($External) { $args += @("--add-dir", $Root) }
     if (-not [string]::IsNullOrWhiteSpace($PaperPath) -and (Test-Path $PaperPath)) {
         $args += @("--add-dir", (Split-Path -Parent (Resolve-Path $PaperPath).Path))
