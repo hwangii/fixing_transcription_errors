@@ -1,5 +1,25 @@
 # REQUEST — deposit the all-states ABE-JW and HLINK/MLP tables into git
 
+> **DONE 2026-10-11** on the machine holding `F:\Deaglan\Census_Transcriptions\`.
+> Paper repo commit `32355f1`: five tables copied byte-for-byte (SHA-256
+> checked) into `deaglan_results/current/`, plus `PROVENANCE.md` answering all
+> eight questions. Nothing regenerated; nothing in `deaglan_results/` touched.
+>
+> Read `PROVENANCE.md` before wiring the tables in. Three findings change the
+> premise of this request:
+>
+> - **The current numbers were already in the paper repo.**
+>   `deaglan_results/linkage_table_HLINK*.tex` and `deaglan_results/main.tex`
+>   (ABE/JW) match `current/` exactly. Only `linkage_table_newlinks*.tex` is
+>   retired.
+> - **The package's HLINK captions are wrong** ("all men"). The denominator is
+>   men and women aged 8+. Deaglan's 2026-08-28 copies in `deaglan_results/`
+>   have the correct caption; use that one.
+> - **`current/` reuses the old `\label`s.** `\input` only one copy of each.
+>
+> Coverage is 48 states + DC (no Alaska, no Hawaii). The `newlinks*` files
+> were moved to `deaglan_results/retired/` on 2026-10-12 (paper repo `a8de797`).
+
 **Written 2026-10-11 from the D:\repos machine, for Claude Code on the machine
 that holds `F:\Deaglan\Census_Transcriptions\`.**
 

@@ -154,10 +154,10 @@ side-by-side in `2026-10-02-Census_Transcriptions-comparison.md` (made by
 
 What it means for the draft, in order:
 
-- **Do not use `deaglan_results/linkage_table_newlinks*.tex`.** Retired
-  script, different dedup rule, match rates of 116–119%. The current tables
-  are `output/tables/linkage_table_hlink*.tex` and `linkage_table_abe_jw*.tex`
-  in his package; the mortality table was never copied to Overleaf.
+- **Do not use `deaglan_results/retired/linkage_table_newlinks*.tex`.**
+  Retired script, different dedup rule, match rates of 116–119%; moved to
+  `retired/` on 2026-10-12. The current tables, mortality included, are in the
+  paper repo under `deaglan_results/current/` with `PROVENANCE.md`.
 - **"Directly Contradicted" undercounts wrong links.** The truth check is
   1940-side only (`02_hlink/linkage_analysis_newlinks.do:295`); a wrong link
   whose 1940 record is outside the truth set is called "Unverifiable". Do not
