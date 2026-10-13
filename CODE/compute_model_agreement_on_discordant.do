@@ -1,4 +1,4 @@
-/*REPLACEMENT FOR DHTS-2024-11-18.tex LINES 281-285, COVERING THE 48          */
+/*REPLACEMENT FOR DHTS-2026-10-12.tex LINES 281-285, COVERING THE 48          */
 /*CONTIGUOUS STATES AND DC -- 49 JURISDICTIONS, NOT 50 STATES. SEE THE NOTE   */
 /*ON COVERAGE BELOW; DO NOT DESCRIBE THIS OUTPUT AS "ALL STATES".             */
 /*  "For records where human transcribers disagree, our model's transcription */

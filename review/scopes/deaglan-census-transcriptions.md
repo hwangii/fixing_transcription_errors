@@ -23,7 +23,7 @@ Master: `code/00_run_all_tables.do`. All paths flow from `code/shared/paths.do`
 **It is not a git repository.** Nothing here has version history.
 
 These tables are about to be wired into the paper draft at
-`F:\github_repos\6638fa0fd89fbec05130caeb\DHTS-2024-11-18.tex`.
+`F:\github_repos\6638fa0fd89fbec05130caeb\DHTS-2026-10-12.tex`.
 
 ## Active dimensions
 

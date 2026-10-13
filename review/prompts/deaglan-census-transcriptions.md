@@ -38,7 +38,7 @@ review `code/01_abe_jw/reference/` or `vendor/` (third-party, vendored).
 ## Paper
 
 The draft that will cite these tables is
-`F:\github_repos\6638fa0fd89fbec05130caeb\DHTS-2024-11-18.tex`. Read it for the
+`F:\github_repos\6638fa0fd89fbec05130caeb\DHTS-2026-10-12.tex`. Read it for the
 `claims-vs-code` dimension: check captions, denominators, age and sex
 restrictions, and sample definitions against what the package's scripts
 compute. The draft currently references none of the package's tables; the

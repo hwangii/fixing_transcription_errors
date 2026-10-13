@@ -183,7 +183,7 @@ In your final message, state plainly:
 - the answers to the eight questions, or which you could not answer
 - anything that looked wrong but which you left alone
 
-Do not edit `DHTS-2024-11-18.tex`. Wiring the tables into the draft is being
+Do not edit `DHTS-2026-10-12.tex`. Wiring the tables into the draft is being
 done on the other machine, and an unpushed `.tex` edited on both machines at
 once is the one thing the paper's `CLAUDE.md` warns hardest about.
 

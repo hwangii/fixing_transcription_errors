@@ -88,7 +88,7 @@ there only because the model produced nothing. Concentrated in the Northeast
 of "agrees with neither" is real outstanding work, and unlike the blank-string
 bug it *does* move the numbers.
 
-Note for the draft: `DHTS-2024-11-18.tex:283` ("the model agrees with
+Note for the draft: `DHTS-2026-10-12.tex:283` ("the model agrees with
 Ancestry's transcription in 11\% of these cases and with FamilySearch's in
 47\%") is fed by this script and is Rhode-Island-era. Its denominator is the
 discordant subset, which has not been computed all-states; that needs one more
