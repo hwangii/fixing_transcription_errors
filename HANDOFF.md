@@ -143,16 +143,49 @@ the data section, not in code.
 passed via `-PaperPath`, four of those with both reviewers — the latest pair is
 `2026-10-14_002133-full-{codex,agy}` with the side-by-side in
 `2026-10-14-post-audit-comparison.md`. Three of its four shared findings were
-addressed in the draft; the fourth (the link files behind the headline results
-have no producing code in this repo) is a repo-scope problem, not a number, and
-is the main thing a replication package will have to answer.
+addressed in `5424c43` of the draft repo: the manual-review claim, the
+conclusion's bias language, and a new paragraph disclosing that the linking
+runs in a separate codebase. **The one still open is the big one** — see item
+4 below.
 
 **`replication` and `identification` have still never been run.** `replication`
 will have plenty to say about the hardcoded `D:\Dropbox` and `F:\` paths, the
 `V2`/`V3`/`_nber`/`_SSHA2025` variants, and the missing linking code just
 mentioned. Run it before submission, with `-Target full`.
 
-### 4. Open the pull request
+### 4. Weaken the transcription-quality claims, or get an adjudicated sample
+
+**Open as of 2026-10-14, and the most important thing left in the draft.** Both
+reviewers independently made this their finding #1, `MAJOR` / `verified`, and
+`5424c43` did not touch it. The code measures two things: agreement with
+Ancestry and FamilySearch, and downstream linkage. Neither establishes that a
+name was transcribed *more accurately*, because nothing compares model output
+to an adjudicated reading of the image. The draft concedes this at
+`DHTS-2026-10-12.tex:302-304` and then claims the stronger thing anyway:
+
+- `:66` "improves name transcription"
+- `:71` "improved transcription methods"
+- `:121` "machine learning can systematically improve transcription quality"
+- `:131` "dramatic improvements in both the quantity and quality"
+- `:132-133`, `:138` the same claim again
+
+Two ways out, and they are not equivalent. Either reword throughout to
+"improved agreement with commercial transcriptions and improved linkage
+outcomes" — cheap, and defensible today — or build the blinded
+adjudicated-name sample the draft already says is planned, which is the only
+thing that earns the current wording. Do not leave it as it stands into a
+referee's hands.
+
+Also open, from Antigravity only: **Table 1 and Appendix A.4's out-of-sample
+performance percentages have no producing code** in this repo
+(`DHTS-2026-10-12.tex:261-273`, `:917-920`). Either find the script that made
+them or recompute them.
+
+And: **the Disposition column is empty in both 2026-10-14 reports.**
+`CLAUDE.md` requires every finding to carry Fixed / Rebutted / Accepted risk.
+Three are Fixed in `5424c43`; the rest are the items above.
+
+### 5. Open the pull request
 
 Done 2026-10-03: https://github.com/hwangii/fixing_transcription_errors/pull/1.
 `gh` is now authenticated on this server. Through Claude Code's `!` prefix,
@@ -160,7 +193,7 @@ bare `gh auth login` hangs waiting for Enter; use
 `echo "" | gh auth login --hostname github.com --git-protocol https --web`
 and enter the printed code at github.com/login/device.
 
-### 5. Act on the review of Deaglan's package (2026-10-02)
+### 6. Act on the review of Deaglan's package (2026-10-02)
 
 His code is at `F:\Deaglan\Census_Transcriptions\` (not a git repo; see
 `review/scopes/deaglan-census-transcriptions.md`). Antigravity reviewed it
