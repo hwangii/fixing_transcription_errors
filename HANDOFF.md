@@ -1,4 +1,4 @@
-# HANDOFF — state as of 2026-09-13
+# HANDOFF — state as of 2026-10-14
 
 Written for continuing this work on **either** of the two servers. Each holds a
 different and equally important dataset, so analysis runs on both and both edit
@@ -88,11 +88,22 @@ there only because the model produced nothing. Concentrated in the Northeast
 of "agrees with neither" is real outstanding work, and unlike the blank-string
 bug it *does* move the numbers.
 
-Note for the draft: `DHTS-2026-10-12.tex:283` ("the model agrees with
-Ancestry's transcription in 11\% of these cases and with FamilySearch's in
-47\%") is fed by this script and is Rhode-Island-era. Its denominator is the
-discordant subset, which has not been computed all-states; that needs one more
-pass over the 58 GB.
+Note for the draft — **the discordant-subset half of this is DONE
+(2026-10-12)**. The Rhode-Island-era "11\% Ancestry / 47\% FamilySearch"
+sentence has been recomputed all-states by
+`CODE/compute_model_agreement_on_discordant.do` and now reads **14\% / 52\%**
+(`DHTS-2026-10-12.tex:301`). No-model-output is split out there rather than
+buried: the four outcomes are 14\% Ancestry, 52\% FamilySearch, 24\% a
+complete name matching neither, and 10\% no usable transcription, partitioning
+all 35.1 million discordant records whose four human name fields are present.
+Conditioning on the model having produced something would raise the headline
+66\% to 73\%, and the draft says so rather than conditioning.
+
+**Still open: the whole-sample partition above.** The 121,129,456-record
+table in this item is not in the draft, which reports only the discordant
+subset. If the paper ever quotes the full-sample shares, use the strict column
+and report "no model output" as its own bucket — do not let 6,066,244 records
+sit inside "agrees with neither".
 
 ### 2. ~~Verify the Hawaii restoration~~ — DONE 2026-10-02: reverted
 
@@ -127,10 +138,19 @@ the data section, not in code.
 
 ### 3. Run the dimensions nothing has touched
 
-Only `correctness` has been run, against one file. `claims-vs-code` is the one
-that most repays a submission, and it needs the draft via `-PaperPath`.
-`replication` will have plenty to say about the hardcoded `D:\Dropbox` and `F:\`
-paths and the `V2`/`V3`/`_nber`/`_SSHA2025` variants.
+**Updated 2026-10-14.** `correctness` has been run against two files, and
+`claims-vs-code` has now been run six times over the full repo with the draft
+passed via `-PaperPath`, four of those with both reviewers — the latest pair is
+`2026-10-14_002133-full-{codex,agy}` with the side-by-side in
+`2026-10-14-post-audit-comparison.md`. Three of its four shared findings were
+addressed in the draft; the fourth (the link files behind the headline results
+have no producing code in this repo) is a repo-scope problem, not a number, and
+is the main thing a replication package will have to answer.
+
+**`replication` and `identification` have still never been run.** `replication`
+will have plenty to say about the hardcoded `D:\Dropbox` and `F:\` paths, the
+`V2`/`V3`/`_nber`/`_SSHA2025` variants, and the missing linking code just
+mentioned. Run it before submission, with `-Target full`.
 
 ### 4. Open the pull request
 
