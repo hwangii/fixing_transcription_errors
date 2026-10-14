@@ -4,6 +4,50 @@ Written for continuing this work on **either** of the two servers. Each holds a
 different and equally important dataset, so analysis runs on both and both edit
 `CODE/`. Read this first, then `CLAUDE.md`.
 
+## Where we are — session of 2026-10-14
+
+**The two repos.** Code is here. The paper is a *separate* clone of the
+Overleaf project at **`D:\repos\6638fa0fd89fbec05130caeb`** — the draft is
+`DHTS-2026-10-12.tex` and several do-files write their exhibits straight into
+its `figures/`. Line references below like `DHTS-2026-10-12.tex:66` mean that
+repo, not this one. Both repos are pushed and level with their servers.
+
+**The draft is readable right now.** `DHTS-2026-10-12.pdf`, 34 pages, built
+2026-10-14 00:33 and committed in `5424c43`. Verified current by extracting
+the PDF's text: every statistic edit is in it and no superseded number
+survives, and the LaTeX log has no undefined references or citations.
+
+**What the statistics audit changed** (draft repo, `d4bd647`, `e96af4f`,
+`0baf6b2`, `5424c43`, all pushed):
+
+| was | now |
+|---|---|
+| transcriber disagreement "approximately 30 percent" | 28.3 percent |
+| model agrees: 11% Ancestry / 47% FamilySearch (Rhode-Island-era) | 14% / 52%, all-states, four-way partition of 35.1M discordant records |
+| non-white / white baseline linking 18.3% / 27.1% | 11.0% / 24.1%, gains 6.4% / 7.9% |
+| foreign-born +14.5%, no schooling +9.2%, non-English +14.5% | +8.1%, +7.0%, +7.8%, each with its baseline stated |
+| inmates "decreased slightly (-1%)" | gain of 7.3% off a 15.0% baseline |
+
+**What this session did here**, besides reconstructing the above from git after
+a restart lost the conversation: repaired four `.gitignore` rules that silently
+matched nothing because they carried inline `#` comments (`*.log`, `*.smcl`,
+`*.stswap`, `*.gph`), added `!review/reports/*.log` so the reviewer audit trail
+is not swallowed by the now-working rule, and refreshed items 1, 3 and 4 below.
+Commits `dcf7f4e`, `2abfd51`, and the one that added this section.
+
+**Next, in order.** Item 4 is the live one and the draft is waiting on a
+decision, not on work:
+
+1. **Decide how to handle the transcription-quality claims** (item 4). Reword
+   to agreement + linkage outcomes, which is cheap and defensible today, or
+   commit to building the blinded adjudicated-name sample. The reword is a
+   half-hour; the sample is a project.
+2. **Fill the Disposition column** in both `2026-10-14_002133-full-*` reports.
+   Three are Fixed in `5424c43`; the remainder are item 4.
+3. **Find or recompute Table 1 and Appendix A.4's percentages** (item 4, second
+   half) — no producing code exists for them.
+4. **Run `-Scope replication`** before submission (item 3). It has never run.
+
 ## What exists now
 
 A cross-model review system: Claude Code writes, **Codex CLI (OpenAI) reviews**.
