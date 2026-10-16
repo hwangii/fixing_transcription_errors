@@ -4,6 +4,39 @@ Written for continuing this work on **either** of the two servers. Each holds a
 different and equally important dataset, so analysis runs on both and both edit
 `CODE/`. Read this first, then `CLAUDE.md`.
 
+## Session of 2026-10-15 — replication package
+
+**`replication/` exists; start with its README.** Every number and exhibit in
+the draft is registered in `replication/claims.toml` against its source, and
+`python replication\check_claims.py` checks the draft against them. It runs
+on either machine and never edits the draft. Machine A's whole pipeline reruns
+with `.\replication\Run-MachineA.ps1`: 130 min for a full run, 33 with
+`-SkipRebuild`.
+
+**Full run, 2026-10-15:**
+- Tables 2-4 and Figure 4 reproduce byte-identical.
+- Figure 3's drawing is identical; only its embedded font bytes differ.
+- Every in-text number reproduces.
+- 41 claims match. 19 have no producing code (the ML pipeline: Table 1,
+  training counts, GPU benchmark; also Deaglan's denominators).
+
+**Wrong in the draft, not yet edited**, per `replication/claims_report.md`:
+
+| line | says | should be | why |
+|---|---|---|---|
+| `:101`, `:726` | 1.4% | 1.6% | computed from the rounded 28.1 / 27.7; the unrounded value is 1.55 |
+| `:719` | 42% | 43% | the 95th percentile is 42.53 |
+| `:577` | 0.41 | 0.40 | 70,375 / 17,391,446 |
+| `:575`, `:577` | "ABE" | JW and ABE | mislabels a Jaro-Winkler column |
+| `:755-756`, `:770` | gains "by most for groups that were previously least well covered" | — | contradicted by the draft's own numbers: non-white +6.4 vs white +7.9; no schooling +7.0 vs all +8 |
+
+**Next: move the draft onto generated numbers, section by section** (agreed
+2026-10-15). The results files must first move into the paper repo so
+Overleaf can `\input` them. Two traps found today:
+- Stata batch mode silently mis-imports any log it reads back as data unless
+  the log is written at `set linesize 255`.
+- `Run-Stata.ps1` is the only reliable way to tell whether a batch run failed.
+
 ## Where we are — session of 2026-10-14
 
 **The two repos.** Code is here. The paper is a *separate* clone of the
