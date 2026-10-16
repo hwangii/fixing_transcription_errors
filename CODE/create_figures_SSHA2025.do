@@ -19,6 +19,11 @@ local original_ed "F:\enum_date\DATA\ORIGINAL\"
 local intermediate_nondb "F:\enum_date\DATA\INTERMEDIATE\"
 local figure "`overleaf'figures\"
 
+/*REPLICATION PACKAGE: THE NUMBERS THE DRAFT QUOTES ARE WRITTEN BY repnum  */
+/*TO THE FILE BELOW, NOT ONLY INTO THE TABLE. SEE replication/README.md.    */
+if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
+repnum open using "$REP_RESULTS/create_figures_SSHA2025.tex", script(CODE/create_figures_SSHA2025.do)
+
 /*SUFFIX ON THE 1930-1940 LINK FILES. The un-suffixed pair the older*/
 /*do-files referenced no longer exists; the "0" pair (2026-02-15) is*/
 /*the current one.                                                  */
@@ -162,6 +167,13 @@ foreach grp in target all {
 
 	di "Linkage rate, `grp': `lr_before' -> `lr_after' (`pct'%)"
 
+	/*IN PERCENT, AS THE PROSE QUOTES THEM. G IS Target OR All.*/
+	local G = proper("`grp'")
+	repnum nRecords`G'        = `n_before',   format(%15.0fc)
+	repnum linkRate`G'Before  = 100*`lr_before', format(%4.1f)
+	repnum linkRate`G'After   = 100*`lr_after',  format(%4.1f)
+	repnum linkGain`G'        = `pct',          format(%4.0f)
+
 	local nb=trim(string(`n_before',"%15.0fc"))
 	local na=trim(string(`n_after',"%15.0fc"))
 	local rb=string(`lr_before',"%4.3f")
@@ -198,6 +210,13 @@ foreach grp in target all {
 
 	di "Share validated, `grp': `sv_before' -> `sv_after' (`pct'%)"
 
+	local G = proper("`grp'")
+	repnum nValidated`G'Before = `n_before',   format(%15.0fc)
+	repnum nValidated`G'After  = `n_after',    format(%15.0fc)
+	repnum shareVal`G'Before   = 100*`sv_before', format(%4.1f)
+	repnum shareVal`G'After    = 100*`sv_after',  format(%4.1f)
+	repnum valGain`G'          = `pct',          format(%4.0f)
+
 	local nb=trim(string(`n_before',"%15.0fc"))
 	local na=trim(string(`n_after',"%15.0fc"))
 	local rb=string(`sv_before',"%4.3f")
@@ -212,6 +231,13 @@ file write avgperf "  \hline\hline" _n
 file write avgperf "\end{tabular}" _n
 
 file close avgperf
+
+/*SHARE OF THE TABLE'S SAMPLE THAT IS DISCORDANT ("TARGET"). THE DRAFT     */
+/*QUOTES 28.3 FROM THE BALANCE-TABLE SAMPLE; THIS IS THE SAME SHARE ON      */
+/*THIS TABLE'S SLIGHTLY SMALLER SAMPLE, KEPT SO THE TWO CAN BE COMPARED.    */
+quietly count if target==1
+local nt=r(N)
+repnum pctTargetOfTable = 100*`nt'/_N, format(%4.1f)
 
 
 
@@ -348,6 +374,16 @@ do `"`code'label_socio_demo.do"'
 
 drop if v1=="migrate5" & v2==4 /*DROP PEOPLE WHO LIVED ABROAD 5 YEARS AGO*/
 
+/*THE NOTE TO fig:hetero_socio SAYS EVERY GROUP IMPROVED ON BOTH MEASURES. */
+/*v8 AND v9 ARE THE % CHANGES PLOTTED. MISSING IS COUNTED SEPARATELY,      */
+/*BECAUSE . > 0 WOULD OTHERWISE PASS AS AN IMPROVEMENT.                    */
+quietly count
+repnum socioGroups = r(N), format(%5.0f)
+quietly count if (v8<=0 | v9<=0) & !missing(v8, v9)
+repnum socioGroupsNotImproved = r(N), format(%5.0f)
+quietly count if missing(v8) | missing(v9)
+repnum socioGroupsMissing = r(N), format(%5.0f)
+
 gsort v4
 
 /*MUNIR'S REVISION*/
@@ -359,3 +395,5 @@ graph export `"`figure'all_states_improvement_sh_validated.pdf"', as(pdf) replac
 
 graph combine 1.gph 2.gph, rows(2) cols(1) ysize(7)
 graph export `"`figure'all_states_socio_demo_combinedV2.pdf"', as(pdf) replace 
+
+repnum close

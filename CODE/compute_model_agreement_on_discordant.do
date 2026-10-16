@@ -40,6 +40,13 @@
 clear all
 set more off
 
+/*REPLICATION PACKAGE: THE NUMBERS THE DRAFT QUOTES ARE WRITTEN BY repnum  */
+/*TO THE FILE BELOW, NOT ONLY DISPLAYED. SEE replication/README.md. THE    */
+/*CSV BELOW IS GITIGNORED, SO BEFORE THIS THE PAPER'S NUMBERS LIVED ONLY   */
+/*IN CONSOLE OUTPUT AND IN A COMMENT IN THE .tex.                          */
+if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
+repnum open using "$REP_RESULTS/compute_model_agreement_on_discordant.tex", script(CODE/compute_model_agreement_on_discordant.do)
+
 local christian_torben "D:/SNU ECON Dropbox/sam hwang/fixing_transcription_errors/DATA/TRANSCRIPTIONS"
 local root "`christian_torben'/USCensus1940FullCount/output_and_output1_ssha2025"
 local out  "D:/SNU ECON Dropbox/sam hwang/fixing_transcription_errors/DATA/INTERMEDIATE"
@@ -183,4 +190,29 @@ if `Tdisc_s'>0 {
 	display "matches neither         : `Tnei_s'  (" %4.1f 100*`Tnei_s'/`Tdisc_s' "%)"
 	display "matches ONE OF THE TWO  : " %4.1f 100*(`Tanc_s'+`Tfs_s')/`Tdisc_s' "%"
 }
+display ""
+display "---- HUMAN-COMPLETE (THE ONE THE DRAFT QUOTES) ----"
+display "discordant records      : `Tdisc_h'"
+if `Tdisc_h'>0 {
+	display "matches Ancestry only   : `Tanc_h'  (" %4.1f 100*`Tanc_h'/`Tdisc_h' "%)"
+	display "matches FamilySearch only: `Tfs_h'  (" %4.1f 100*`Tfs_h'/`Tdisc_h' "%)"
+	display "complete, matches neither: `Tnei_h'  (" %4.1f 100*`Tnei_h'/`Tdisc_h' "%)"
+	display "no usable model output  : `Tnom_h'  (" %4.1f 100*`Tnom_h'/`Tdisc_h' "%)"
+	display "matches ONE OF THE TWO  : " %4.1f 100*(`Tanc_h'+`Tfs_h')/`Tdisc_h' "%"
+	display "  ...given model output : " %4.1f 100*(`Tanc_h'+`Tfs_h')/(`Tdisc_h'-`Tnom_h') "%"
+}
 display "=============================================="
+
+/*HUMAN-COMPLETE, IN PERCENT OF ALL DISCORDANT RECORDS WITH THE FOUR HUMAN  */
+/*FIELDS PRESENT. ...GivenModel DROPS THE NO-OUTPUT CELL FROM THE           */
+/*DENOMINATOR; THE DRAFT QUOTES IT ONLY AS THE CONTRAST ("66 to 73").       */
+repnum nDiscordant           = `Tdisc_h', format(%15.0fc)
+repnum nDiscordantMillions   = `Tdisc_h'/1e6, format(%4.1f)
+repnum discAncOnly           = 100*`Tanc_h'/`Tdisc_h', format(%3.0f)
+repnum discFsOnly            = 100*`Tfs_h'/`Tdisc_h',  format(%3.0f)
+repnum discNeither           = 100*`Tnei_h'/`Tdisc_h', format(%3.0f)
+repnum discNoModel           = 100*`Tnom_h'/`Tdisc_h', format(%3.0f)
+repnum discOneOfTwo          = 100*(`Tanc_h'+`Tfs_h')/`Tdisc_h', format(%3.0f)
+repnum discOneOfTwoGivenModel = 100*(`Tanc_h'+`Tfs_h')/(`Tdisc_h'-`Tnom_h'), format(%3.0f)
+repnum nStatesAgreement      = `nok', format(%3.0f)
+repnum close

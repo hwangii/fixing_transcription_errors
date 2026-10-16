@@ -25,6 +25,11 @@
 clear all
 set more off
 
+/*REPLICATION PACKAGE: THE NUMBERS THE DRAFT QUOTES ARE WRITTEN BY repnum  */
+/*TO THE FILE BELOW, NOT ONLY DISPLAYED. SEE replication/README.md.         */
+if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
+repnum open using "$REP_RESULTS/make_balance_exhibits.tex", script(CODE/make_balance_exhibits.do)
+
 local dropbox "D:\SNU ECON Dropbox\sam hwang\"
 local overleaf "D:\repos\6638fa0fd89fbec05130caeb\"
 local trans_intermediate_f "F:\fixing_transcription_errors\DATA\INTERMEDIATE\"
@@ -106,6 +111,13 @@ foreach v of local chars {
 		local s_as = trim(string(`m_as',"%4.3f"))
 	}
 
+	/*THE TWO ROWS THE PROSE QUOTES, IN PERCENT.*/
+	if inlist("`v'","urban","farm") {
+		local K = proper("`v'")
+		repnum share`K'US     = 100*`m_us', format(%4.1f)
+		repnum share`K'Sample = 100*`m_as', format(%4.1f)
+	}
+
 	file write bal "`lbl'&`s_us'&`s_as'\\" _n
 }
 
@@ -181,6 +193,14 @@ display "congruent / incongruent    : `n_cong' / `n_inc'"
 quietly summarize incongruent
 display "incongruent share          : " %5.4f r(mean)
 display "==============================================="
+
+repnum nMalesTen    = `n_us',   format(%15.0fc)
+repnum nAnalysis    = `n_as',   format(%15.0fc)
+repnum nCongruent   = `n_cong', format(%15.0fc)
+repnum nIncongruent = `n_inc',  format(%15.0fc)
+repnum pctIncongruent = 100*`n_inc'/`n_as', format(%4.1f)
+repnum pctCongruent   = 100*`n_cong'/`n_as', format(%4.1f)
+repnum close
 
 /*ON THE AGE CUTOFF. THESE TABLES USE age>=10, WHICH IS THE PAPER'S OWN      */
 /*ANALYSIS SAMPLE AND MATCHES avg_performance_allstates.tex. DEAGLAN'S       */

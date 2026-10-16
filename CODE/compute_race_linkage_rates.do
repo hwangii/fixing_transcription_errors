@@ -8,6 +8,11 @@
 clear all
 set more off
 
+/*REPLICATION PACKAGE: THE NUMBERS THE DRAFT QUOTES ARE WRITTEN BY repnum  */
+/*TO THE FILE BELOW, NOT ONLY DISPLAYED. SEE replication/README.md.         */
+if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
+repnum open using "$REP_RESULTS/compute_race_linkage_rates.tex", script(CODE/compute_race_linkage_rates.do)
+
 local intermediate "D:/SNU ECON Dropbox/sam hwang/enum_date/DATA/INTERMEDIATE"
 
 use race linked_before linked_after validated_before validated_after using `"`intermediate'/temp.dta"', clear
@@ -36,6 +41,16 @@ foreach r in 1 2 {
 display "White     : before " %6.4f `b1' "  after " %6.4f `a1' "  increase " %5.1f `pct1' "%  (N=`n1')"
 display "Non-white : before " %6.4f `b2' "  after " %6.4f `a2' "  increase " %5.1f `pct2' "%  (N=`n2')"
 
+/*IN PERCENT, AS THE DRAFT QUOTES THEM.*/
+repnum linkBaseWhite    = 100*`b1', format(%4.1f)
+repnum linkAfterWhite   = 100*`a1', format(%4.1f)
+repnum linkGainWhite    = `pct1',    format(%4.1f)
+repnum nWhite           = `n1',      format(%15.0fc)
+repnum linkBaseNonwhite  = 100*`b2', format(%4.1f)
+repnum linkAfterNonwhite = 100*`a2', format(%4.1f)
+repnum linkGainNonwhite  = `pct2',    format(%4.1f)
+repnum nNonwhite         = `n2',      format(%15.0fc)
+
 display ""
 display "=============== SHARE VALIDATED BY RACE ==============="
 foreach r in 1 2 {
@@ -48,3 +63,4 @@ foreach r in 1 2 {
 display "White     : before " %6.4f `vb1' "  after " %6.4f `va1' "  increase " %5.1f `vp1' "%"
 display "Non-white : before " %6.4f `vb2' "  after " %6.4f `va2' "  increase " %5.1f `vp2' "%"
 display "======================================================"
+repnum close

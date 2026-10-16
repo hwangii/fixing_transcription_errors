@@ -11,6 +11,11 @@
 clear all
 set more off
 
+/*REPLICATION PACKAGE: THE NUMBERS THE DRAFT QUOTES ARE WRITTEN BY repnum  */
+/*TO THE FILE BELOW, NOT ONLY DISPLAYED. SEE replication/README.md.         */
+if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
+repnum open using "$REP_RESULTS/compute_legibility_quartiles.tex", script(CODE/compute_legibility_quartiles.do)
+
 local intermediate "D:/SNU ECON Dropbox/sam hwang/enum_date/DATA/INTERMEDIATE"
 
 /*temp.dta IS BUILT BY create_figures_SSHA2025.do. IT IS THE 51,036,859-RECORD   */
@@ -69,3 +74,14 @@ display "linked_after        Q1=" %6.4f `a1' "  Q4=" %6.4f `a4'
 display "  improvement in Q1: " %6.1f 100*(`a1'/`l1'-1) "%"
 display "  improvement in Q4: " %6.1f 100*(`a4'/`l4'-1) "%"
 display "======================================================"
+
+/*Q1 IS THE LEAST LEGIBLE QUARTILE, Q4 THE MOST. IN PERCENT.*/
+repnum legDisagreeLowest   = 100*`d1', format(%4.1f)
+repnum legDisagreeHighest  = 100*`d4', format(%4.1f)
+repnum legLinkBaseLowest   = 100*`l1', format(%4.1f)
+repnum legLinkBaseHighest  = 100*`l4', format(%4.1f)
+repnum legLinkAfterLowest  = 100*`a1', format(%4.1f)
+repnum legLinkAfterHighest = 100*`a4', format(%4.1f)
+repnum legGainLowest       = 100*(`a1'/`l1'-1), format(%4.1f)
+repnum legGainHighest      = 100*(`a4'/`l4'-1), format(%4.1f)
+repnum close
