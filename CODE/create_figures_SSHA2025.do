@@ -89,7 +89,9 @@ numlabel,add
 
 bysort state_folder_name county_folder_name eventdistrict: egen legibility=mean(congruent)
 
-keep if sex==1 & age>=10
+/*age<. : MISSING AGE WOULD OTHERWISE PASS age>=10. NO-OP ON THE CURRENT  */
+/*DATA (0 MISSING AGES; replication/results/size_hazards_analysis.tex).    */
+keep if sex==1 & age>=10 & age<.
 
 bysort state_folder_name county_folder_name eventdistrict: replace rep=_n==1
 
@@ -328,6 +330,12 @@ foreach var in durunemp incwage {
 recode incnonwg (1 9=.)
 recode migrate5 (9=.)
 
+/*THIS LOG IS READ BACK AS DATA BELOW (import delimited ... "|"). A TEXT    */
+/*LOG WRAPS AT THE LINESIZE, AND BATCH MODE USES 80, WHICH SPLITS EVERY ROW */
+/*(ROWS ARE ~90 CHARACTERS) AND TURNS v8/v9 INTO STRINGS. FOUND 2026-10-15  */
+/*BY THE FIRST BATCH RUN; INTERACTIVE RUNS WITH A WIDE WINDOW WERE FINE.    */
+local old_linesize = c(linesize)
+set linesize 255
 qui {
 	log using `"`intermediate_nondb'all_states_effect_socio_demo.log"',replace
 	log off
@@ -363,6 +371,7 @@ qui foreach var in gq relate marst race bpl /*school*/ higrade empstat /*labforc
 qui {
 	log close
 }
+set linesize `old_linesize'
 
 
 

@@ -8,10 +8,11 @@
      from a hand edit when the diff is read afterwards.
   2. Runs replication/run_machineA.do through Run-Stata.ps1.
   3. Runs replication/check_claims.py.
-  4. Shows what the run changed. In the paper repo, a changed .tex table is a
-     result that did not reproduce. PDFs always differ (they embed a timestamp),
-     so figures are checked through the numbers behind them, not their bytes.
-     In this repo, a changed replication/results/*.tex is a number that moved.
+  4. Shows what the run changed. In the paper repo, a changed .tex table is
+     an exhibit that did not reproduce. A changed PDF is checked by
+     compare_figures.py, which compares the drawing (page content) and ignores
+     embedded fonts, which can differ between Stata sessions. In this repo, a
+     changed replication/results/*.tex is a number that moved.
 
 .PARAMETER SkipRebuild
   Skip create_figures_SSHA2025.do (hours) and run the rest on the existing
@@ -54,8 +55,12 @@ Write-Host "`n=== claim check ==="
 python (Join-Path $PSScriptRoot "check_claims.py")
 $checkExit = $LASTEXITCODE
 
-Write-Host "`n=== exhibits changed in the paper repo (a changed .tex table did not reproduce) ==="
-git -C $paper status --short figures/
+Write-Host "`n=== exhibits changed in the paper repo ==="
+git -C $paper status --short --untracked-files=no figures/
+Write-Host "A changed .tex table did not reproduce. A changed PDF may differ only in its"
+Write-Host "embedded font; compare_figures.py checks the drawing itself:"
+python (Join-Path $PSScriptRoot "compare_figures.py") --paper-repo $paper
+if ($LASTEXITCODE -ne 0) { $checkExit = 1 }
 Write-Host "`n=== result files changed in this repo (a changed line is a number that moved) ==="
 git -C $repo status --short replication/results/
 git -C $repo diff --stat replication/results/

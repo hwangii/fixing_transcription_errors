@@ -44,7 +44,9 @@ capture label var white_color "White-collar occupation"
 capture label var skilled "Skilled occupation"
 capture label var unskilled "Unskilled occupation"
 
-keep if age>=10 & female==0
+/*age<. : MISSING AGE WOULD OTHERWISE PASS age>=10. NO-OP ON THE CURRENT  */
+/*DATA (0 MISSING AGES; replication/results/size_hazards_balance.tex).     */
+keep if age>=10 & age<. & female==0
 
 /*FAIL LOUDLY RATHER THAN WRITING A TABLE WITH SILENTLY MISSING ROWS.*/
 foreach v in incongruent `chars' {

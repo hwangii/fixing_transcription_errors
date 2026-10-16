@@ -45,9 +45,13 @@ changed. Read the output in this order:
 - **`check_claims.py` exit status.** 0 means every checkable number in the
   draft matches its source. 1 means at least one `MISMATCH`, `TEXT NOT FOUND`
   or failed assertion. Details are in `claims_report.md`.
-- **`git status` in the paper repo.** A changed `.tex` table under `figures/`
-  is an exhibit that did **not** reproduce. PDFs always differ, because they
-  embed a creation time. Figures are checked through the numbers behind them.
+- **The paper repo's `figures/`.** A changed `.tex` table did **not**
+  reproduce. A changed PDF is checked by `compare_figures.py`, which compares
+  the drawing (every point, label and coordinate) and ignores the embedded
+  font. Stata 15 PDFs carry no creation date, but the font program embedded
+  in them can differ between sessions. On 2026-10-15 Figure 4 regenerated
+  byte-identical, and Figure 3 regenerated with an identical drawing and
+  different font bytes.
 - **`git diff replication/results/`.** A changed line is a number that moved.
 
 To check the draft without running Stata, for example after editing prose:
@@ -117,6 +121,8 @@ replication/
   results/*.tex        the numbers each script wrote (tracked; one file per script)
   claims.toml          registry: every number and exhibit in the draft -> its source
   check_claims.py      compares the draft with results/, the exhibit tables, and claims.toml
+  compare_figures.py   says whether a regenerated PDF has the same drawing as the committed one
+  diagnostics/         one-off sizing scripts (e.g. missing ages, blank names)
   claims_report.md     the latest check (generated)
 ```
 
