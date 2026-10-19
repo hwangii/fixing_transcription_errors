@@ -6,6 +6,19 @@ different and equally important dataset, so analysis runs on both and both edit
 
 ## Machine B replication — the next job, to be done on machine B (written 2026-10-18)
 
+> **DONE 2026-10-19 on machine B (`ARTS-ECON-SHSRV`).** Steps 1-5 are
+> committed (`83d8b98` unmodified copy, `c49e135` `$LCODE` repoint across
+> all 33 scripts, agreed with the author, `6ac58bb`, `8a9b469`, `e366bd2`).
+> The full run (`.\replication\Run-MachineB.ps1`, 234 min) **reproduced all
+> five of Deaglan's tables byte-identical** (SHA-256) to
+> `deaglan_results/current/`, so his "byte-identical" claim is now verified.
+> `figures/deaglan_*.tex` did not change. New results files:
+> `replication/results/linkage_{abe_jw,hlink}.tex`. The four denominators
+> and 58.06 / 59.52 all match the draft. The checker's only failures are the
+> five known draft errors in the 2026-10-15 table below.
+> Still open: the Codex + Antigravity review of this work, and the fixes
+> listed under "Reproduce first, fix afterwards" (each needs sign-off).
+
 **Decided 2026-10-18 by the author:** Deaglan's code and data on machine B
 (`F:\Deaglan\Census_Transcriptions\`) are now ours to work on, and he is not
 expected to edit them again. The copy of his code in this repo becomes the
