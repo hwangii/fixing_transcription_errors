@@ -65,6 +65,10 @@ tmp/
 !review/reports/*.log
 sigma.dta
 _stata_temp*/
+# Deaglan's linkage code (LINKAGE/) carries one plain-text readme
+# (code/01_abe_jw/reference/ABE_algorithm_readme.txt). It is documentation,
+# not data, and *.txt above would otherwise silently drop it.
+!LINKAGE/**/*.txt
 
 # ---------- LaTeX build artifacts ----------
 *.aux
