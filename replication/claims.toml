@@ -29,6 +29,9 @@ draft = "DHTS-2026-10-12.tex"
 [machines.ARTS-ECON-CM]
 paper_repo = "D:/repos/6638fa0fd89fbec05130caeb"
 
+[machines.ARTS-ECON-SHSRV]
+paper_repo = "F:/github_repos/6638fa0fd89fbec05130caeb"
+
 
 # ===================================================================== ABSTRACT, INTRO
 

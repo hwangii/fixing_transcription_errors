@@ -23,6 +23,17 @@ if c(hostname) == "ARTS-ECON-CM" {
 	global REP_SNU     "D:/SNU ECON Dropbox/sam hwang"
 	global REP_F       "F:"
 }
+else if c(hostname) == "ARTS-ECON-SHSRV" {
+	/*MACHINE B: DEAGLAN'S LINKAGE PACKAGE. CODE IS THIS REPO'S LINKAGE/code; */
+	/*DATA STAYS IN HIS FOLDER ON F:, WHICH NOW HOLDS DATA ONLY. LINKAGE'S OWN */
+	/*paths.do READS $ROOT (DATA) AND $LCODE (CODE), SET HERE FROM THESE.     */
+	global REP_MACHINE "B"
+	global REP_REPO    "F:/github_repos/fixing_transcription_errors"
+	global REP_PAPER   "F:/github_repos/6638fa0fd89fbec05130caeb"
+	global REP_LINK    "F:/Deaglan/Census_Transcriptions"
+	global ROOT        "$REP_LINK"
+	global LCODE       "$REP_REPO/LINKAGE/code"
+}
 else {
 	display as error "replication/config.do: no paths for machine `c(hostname)'."
 	display as error "Add a block for it at the top of this file."
