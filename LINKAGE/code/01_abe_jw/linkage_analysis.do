@@ -42,7 +42,7 @@ local true_links "$D_TRUTH/mlp_training1930_1940.dta"
 
 * 1940 clean names (full) — restricted to boys age 8+
 use `names1940', clear
-keep if age >= 8
+keep if age >= 8 & !missing(age)
 scalar N_men_1940_full = _N
 repnum linkDenomAbe = N_men_1940_full, format(%15.0fc)
 keep histid mi
