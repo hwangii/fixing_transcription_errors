@@ -16,8 +16,11 @@ different and equally important dataset, so analysis runs on both and both edit
 > `replication/results/linkage_{abe_jw,hlink}.tex`. The four denominators
 > and 58.06 / 59.52 all match the draft. The checker's only failures are the
 > five known draft errors in the 2026-10-15 table below.
-> Still open: the Codex + Antigravity review of this work, and the fixes
-> listed under "Reproduce first, fix afterwards" (each needs sign-off).
+> Review done and dispositioned (`96743b5`). **The four fixes below are
+> committed and rerun (2026-10-19); their effects are in
+> `replication/fix_effects_2026-10-19.md`, awaiting the author's sign-off.**
+> Until the paper repo takes them, the paper repo is unchanged and
+> `Run-MachineB.ps1` reports the regenerated tables on F: as DIFFERS.
 
 **Decided 2026-10-18 by the author:** Deaglan's code and data on machine B
 (`F:\Deaglan\Census_Transcriptions\`) are now ours to work on, and he is not
@@ -408,10 +411,11 @@ What it means for the draft, in order:
   whose 1940 record is outside the truth set is called "Unverifiable". Do not
   describe Contradicted as a false-positive rate without saying so, or ask for
   a two-sided classification.
-- **"Match Rate" is pairs ÷ persons, not the share of people linked**
-  (`:270`; the link file is not one-to-one). Either describe it as such or
-  have it recomputed on `first40 == 1` — the flag already exists in
-  `build_matched_links.do:220`.
+- ~~**"Match Rate" is pairs ÷ persons, not the share of people linked**
+  (`:270`; the link file is not one-to-one).~~ **Wrong, corrected
+  2026-10-19:** all six link files behind Tables 5-8 are one-to-one on both
+  IDs, so pairs ÷ persons *is* the share of people linked. See
+  `replication/fix_effects_2026-10-19.md`.
 - **Three tables, three denominators**: men-only census (ABE/JW), men and
   women (HLINK), BUNMD death records (mortality). Captions say "all men" for
   both census tables; the HLINK one is wrong and his §6 admits it. Never
