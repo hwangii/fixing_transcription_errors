@@ -15,18 +15,26 @@ script does mechanically what was done by hand on 2026-10-12.
     # test: change nothing, only report whether figures/ would change
     python replication/extract_deaglan_tables.py --check
 
-With --regenerated, a table whose regenerated text equals the committed copy
-is extracted from the committed copy, so figures/ does not change. A table
-that differs is extracted from the regenerated file, and its header names that
-file. So, as on machine A, a changed figures/deaglan_*.tex in the paper repo
-means the table did NOT reproduce. Line endings are ignored when comparing:
-git stores both with LF.
+With --regenerated, two separate checks run:
+
+1. REPRODUCTION. All five of Deaglan's tables -- the four above and the
+   mortality table, which the draft does not use -- are compared with the
+   committed copies by SHA-256 of their raw bytes, and both hashes are printed.
+   This is the test of his "byte-identical" claim. (Review 2026-10-19: the
+   first version compared four tables, as text.)
+2. EXTRACTION. A table whose regenerated text equals the committed copy is
+   extracted from the committed copy, so figures/ does not change. A table
+   that differs is extracted from the regenerated file, and its header names
+   that file. So, as on machine A, a changed figures/deaglan_*.tex in the paper
+   repo means the table did NOT reproduce. Line endings are ignored here only:
+   git stores both copies with LF.
 
 Exit status: 0 if every table reproduced and (with --check) figures/ is
 unchanged; 1 otherwise. Standard library only.
 """
 
 import argparse
+import hashlib
 import socket
 import sys
 import tomllib
@@ -34,7 +42,33 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 TABLES = ["abe_jw", "abe_jw_restricted", "hlink", "hlink_restricted"]
+ALL_TABLES = TABLES + ["mortality_bunmd"]  # mortality is reproduced, not extracted
 COMMITTED = "deaglan_results/current"
+
+
+def sha256(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def check_reproduction(paper, regenerated):
+    """SHA-256 of raw bytes, regenerated vs committed, for all five tables."""
+    print(f"reproduction (SHA-256 of raw bytes), {regenerated} vs {COMMITTED}/:")
+    ok = True
+    for name in ALL_TABLES:
+        fname = f"linkage_table_{name}.tex"
+        committed, regen = paper / COMMITTED / fname, regenerated / fname
+        if not regen.exists():
+            print(f"  MISSING     {fname}")
+            ok = False
+            continue
+        a, b = sha256(regen), sha256(committed)
+        same = a == b
+        ok &= same
+        print(f"  {'IDENTICAL' if same else 'DIFFERS  '}   {fname}")
+        print(f"      regenerated {a}")
+        print(f"      committed   {b}")
+    print(f"  => {'all ' + str(len(ALL_TABLES)) + ' tables byte-identical' if ok else 'NOT all tables reproduced'}")
+    return ok
 
 HEADER = [
     "% EXTRACTED MECHANICALLY from {source} -- DO NOT EDIT BY HAND.",
@@ -83,6 +117,9 @@ def main():
             sys.exit(f"no paper_repo for machine {host} in claims.toml [machines]; pass --paper-repo")
 
     failed = False
+    if args.regenerated:
+        failed |= not check_reproduction(paper, args.regenerated)
+        print("extraction into figures/:")
     for name in TABLES:
         fname = f"linkage_table_{name}.tex"
         committed = paper / COMMITTED / fname
@@ -96,10 +133,8 @@ def main():
                 failed = True
                 continue
             rtext, _ = read(regen)
-            if rtext == ctext:
-                print(f"  REPRODUCED  {fname}")
-            else:
-                print(f"  DIFFERS     {fname}: regenerated table is not the committed one")
+            if rtext != ctext:
+                print(f"  text differs: {fname} -- extracting from the regenerated file")
                 source_label, text = regen.as_posix(), rtext
                 failed = True
 
