@@ -16,7 +16,7 @@ The paper's numbers come from three places:
 | Source | Runs on | Produces |
 |---|---|---|
 | Stata scripts in `CODE/` | machine A (`ARTS-ECON-CM`) | Tables 2-4, Figures 3-4, every in-text agreement, sample and subgroup statistic |
-| Deaglan's linkage package (`F:\Deaglan\Census_Transcriptions\`, not in this repo) | machine B | Tables 5-8 (ABE, Jaro-Winkler and HLINK linkage), and the prose that quotes them |
+| Deaglan's linkage package (code: `LINKAGE/`; data: `F:\Deaglan\Census_Transcriptions\`) | machine B (`ARTS-ECON-SHSRV`) | Tables 5-8 (ABE, Jaro-Winkler and HLINK linkage), and the prose that quotes them |
 | The ML transcription pipeline (not in this repo) | ? | Table 1, the training-set counts, the hyperparameters, the GPU benchmark |
 
 The package does three things:
@@ -116,6 +116,9 @@ replication/
   config.do            the one place paths are set; one block per machine
   run_machineA.do      master for machine A: preflight, then every script in order
   Run-MachineA.ps1     driver: clean-repo check -> Stata -> claim check -> what changed
+  run_machineB.do      master for machine B: preflight, then LINKAGE/code/00_run_all_tables.do
+  Run-MachineB.ps1     driver: clean-repo check -> Stata -> extract + reproduce check -> claim check
+  extract_deaglan_tables.py  Deaglan's tables -> figures/deaglan_*.tex; says which reproduced
   Run-Stata.ps1        runs one do-file in batch mode and reports its real return code
   stata/repnum.ado     writes one number as \newcommand{\Key}{value}% raw=...
   results/*.tex        the numbers each script wrote (tracked; one file per script)
@@ -146,7 +149,7 @@ Stata then never runs the file.
 | Table 2 | `tab:sample_characteristics` | `make_balance_exhibits.do` | A | `figures/balance_allstates.tex` |
 | Table 3 | `tab:cong_vs_incong` | `make_balance_exhibits.do` | A | `figures/incongruent_allstates.tex` |
 | Table 4 | `tab:avg_performance` | `create_figures_SSHA2025.do` | A | `figures/avg_performance_allstates.tex` |
-| Tables 5-8 | `tab:deaglan_*` | Deaglan, `code/00_run_all_tables.do` | B | `figures/deaglan_*.tex` (tabular extracted by hand from `deaglan_results/current/`) |
+| Tables 5-8 | `tab:deaglan_*` | `LINKAGE/code/00_run_all_tables.do`, then `extract_deaglan_tables.py` | B | `figures/deaglan_*.tex` |
 | Figure 1 | `fig:schedule` | **none** (image crop) | ? | `figures/rhode_island_4_252_61.png` |
 | Figure 2 | `fig:error_examples` | **none** (image crops) | ? | three `.png` |
 | Figure 3 | `fig:hetero_socio` | `create_figures_SSHA2025.do` | A | `figures/all_states_socio_demo_combinedV2.pdf` |
@@ -178,12 +181,21 @@ see the other's data.
 - **Machine A** runs `Run-MachineA.ps1`. Its outputs are the `results/*.tex`
   files in this repo and the exhibit tables in the paper repo's `figures/`.
   All of them travel by git.
-- **Machine B: not built yet.** It needs its own block in `config.do`, a
-  `run_machineB` that reruns Deaglan's `00_run_all_tables.do`, and a script
-  that extracts the `tabular` from `deaglan_results/current/*.tex` into
-  `figures/deaglan_*.tex`. That step is currently done by hand. Until then, the
-  checker verifies that the prose matches Deaglan's tables as committed. It does
-  not verify that those tables reproduce.
+- **Machine B** (`ARTS-ECON-SHSRV`, Stata/MP 15.1) runs `Run-MachineB.ps1`.
+  Deaglan's code is in this repo as `LINKAGE/` (canonical since 2026-10-18);
+  his data stays in `F:\Deaglan\Census_Transcriptions\`, which `config.do`
+  passes to his `paths.do` as `$ROOT` (data) and `$LCODE` (code). The driver
+  runs `run_machineB.do` (preflight of 22 inputs, then
+  `LINKAGE/code/00_run_all_tables.do`, about 4 hours), then
+  `extract_deaglan_tables.py --regenerated`, which compares each regenerated
+  table with the committed copy in the paper repo's `deaglan_results/current/`
+  and writes the `tabular` into `figures/deaglan_*.tex`. As on A, a changed
+  `figures/deaglan_*.tex` is a table that did not reproduce.
+
+  ```powershell
+  .\replication\Run-MachineB.ps1 -PreflightOnly   # seconds: config, code and inputs resolve
+  .\replication\Run-MachineB.ps1                  # ~4 hours: rerun Tables 5-8
+  ```
 - **`check_claims.py` runs on either machine.** It needs only the two repos.
 
 ## What is not covered
@@ -210,7 +222,9 @@ individually.
    is the next big piece of work.
 3. **The 1930-1940 link files** come from the `enum_date` project, whose code
    is not in this repo.
-4. **Machine B's runner** (see above).
+4. **Deaglan's matching is not rerun.** Machine B reruns his table tier
+   only. The ABE/JW and HLINK link files it reads are frozen; HLINK matching
+   was done by a third party. See `LINKAGE/DOCUMENTATION.md`, "Known gaps".
 5. **Inputs with no checksum.** Nothing records which version of each frozen
    file produced the results. Adding a SHA-256 manifest of the inputs to each
    run's log would close this.
