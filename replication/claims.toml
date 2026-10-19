@@ -1,0 +1,832 @@
+# CLAIM REGISTRY: every empirical number and exhibit in the draft, and where it comes from.
+#
+# check_claims.py reads this file, finds each `text` in the draft, pulls the numbers out
+# of it in order, and compares each with the matching entry of `values`, rounded to the
+# precision the draft prints. Nothing here edits the draft.
+#
+# Fields
+#   id       short unique name
+#   text     an exact substring of the draft (TOML '...' strings are literal: \% stays \%)
+#   values   one entry per number in `text`, in order. Each is an expression over
+#              - result keys written by repnum into replication/results/*.tex
+#              - cell("<table in paper repo>", "<row label>", <column>)   (column 1 = first number)
+#              - contra("<deaglan table>", <column>)  = 100 * contradicted / all pairs in that column
+#            or "" to leave that number unchecked (a year, an age cutoff, a parameter).
+#   assert   optional: an expression that must be true (for claims with no single number)
+#   status   scripted  produced by a script in this repo: CODE/ (machine A) or LINKAGE/ (machine B)
+#            table     read off an exhibit .tex that a script in CODE/ writes
+#            external  from Deaglan's linkage package, which runs on machine B
+#            nocode    no producing code exists anywhere in the package -- UNVERIFIABLE
+#   script   the producing script
+#   machine  A = holds the transcription data (ARTS-ECON-CM); B = holds Deaglan's package
+#   issue    a known problem with the claim, reported every run until it is resolved
+#
+# When the draft is edited, the checker reports TEXT NOT FOUND for any claim whose
+# wording changed. Update `text` here at the same time; that is the point of the file.
+
+draft = "DHTS-2026-10-12.tex"
+
+[machines.ARTS-ECON-CM]
+paper_repo = "D:/repos/6638fa0fd89fbec05130caeb"
+
+[machines.ARTS-ECON-SHSRV]
+paper_repo = "F:/github_repos/6638fa0fd89fbec05130caeb"
+
+
+# ===================================================================== ABSTRACT, INTRO
+
+[[claim]]
+id = "abstract-disagree"
+text = 'Independent human transcribers disagree on names in 28 percent of records'
+values = ["pctIncongruent"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+[[claim]]
+id = "abstract-disagree-groups"
+text = 'with higher disagreement rates for foreign-born individuals and non-English speakers'
+values = []
+assert = 'cell("figures/incongruent_allstates.tex", "Foreign-born", 2) > cell("figures/incongruent_allstates.tex", "Foreign-born", 1)'
+status = "table"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+issue = "Foreign-born half is checked. Non-English half: no exhibit or script measures disagreement by mother tongue (non_english_mtongue is not among the 18 balance-table characteristics)."
+
+[[claim]]
+id = "abstract-link-gain"
+text = 'increase linking rates by 119 percent for records where human transcribers disagree, while simultaneously improving match quality by 28 percent'
+values = ["linkGainTarget", "valGainTarget"]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[claim]]
+id = "intro-target-link"
+text = '28.3 percent of our sample---our improved transcriptions increase the linking rate from 8.9 to 19.4 percent, representing a 119 percent improvement'
+values = ["pctIncongruent", "linkRateTargetBefore", "linkRateTargetAfter", "linkGainTarget"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do + CODE/create_figures_SSHA2025.do"
+machine = "A"
+issue = "28.3 is the balance-table sample's share; on Table 4's own sample (the one the rest of this sentence describes) it is pctTargetOfTable, which rounds to 28.2."
+
+[[claim]]
+id = "intro-val-gain"
+text = 'accompanied by a 28 percent increase in match quality'
+values = ["valGainTarget"]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[claim]]
+id = "intro-all-gain"
+text = 'our improvements increase the overall linkage rate by 8 percent'
+values = ["linkGainAll"]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[claim]]
+id = "intro-legibility"
+text = 'where the linkage rate rises by 20 percent against 1.4 percent in the most legible quartile'
+values = ["legGainLowest", "legGainHighest"]
+status = "scripted"
+script = "CODE/compute_legibility_quartiles.do"
+machine = "A"
+
+[[claim]]
+id = "intro-validation"
+text = 'rises from 515,555 to 1,300,253 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 3.19 to 1.56 percent on that sample and from 0.44 to 0.43 percent under the machine-learning linker'
+values = [
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 3)',
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 4)',
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 3)',
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 4)',
+  'contra("figures/deaglan_abe_jw_restricted.tex", 3)',
+  'contra("figures/deaglan_abe_jw_restricted.tex", 4)',
+  'contra("figures/deaglan_hlink.tex", 1)',
+  'contra("figures/deaglan_hlink.tex", 2)',
+]
+status = "external"
+script = "Deaglan: code/00_run_all_tables.do (F:/Deaglan/Census_Transcriptions)"
+machine = "B"
+
+[[claim]]
+id = "intro-doubling"
+text = 'doubling linking rates for targeted records'
+values = []
+assert = "linkRateTargetAfter / linkRateTargetBefore >= 2"
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+
+# ============================================================ SECTION 3: MODEL & TRAINING
+
+[[claim]]
+id = "training-labels"
+text = 'this approach provides 392,085 training examples for first names and 121,465 for last names'
+values = ["", ""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+issue = "No training-set construction code in the package. Also: this line says the sample is 'Rhode Island and selected regions of other states'; line 393 says the method was developed 'on Rhode Island alone'."
+
+[[claim]]
+id = "training-unique-names"
+text = 'Our training data includes 29,641 unique first names and 28,032 unique last names'
+values = ["", ""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+
+[[claim]]
+id = "table1-accuracy"
+text = 'First name & 97.38\%           & 98.61\%           \\'
+values = ["", ""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+issue = "Table 1 is hand-typed and has no producing code (HANDOFF item 4). Same numbers at 276-277 and 924."
+
+[[claim]]
+id = "table1-accuracy-last"
+text = 'Last name  & 94.54\%           & 98.29\%           \\'
+values = ["", ""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+
+[[claim]]
+id = "accuracy-prose"
+text = 'Our model reproduces the consensus label exactly for 97.4\% of first names, and 98.6\% of their characters'
+values = ["", ""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+
+[[claim]]
+id = "accuracy-prose-last"
+text = 'Performance on last names is slightly lower, at 94.5\% of names and 98.3\% of characters'
+values = ["", ""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+
+[[claim]]
+id = "appendix-accuracy"
+text = 'Our first name model reproduces the consensus label exactly for 97.38\% of names and 98.61\% of characters; the last name model does so for 94.54\% and 98.29\%'
+values = ["", "", "", ""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+
+[[claim]]
+id = "appendix-labels"
+text = 'This results in 392,085 labels for our initial dataset'
+values = [""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+
+[[claim]]
+id = "appendix-last-labels"
+text = 'we retain 121,465 labels for last names, consisting of 28,032 unique last names'
+values = ["", ""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+
+[[claim]]
+id = "gpu-benchmark"
+text = 'Processing the complete Rhode Island sample of 299,880 records, approximately 0.22\% of the 1940 U.S. Census, required approximately 1,600 GPU-hours'
+values = ["", "", "", ""]
+status = "nocode"
+script = "none"
+machine = "?"
+issue = "No benchmark code or log. 1940 Rhode Island had roughly 713,000 persons, so 299,880 as 'the complete Rhode Island sample' needs a definition."
+
+
+[[claim]]
+id = "gpu-extrapolation"
+text = 'implies on the order of 730,000 GPU-hours for the census as a whole'
+values = ["", ]
+status = "nocode"
+script = "arithmetic on gpu-benchmark (1,600 / 0.0022), which itself has no source"
+machine = "?"
+
+[[claim]]
+id = "training-names-appendix"
+text = 'Our training data includes 29,641 unique first names, including differentiating'
+values = [""]
+status = "nocode"
+script = "ML pipeline (not in this repo)"
+machine = "?"
+
+[[claim]]
+id = "sec3-disagree"
+text = 'The frequency of disagreement between transcribers---28.3 percent in our sample'
+values = ["pctIncongruent"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+[[claim]]
+id = "sec3-disagree-selection"
+text = 'these disagreement cases represent 28 percent of our sample'
+values = ["pctIncongruent"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+# ================================================== SECTION 3: AGREEMENT ON DISCORDANT
+
+[[claim]]
+id = "disc-one-of-two"
+text = 'matches one of the two human transcriptions in 66\% of cases'
+values = ["discOneOfTwo"]
+status = "scripted"
+script = "CODE/compute_model_agreement_on_discordant.do"
+machine = "A"
+
+[[claim]]
+id = "disc-anc-fs"
+text = '''The model agrees with Ancestry's transcription in 14\% of these cases and with FamilySearch's in 52\%'''
+values = ["discAncOnly", "discFsOnly"]
+status = "scripted"
+script = "CODE/compute_model_agreement_on_discordant.do"
+machine = "A"
+
+[[claim]]
+id = "disc-neither"
+text = 'In a further 24\% of disagreement cases the model returns a complete name that matches neither human transcription, and in the remaining 10\% it returns no usable transcription'
+values = ["discNeither", "discNoModel"]
+status = "scripted"
+script = "CODE/compute_model_agreement_on_discordant.do"
+machine = "A"
+
+[[claim]]
+id = "disc-denominator"
+text = 'These four outcomes partition all 35.1 million discordant records whose four human name fields are present'
+values = ["nDiscordantMillions"]
+status = "scripted"
+script = "CODE/compute_model_agreement_on_discordant.do"
+machine = "A"
+issue = "Different universe from the 14,427,780 at line 403: all persons, both sexes, all ages, versus males 10+. The draft does not say so."
+
+[[claim]]
+id = "disc-conditioned"
+text = 'which raises the apparent agreement rate from 66 to 73 percent'
+values = ["discOneOfTwo", "discOneOfTwoGivenModel"]
+status = "scripted"
+script = "CODE/compute_model_agreement_on_discordant.do"
+machine = "A"
+
+
+# ======================================================================= SECTION 4: DATA
+
+[[claim]]
+id = "n-males-ten"
+text = 'There were 55,350,482 males aged 10 or above in the 1940 census'
+values = ["nMalesTen", "", ""]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+issue = "keep if age>=10 & female==0 retains records with missing age (missing > every number)."
+
+[[claim]]
+id = "n-analysis"
+text = 'Of these, 51,066,203 records are transcribed by both'
+values = ["nAnalysis"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+[[claim]]
+id = "n-table4"
+text = 'small difference between that count and the 51,036,859 records reported'
+values = ["nRecordsAll"]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+issue = "'accounts for most of the small difference' -- no script decomposes the 29,344-record gap, so 'most' is unverified."
+
+[[claim]]
+id = "n-incongruent"
+text = 'we identify 14,427,780 records (28.3\%) where the Ancestry.com and FamilySearch.org transcriptions disagree'
+values = ["nIncongruent", "pctIncongruent"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+[[claim]]
+id = "balance-urban-farm"
+text = 'the analysis sample is marginally less urban (54.8 versus 55.5 percent) and slightly more likely to live on a farm (24.3 versus 23.3 percent)'
+values = ["shareUrbanSample", "shareUrbanUS", "shareFarmSample", "shareFarmUS"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+[[claim]]
+id = "balance-disagree"
+text = 'within that sample the disagreement rate is 28.3 percent'
+values = ["pctIncongruent"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+[[claim]]
+id = "disagree-correlates"
+text = 'Disagreement is more common among foreign-born individuals and those with foreign-born parents, as well as among individuals without any formal education'
+values = []
+assert = '''cell("figures/incongruent_allstates.tex", "Foreign-born", 2) > cell("figures/incongruent_allstates.tex", "Foreign-born", 1) and cell("figures/incongruent_allstates.tex", "Father is foreign-born", 2) > cell("figures/incongruent_allstates.tex", "Father is foreign-born", 1) and cell("figures/incongruent_allstates.tex", "No education", 2) > cell("figures/incongruent_allstates.tex", "No education", 1)'''
+status = "table"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+
+[[claim]]
+id = "table3-note-n"
+text = 'the sample the difference is computed on, 51,066,203 records'
+values = ["nAnalysis"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+# ================================================================ SECTION 5: LINKAGE
+
+[[claim]]
+id = "results-target-link"
+text = 'the linking rate increased from 8.9 to 19.4\%, representing a 119 percent improvement'
+values = ["linkRateTargetBefore", "linkRateTargetAfter", "linkGainTarget"]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[claim]]
+id = "table4-note-counts"
+text = '51,036,859 against 51,066,203 overall, and 14,416,543 against 14,427,780 in the target group, differences of 0.06 and 0.08 percent'
+values = ["nRecordsAll", "nAnalysis", "nRecordsTarget", "nIncongruent",
+          "100*(nAnalysis-nRecordsAll)/nAnalysis", "100*(nIncongruent-nRecordsTarget)/nIncongruent"]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do + CODE/make_balance_exhibits.do"
+machine = "A"
+
+[[claim]]
+id = "results-validated"
+text = 'increased from 65\% to 84\%, a 28 percent improvement'
+values = ["shareValTargetBefore", "shareValTargetAfter", "valGainTarget"]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[claim]]
+id = "results-all"
+text = 'increased the overall linking rate by 8 percent and the overall validation rate by 1 percent'
+values = ["linkGainAll", "valGainAll"]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[claim]]
+id = "results-congruent-share"
+text = 'the roughly 72 percent of records where human transcribers agreed'
+values = ["pctCongruent"]
+status = "scripted"
+script = "CODE/make_balance_exhibits.do"
+machine = "A"
+
+
+# ======================================================= SECTION 5: DEAGLAN'S TABLES
+
+[[claim]]
+id = "deaglan-abe-disc"
+text = 'the exact-name algorithm links 8.6 percent of its denominator before our transcriptions and 18.7 percent after, a 118 percent increase that reproduces the 119 percent'
+values = [
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 3)',
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 4)',
+  '100*(cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 4)/cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 3)-1)',
+  "linkGainTarget",
+]
+status = "external"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+
+[[claim]]
+id = "deaglan-jw-disc"
+text = 'rises from 14.9 to 22.1 percent'
+values = ['cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 1)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 2)']
+status = "external"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+
+[[claim]]
+id = "deaglan-hlink-disc"
+text = 'rises from 49.7 to 56.6 percent'
+values = ['cell("figures/deaglan_hlink_restricted.tex", "Match Rate", 1)', 'cell("figures/deaglan_hlink_restricted.tex", "Match Rate", 2)']
+status = "external"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+
+[[claim]]
+id = "deaglan-mi"
+text = 'increases from 76.8 to 83.5 percent under exact names, from 79.7 to 83.8 percent under Jaro-Winkler, and from 82.7 to 83.4 percent under HLINK'
+values = [
+  'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 4)',
+  'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 1)', 'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 2)',
+  'cell("figures/deaglan_hlink_restricted.tex", "MI Match Rate", 1)', 'cell("figures/deaglan_hlink_restricted.tex", "MI Match Rate", 2)',
+]
+status = "external"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+issue = "These are discordant-sample values (full-sample MI rates are 86-87); the sentence does not say which sample."
+
+[[claim]]
+id = "deaglan-verified"
+text = 'from 515,555 to 1,300,253 on discordant records under exact names, and recall rises with it, from 11.1 to 28.1 percent, from 20.6 to 32.5 percent under Jaro-Winkler, and from 69.5 to 77.4 percent under HLINK'
+values = [
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 4)',
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 4)',
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 1)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 2)',
+  'cell("figures/deaglan_hlink_restricted.tex", "Recall", 1)', 'cell("figures/deaglan_hlink_restricted.tex", "Recall", 2)',
+]
+status = "external"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+
+[[claim]]
+id = "deaglan-contradicted-counts"
+text = 'it falls under ABE and Jaro-Winkler, from 190,805 to 171,174 in the full sample, but rises under HLINK, from 293,078 to 296,657, and on the discordant sample under exact names, from 40,919 to 43,715'
+values = [
+  'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 2)',
+  'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 2)',
+  'cell("figures/deaglan_abe_jw_restricted.tex", "Directly Contradicted", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Directly Contradicted", 4)',
+]
+status = "external"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+issue = "Mislabelled: 190,805 -> 171,174 is the Jaro-Winkler column only. ABE full is 210,054 -> 194,387. The HLINK discordant rise (67,636 -> 70,375) is not mentioned."
+
+[[claim]]
+id = "deaglan-contradicted-shares"
+text = 'from 1.51 to 1.27 and from 1.68 to 1.44 percent in the two full-sample ABE columns, from 2.59 to 1.36 and from 3.19 to 1.56 percent on the discordant sample, and from 0.44 to 0.43 and from 0.44 to 0.41 percent under HLINK'
+values = [
+  'contra("figures/deaglan_abe_jw.tex", 1)', 'contra("figures/deaglan_abe_jw.tex", 2)',
+  'contra("figures/deaglan_abe_jw.tex", 3)', 'contra("figures/deaglan_abe_jw.tex", 4)',
+  'contra("figures/deaglan_abe_jw_restricted.tex", 1)', 'contra("figures/deaglan_abe_jw_restricted.tex", 2)',
+  'contra("figures/deaglan_abe_jw_restricted.tex", 3)', 'contra("figures/deaglan_abe_jw_restricted.tex", 4)',
+  'contra("figures/deaglan_hlink.tex", 1)', 'contra("figures/deaglan_hlink.tex", 2)',
+  'contra("figures/deaglan_hlink_restricted.tex", 1)', 'contra("figures/deaglan_hlink_restricted.tex", 2)',
+]
+status = "external"
+script = "hand-computed from Deaglan's tables"
+machine = "B"
+issue = "'the two full-sample ABE columns' are one Jaro-Winkler and one ABE column."
+
+[[claim]]
+id = "deaglan-denom-abe"
+text = 'Denominator is the 57,589,273 men aged 8 and above'
+values = ["linkDenomAbe", ""]
+status = "scripted"
+script = "LINKAGE/code/01_abe_jw/linkage_analysis.do"
+machine = "B"
+
+[[claim]]
+id = "deaglan-denom-abe-disc"
+text = 'restricted throughout to the 15,003,537 men aged 8 and above'
+values = ["linkDenomAbeDisc", ""]
+status = "scripted"
+script = "LINKAGE/code/01_abe_jw/linkage_analysis.do"
+machine = "B"
+
+[[claim]]
+id = "deaglan-denom-hlink"
+text = 'Denominator is the 115,030,746 men and women aged 8 and above'
+values = ["linkDenomHlink", ""]
+status = "scripted"
+script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
+machine = "B"
+
+[[claim]]
+id = "deaglan-hlink-restriction"
+text = 'changes the match rates from 58.08 and 59.55 to 58.06 and 59.52'
+values = ['cell("figures/deaglan_hlink.tex", "Match Rate", 1)', 'cell("figures/deaglan_hlink.tex", "Match Rate", 2)', "linkHlinkInDenomOld", "linkHlinkInDenomNew"]
+status = "scripted"
+script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do (58.08/59.55 from its table; 58.06/59.52 by repnum, added 2026-10-18)"
+machine = "B"
+
+[[claim]]
+id = "deaglan-denom-hlink-disc"
+text = 'restricted throughout to the 30,754,309 men and women aged 8 and above'
+values = ["linkDenomHlinkDisc", ""]
+status = "scripted"
+script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
+machine = "B"
+
+
+# ===================================================== SECTION 5: HETEROGENEITY
+
+[[claim]]
+id = "socio-all-improved"
+text = '''Every group improved on both measures, so each panel's vertical axis lies entirely above zero'''
+values = []
+assert = "socioGroupsNotImproved == 0 and socioGroupsMissing == 0"
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+issue = "The figure note's list of grouping variables omits non-English mother tongue, which the figure includes and line 712 quotes."
+
+[[claim]]
+id = "race-baseline"
+text = 'The baseline linking rate for non-white residents in our sample was 11.0\% compared to 24.1\% for white residents'
+values = ["linkBaseNonwhite", "linkBaseWhite"]
+status = "scripted"
+script = "CODE/compute_race_linkage_rates.do"
+machine = "A"
+
+[[claim]]
+id = "race-gain"
+text = 'Our improvements raised the linking rate by 6.4\% for non-white residents and 7.9\% for white residents'
+values = ["linkGainNonwhite", "linkGainWhite"]
+status = "scripted"
+script = "CODE/compute_race_linkage_rates.do"
+machine = "A"
+
+[[claim]]
+id = "subgroups"
+text = 'including foreign-born individuals (16.6 to 18.0\%, a gain of 8.1\%), those with no formal schooling (11.9 to 12.7\%, a gain of 7.0\%), and those with a non-English mother tongue (19.9 to 21.5\%, a gain of 7.8\%)'
+values = ["linkBaseForeignborn", "linkAfterForeignborn", "linkGainForeignborn",
+          "linkBaseNoschool", "linkAfterNoschool", "linkGainNoschool",
+          "linkBaseNonenglish", "linkAfterNonenglish", "linkGainNonenglish"]
+status = "scripted"
+script = "CODE/compute_subgroup_linkage_rates.do"
+machine = "A"
+
+[[claim]]
+id = "inmates"
+text = 'who start from one of the lowest baselines at 15.0\%, gain 7.3\%'
+values = ["linkBaseInmate", "linkGainInmate"]
+status = "scripted"
+script = "CODE/verify_inmates_and_county_stats.do"
+machine = "A"
+
+[[claim]]
+id = "no-group-fell"
+text = '''No group's linking rate fell'''
+values = []
+assert = "socioGroupsNotImproved == 0 and socioGroupsMissing == 0"
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[claim]]
+id = "county-percentiles"
+text = 'the 5th and 95th percentile of the distribution of the share of records with incongruent transcription is 18\% and 42\%'
+values = ["", "", "countyIncongLow", "countyIncongHigh"]
+status = "scripted"
+script = "CODE/verify_inmates_and_county_stats.do"
+machine = "A"
+issue = "The 95th percentile is 42.5 at one decimal, which would normally be printed as 43."
+
+[[claim]]
+id = "county-correlates"
+text = 'with notably higher rates occurring in counties with above-median share of individuals born in the South, below age 30, or without formal education'
+values = [""]
+status = "nocode"
+script = "none for all states (only commented-out Rhode Island code in munir_figures_for_nber.do)"
+machine = "A"
+
+[[claim]]
+id = "legibility-headline"
+text = 'where the linkage rate rises by 20 percent, against 1.4 percent in the most legible quartile'
+values = ["legGainLowest", "legGainHighest"]
+status = "scripted"
+script = "CODE/compute_legibility_quartiles.do"
+machine = "A"
+
+[[claim]]
+id = "legibility-detail"
+text = 'their transcription disagreement rate is 46.2 percent against 14.0 percent in the highest quartile, and their baseline linkage rate is 16.9 percent against 27.7 percent'
+values = ["legDisagreeLowest", "legDisagreeHighest", "legLinkBaseLowest", "legLinkBaseHighest"]
+status = "scripted"
+script = "CODE/compute_legibility_quartiles.do"
+machine = "A"
+issue = "Quartiles are record-weighted; the prose says 'districts in the lowest quartile'."
+
+[[claim]]
+id = "legibility-gain"
+text = 'from 16.9 to 20.3 percent, a gain of 20 percent, against 27.7 to 28.1 percent in the highest'
+values = ["legLinkBaseLowest", "legLinkAfterLowest", "legGainLowest", "legLinkBaseHighest", "legLinkAfterHighest"]
+status = "scripted"
+script = "CODE/compute_legibility_quartiles.do"
+machine = "A"
+
+
+# ======================================================================= CONCLUSION
+
+[[claim]]
+id = "conclusion-least-covered"
+text = 'they do so by most for groups that were previously least well covered'
+values = []
+assert = "linkGainNonwhite > linkGainWhite and linkGainNoschool > linkGainAll"
+status = "scripted"
+script = "CODE/compute_race_linkage_rates.do + CODE/compute_subgroup_linkage_rates.do"
+machine = "A"
+issue = "Contradicted by the draft's own numbers: the non-white gain (6.4%) is below the white gain (7.9%), and no-schooling (7.0%) is below the overall 8%. Line 755 and line 770 make the same claim."
+
+
+# ========================================================================= EXHIBITS
+# Every exhibit the draft pulls in. check_claims.py confirms each file exists in the
+# paper repo and is referenced by the draft. For generated .tex tables, a rerun of the
+# producing script on machine A followed by `git diff` in the paper repo is the
+# replication test: no diff means the table reproduced exactly.
+
+[[exhibit]]
+file = "figures/balance_allstates.tex"
+label = "tab:sample_characteristics"
+script = "CODE/munir_figures_for_nber.do (state loop) -> CODE/make_balance_exhibits.do"
+machine = "A"
+issue = "munir_figures_for_nber.do still contains balancetable writers for this file; running it after make_balance_exhibits.do overwrites the table with the old version."
+
+[[exhibit]]
+file = "figures/incongruent_allstates.tex"
+label = "tab:cong_vs_incong"
+script = "CODE/munir_figures_for_nber.do (state loop) -> CODE/make_balance_exhibits.do"
+machine = "A"
+issue = "Same overwrite risk as balance_allstates.tex."
+
+[[exhibit]]
+file = "figures/avg_performance_allstates.tex"
+label = "tab:avg_performance"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[exhibit]]
+file = "figures/all_states_hetero_combinedV2.pdf"
+label = "fig:hetero_legibility"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[exhibit]]
+file = "figures/all_states_socio_demo_combinedV2.pdf"
+label = "fig:hetero_socio"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[exhibit]]
+file = "figures/deaglan_abe_jw.tex"
+label = "tab:deaglan_abe_jw"
+script = "Deaglan: code/00_run_all_tables.do -> deaglan_results/current/linkage_table_abe_jw.tex (tabular extracted by hand)"
+machine = "B"
+issue = "The extraction step from deaglan_results/current/ into figures/ has no script."
+
+[[exhibit]]
+file = "figures/deaglan_abe_jw_restricted.tex"
+label = "tab:deaglan_abe_jw_restricted"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+
+[[exhibit]]
+file = "figures/deaglan_hlink.tex"
+label = "tab:deaglan_hlink"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+
+[[exhibit]]
+file = "figures/deaglan_hlink_restricted.tex"
+label = "tab:deaglan_hlink_restricted"
+script = "Deaglan: code/00_run_all_tables.do"
+machine = "B"
+
+[[exhibit]]
+file = "figures/rhode_island_4_252_61.png"
+label = "fig:schedule"
+script = "none (census image crop)"
+machine = "?"
+issue = "The choice of ED 4-252 as closest to mean legibility survives only as commented-out Rhode Island code."
+
+[[exhibit]]
+file = "figures/ernest_bassette_RI_kent_2_52_701_16.png"
+label = "fig:error_examples"
+script = "none (census image crop)"
+machine = "?"
+
+[[exhibit]]
+file = "figures/rhode_island_providence_4_60_692_34.png"
+label = "fig:error_examples"
+script = "none (census image crop)"
+machine = "?"
+
+[[exhibit]]
+file = "figures/rhode_island_providence_6_128_298_38.png"
+label = "fig:error_examples"
+script = "none (census image crop)"
+machine = "?"
+
+
+# ========================================================================== IGNORED
+# Numbers that look like results but are not: model parameters, layout, an illustration,
+# significance thresholds, the name of a dataset. Listing them here records the decision,
+# so they stop appearing as "uncovered". `reason` says why each is not a claim.
+# Hyperparameters are not results, but they have no training code to be checked against
+# either; that gap is recorded under the ML-pipeline claims above.
+
+[[ignore]]
+text = 'We reserve 10\% of records as a test set'
+reason = "design choice of the ML pipeline"
+
+[[ignore]]
+text = '''the model might assign 60\% probability to `S', 35\% probability'''
+reason = "hypothetical illustration"
+
+[[ignore]]
+text = 'and 5\% probability distributed'
+reason = "hypothetical illustration (continues the 60/35 example)"
+
+[[ignore]]
+text = '\includegraphics[width=0.45\textwidth]'
+reason = "layout"
+
+[[ignore]]
+text = '\vspace{-0.3cm}'
+reason = "layout"
+
+[[ignore]]
+text = '* for $p < 0.10$, ** for $p < 0.05$, and *** for $p < 0.01$'
+reason = "significance thresholds"
+
+[[ignore]]
+text = '1\% sample'
+reason = "name of the IPUMS 1% sample, not a result"
+
+[[ignore]]
+text = '1\% Sample'
+reason = "name of the IPUMS 1% sample, in a heading"
+
+[[ignore]]
+text = 'with probability 0.4 to randomly disable neurons'
+reason = "hyperparameter"
+
+[[ignore]]
+text = 'with probability 0.25, which randomly drops'
+reason = "hyperparameter"
+
+[[ignore]]
+text = 'with value 0.1 helps prevent'
+reason = "hyperparameter"
+
+[[ignore]]
+text = 'at a rate of 0.000007'
+reason = "hyperparameter"
+
+[[ignore]]
+text = 'Random erase \citep{zhong2020random} with probability 0.4'
+reason = "hyperparameter"
+
+[[ignore]]
+text = 'with a momentum value of 0.9'
+reason = "hyperparameter"
+
+[[ignore]]
+text = 'We apply gradient clipping at 0.02'
+reason = "hyperparameter"
+
+[[ignore]]
+text = 'Gradient clip value & 0.02'
+reason = "hyperparameter table (tab: network-params)"
+
+[[ignore]]
+text = 'Dropout probability & 0.4'
+reason = "hyperparameter table"
+
+[[ignore]]
+text = 'Stochastic depth probability & 0.25'
+reason = "hyperparameter table"
+
+[[ignore]]
+text = 'Peak learning rate & 0.5'
+reason = "hyperparameter table"
+
+[[ignore]]
+text = 'Momentum & 0.9'
+reason = "hyperparameter table"
+
+[[ignore]]
+text = 'Random erase probability & 0.4'
+reason = "hyperparameter table"
+
+[[ignore]]
+text = 'Label smoothing & 0.1'
+reason = "hyperparameter table"
+
+[[ignore]]
+text = 'Weight decay & 0.000007'
+reason = "hyperparameter table"
+
+[[ignore]]
+text = 'of which we reserve 10\% as a test set'
+reason = "design choice of the ML pipeline"
+
+[[ignore]]
+text = 'of which we again reserve 10% as a test set'
+reason = "design choice of the ML pipeline"

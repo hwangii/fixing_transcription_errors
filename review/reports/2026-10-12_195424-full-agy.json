@@ -1,0 +1,111 @@
+{
+  "dimensions_reviewed": [
+    "claims-vs-code"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Compare lines 70 and 104-106 with lines 648-650 in DHTS-2026-10-12.tex. Inspect figures/deaglan_abe_jw_restricted.tex:16 to confirm that 1,460,694 of 2,804,662 new exact-name links are unverifiable under the FamilySearch reference set.",
+      "id": "link-validation-presented-as-transcription-accuracy",
+      "location": "D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:70, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:104-106, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:565-573, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:648-650",
+      "severity": "major",
+      "suggested_fix": "In the Abstract and Introduction, soften claims from 'genuine accuracy improvements' and ruling out spurious matches to the precise result: increased recovery of verified links and lower contradicted link shares within an incomplete reference standard. Clarify that validating name transcriptions directly against profile names is pending as described in Section 3.3.",
+      "title": "Validation of linked pairs against genealogical links is presented as proof of transcription accuracy",
+      "what_the_code_does": "The paper's external validation exercise in Section 3.2 classifies census-to-census linked pairs against FamilySearch genealogical pairs on 1940 record IDs. It categorizes pairs as verified correct, directly contradicted, or unverifiable depending on whether the genealogical source links to the same 1930 partner, a different 1930 partner, or is missing from FamilySearch. No name string is evaluated against ground truth. Indeed, Section 3.3 (lines 648-650) explicitly acknowledges: 'Section 3.2 validates the links our transcriptions produce against an external genealogical standard. A second and distinct exercise, which we describe here and have not yet completed, validates the transcriptions themselves: rather than asking whether a link is right, it asks how close each transcription comes to the name a genealogical profile records.'",
+      "why_it_matters": "The Abstract (line 70) and Introduction (lines 104-106) assert that genealogical validation confirms 'genuine accuracy improvements rather than spurious matches.' In reality, link validation cannot evaluate transcription accuracy, and over half of newly added exact-name links on discordant records (1,460,694 of 2,804,662, or 52.1% in Table 6/deaglan_abe_jw_restricted.tex) are unverifiable. A referee will reject the claim that genealogical link recovery establishes transcription accuracy or rules out false-positive matches."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Run git grep '97.38' or search CODE/ for accuracy metrics or Table 1 generation. No script produces these numbers.",
+      "id": "model-performance-numbers-have-no-producing-code",
+      "location": "D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:263-270, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:916, CODE/clean_FS_and_combineV5_nber.do:225",
+      "severity": "major",
+      "suggested_fix": "Include the model evaluation script and frozen test-set predictions under CODE/, with an automated script that computes sequence and token accuracy and outputs Table 1 directly to LaTeX.",
+      "title": "The four reported out-of-sample model performance percentages have no producing code in the repository",
+      "what_the_code_does": "Table 1 (line 261) and Appendix A.4 (line 916) report out-of-sample performance: first name whole name 97.38%, characters 98.61%; last name whole name 94.54%, characters 98.29%. In the codebase, CODE/clean_FS_and_combineV5_nber.do:225 exports labels, but no Python or Stata code implements the 10% test split, model inference, sequence accuracy, token accuracy denominator rules, or generation of Table 1.",
+      "why_it_matters": "These four numbers constitute the paper's only direct empirical evaluation of the neural network's transcription capability. Without the evaluation code, the test set sample definition, handling of character length/padding/special characters, and calculations cannot be verified or replicated."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Inspect CODE/create_figures_SSHA2025.do:220-254. Note that it collapses by ED and calls binsreg without computing quartiles. Search CODE/ for 46.2, 14.0, 16.9, or 35.",
+      "id": "legibility-quartile-and-gain-statistics-untraced-in-all-state-code",
+      "location": "D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:101-102, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:719, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:738-740, CODE/create_figures_SSHA2025.do:220-254, CODE/munir_figures_for_nber.do:672-692",
+      "severity": "major",
+      "suggested_fix": "Add code to create_figures_SSHA2025.do that defines ED legibility quartiles, computes disagreement and linkage rates before and after, and exports them to an exhibit or log. Update lines 101-102 and 719 to reflect the verified 20% lowest-quartile gain or define the specific bin supporting 'up to 35 percent'.",
+      "title": "National legibility quartile statistics and the 'up to 35 percent' linking gain claim have no producing code in the repository",
+      "what_the_code_does": "Lines 739-740 cite national legibility quartile statistics: lowest quartile disagreement 46.2% vs highest 14.0%, baseline linkage 16.9% vs 27.7%, and post-transcription linkage 20.3% vs 28.1% (a 20% gain). Lines 101-102 and 719 also claim linking rates in lowest-legibility districts increased by 'up to 35 percent'. The active national analysis script CODE/create_figures_SSHA2025.do:220-254 collapses by ED and runs binsreg, but never computes quartiles or outputs these statistics. The only quartile calculation in CODE/ is commented out in munir_figures_for_nber.do:673 on Rhode Island. Furthermore, no code defines the subgroup or bin underlying the 'up to 35 percent' claim, which contradicts the 20% gain reported in the text.",
+      "why_it_matters": "The national quartile numbers in the text cannot be reproduced from the codebase, and the 'up to 35 percent' claim in the Introduction and Section 4.3 conflicts with the 20% lowest-quartile gain reported in the body."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Check CODE/create_figures_SSHA2025.do:271 and CODE/label_socio_demo.do:14-15. Confirm that race==2 includes all non-white categories and is labeled 'Non-whites'.",
+      "id": "non-white-grouping-described-as-black-residents",
+      "location": "D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:703-704, CODE/create_figures_SSHA2025.do:271, CODE/label_socio_demo.do:14-15",
+      "severity": "minor",
+      "suggested_fix": "Either compute separate statistics for Black residents using the specific race/raced code (black = floor(raced/100)==2), or update the text at lines 703-704 to state 'non-white residents' to match the code and Figure 4 marker.",
+      "title": "Heterogeneity analysis describes the aggregated non-white racial category as Black residents",
+      "what_the_code_does": "The text at lines 703-704 states: 'The baseline linking rate for Black residents in our sample was 18.3\\% compared to 27.1\\% for white residents... Our improvements increased linking rates by similar rates for both groups: 11.4\\% for Black residents compared to 12.2\\% for white residents.' In CODE/create_figures_SSHA2025.do:271, the code executes recode race (1=1) (2 3 4 5 6 7=2), grouping all non-white racial categories together. CODE/label_socio_demo.do:14-15 labels this group 'Non-whites', and Figure 4 plots a marker for 'Non-whites'.",
+      "why_it_matters": "The prose attributes the statistics specifically to 'Black residents' when the underlying calculation and plotted point combine Black, American Indian, Asian, and other non-white individuals into an aggregate non-white category."
+    },
+    {
+      "confidence": "likely",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Inspect CODE/clean_FS_and_combineV5_nber.do:225 and compare with lines 398 and 536-538 of DHTS-2026-10-12.tex.",
+      "id": "headline-sample-imposes-undisclosed-familysearch-age-filter",
+      "location": "CODE/clean_FS_and_combineV5_nber.do:225, CODE/create_figures_SSHA2025.do:43, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:398, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:536-538",
+      "severity": "minor",
+      "suggested_fix": "Disclose the age_fs!=. restriction in the data description and Table 4 note, or omit age_fs!=. from data construction if FamilySearch age is not required.",
+      "title": "Headline table input dataset imposes an undisclosed FamilySearch age completeness restriction",
+      "what_the_code_does": "In CODE/clean_FS_and_combineV5_nber.do:225, census1940_all_labeled_data.dta is created with: keep if namelast!=\\\"\\\" & namefrst!=\\\"\\\" & namefrst_fs!=\\\"\\\" & namelast_fs!=\\\"\\\" & age!=. & age_fs!=.. This dataset is loaded in CODE/create_figures_SSHA2025.do:43 to generate Table 4 (tab:avg_performance, N=51,036,859). However, DHTS-2026-10-12.tex:398 defines the analysis sample as requiring only the four name fields (N=51,066,203), and Table 4's note (lines 536-538) explains the 29,344 difference as solely resulting from merging to socio-demographic and link extracts, without disclosing that records lacking age_fs were pre-filtered.",
+      "why_it_matters": "The requirement age_fs!=. imposes an unstated selection criterion on the headline analysis sample that is omitted from both the sample definition and the table note accounting for record attrition."
+    }
+  ],
+  "review_limits": [
+    "All census microdata, raw image files, intermediate .dta files, and external linkage tables reside on external paths (D:\\SNU ECON Dropbox\\, F:\\...), so scripts could not be executed dynamically and results were audited by code reading and static artifact verification.",
+    "Machine learning model training, architecture code, and test evaluation scripts are absent from CODE/, so model weights, test set splits, and token denominators could not be inspected in source.",
+    "Deaglan Jakob's linking pipeline scripts that produced deaglan_results/current/ are outside the repository; the resulting LaTeX tables and provenance notes were verified against the paper text, but the underlying linking code was not auditable."
+  ],
+  "summary": "The manuscript's core linkage tables and discordant-sample partition statistics are reproducible and correctly documented, but the draft continues to present link-level genealogical recovery as proof of transcription accuracy when over half of new links remain unverifiable. The most critical fix is to align Abstract and Introduction claims with the actual evidenceΓÇöconfirming increased recovery of verified links rather than claiming demonstrated transcription accuracyΓÇöwhile providing repository code for the unverified model-performance and legibility statistics.",
+  "verified_clean": [
+    {
+      "evidence": "CODE/create_figures_SSHA2025.do:139-209 computes and writes figures/avg_performance_allstates.tex, confirming the 119%, 28%, 8%, and 1% figures cited in lines 96-100 and Table 4.",
+      "item": "Headline linkage and middle-initial validation percentages in Table 4 match the producing code"
+    },
+    {
+      "evidence": "CODE/create_figures_SSHA2025.do:68, 78 requires mi!=\"\" in both years and linked==1, ensuring blank initials are never counted as matches.",
+      "item": "Middle-initial validation correctly ignores blank fields"
+    },
+    {
+      "evidence": "CODE/compute_model_agreement_on_discordant.do:109-137 partitions 35,094,490 records into Ancestry (14.3%), FamilySearch (51.8%), neither (24.3%), and no model output (9.6%), asserting that they sum exactly to the denominator without conditioning on model success.",
+      "item": "Model agreement categories on discordant records form an asserted partition"
+    },
+    {
+      "evidence": "DHTS-2026-10-12.tex:298-305 explicitly notes that higher agreement with FamilySearch represents resemblance rather than reliability, citing normalization and ditto-resolution conventions.",
+      "item": "Model agreement is not claimed to demonstrate FamilySearch accuracy"
+    },
+    {
+      "evidence": "DHTS-2026-10-12.tex:441-443 explicitly explains that transcription congruency is defined only for records in the analysis sample, clarifying that the 28.3% figure in Table 2 is identical by construction rather than an empirical property of the unlinked US population.",
+      "item": "Incongruent rate equality between US population and analysis sample is correctly explained"
+    },
+    {
+      "evidence": "DHTS-2026-10-12.tex:477-478 note explains that the 55,350,482 count reported under Diff. is what balancetable outputs for the total population and accounts for the 4,284,279 record gap.",
+      "item": "Table 2 difference column observation count is clarified"
+    },
+    {
+      "evidence": "DHTS-2026-10-12.tex:682-684, 696 correctly describes Figure 4 as two vertically stacked panels of percentage change vs pre-improvement baseline with a dashed zero-change line, matching CODE/create_figures_SSHA2025.do:354-361.",
+      "item": "Socio-demographic combined figure description matches the actual plot layout"
+    },
+    {
+      "evidence": "DHTS-2026-10-12.tex:556-573 accurately quotes verified correct counts (e.g. 515,555 to 1,300,253) and recall (11.1% to 28.1%), while lines 569-572 explicitly disclose that directly contradicted link counts rise under HLINK and discordant ABE while contradicted shares fall across all specifications.",
+      "item": "External genealogical validation numbers match the generated artifacts and disclose contradicted link dynamics"
+    },
+    {
+      "evidence": "DHTS-2026-10-12.tex:391-395 accurately distinguishes why Hawaii (empty extract) and Alaska (omitted from state loops) do not contribute records to the 49-jurisdiction analysis.",
+      "item": "Jurisdiction coverage for Alaska and Hawaii is accurately stated"
+    }
+  ]
+}

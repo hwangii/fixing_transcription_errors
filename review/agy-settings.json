@@ -1,0 +1,51 @@
+{
+  "_comment": "Install as %USERPROFILE%\\.gemini\\antigravity-cli\\settings.json. Required for Run-Review.ps1 -Reviewer agy. Headless agy cannot prompt, so toolPermission must be always-proceed; edits are prevented by --mode plan (set by the launcher), and the deny list below is the backstop against shell-level writes. The terminal sandbox is off because it cannot execute commands on Windows Server 2019 (run exits 2 with no output). The CLI rewrites this file on startup and may reorder keys; that is harmless.",
+  "toolPermission": "always-proceed",
+  "enableTerminalSandbox": false,
+  "permissions": {
+    "allow": [
+      "command(dir)",
+      "command(ls)",
+      "command(type)",
+      "command(cat)",
+      "command(head)",
+      "command(tail)",
+      "command(wc)",
+      "command(grep)",
+      "command(rg)",
+      "command(findstr)",
+      "command(Get-ChildItem)",
+      "command(Get-Content)",
+      "command(Select-String)"
+    ],
+    "deny": [
+      "command(del)",
+      "command(erase)",
+      "command(rm)",
+      "command(rmdir)",
+      "command(rd)",
+      "command(move)",
+      "command(mv)",
+      "command(copy)",
+      "command(cp)",
+      "command(ren)",
+      "command(rename)",
+      "command(Remove-Item)",
+      "command(Move-Item)",
+      "command(Copy-Item)",
+      "command(Rename-Item)",
+      "command(Set-Content)",
+      "command(Add-Content)",
+      "command(Out-File)",
+      "command(New-Item)",
+      "command(git)",
+      "command(python)",
+      "command(py)",
+      "command(StataMP-64)",
+      "command(stata)",
+      "command(powershell)",
+      "command(pwsh)",
+      "command(cmd)"
+    ]
+  }
+}

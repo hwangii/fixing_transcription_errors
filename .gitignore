@@ -50,12 +50,25 @@ tmp/
 *.bmp
 
 # ---------- Stata ----------
-*.log          # Stata (and LaTeX) logs
-*.smcl         # Stata formatted logs
-*.stswap       # Stata autosave/recovery
-*.gph          # Stata graph files (regenerated from .do)
+# NOTE: gitignore has no inline comments -- a trailing "# ..." becomes part
+# of the pattern and the rule silently matches nothing. Keep comments on
+# their own line.
+# Stata (and LaTeX) logs, formatted logs, autosave/recovery, and graph files
+# (the last are regenerated from the .do files).
+*.log
+*.smcl
+*.stswap
+*.gph
+# ...but the reviewer transcripts under review/reports/ ARE the audit trail and
+# are committed on purpose. Ten of them were already tracked when *.log began
+# matching; without this exception new ones would be silently left behind.
+!review/reports/*.log
 sigma.dta
 _stata_temp*/
+# Deaglan's linkage code (LINKAGE/) carries one plain-text readme
+# (code/01_abe_jw/reference/ABE_algorithm_readme.txt). It is documentation,
+# not data, and *.txt above would otherwise silently drop it.
+!LINKAGE/**/*.txt
 
 # ---------- LaTeX build artifacts ----------
 *.aux
