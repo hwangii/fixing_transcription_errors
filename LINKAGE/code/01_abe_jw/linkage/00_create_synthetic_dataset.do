@@ -3,7 +3,8 @@ clear all
 
 * ---- Path bootstrap: single source of truth ----
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 
 * raw_census/ is scratch for the small-scale demo pipeline (stages 01-05 and
 * comparison/). Its previous contents are in _archive/; this script regenerates

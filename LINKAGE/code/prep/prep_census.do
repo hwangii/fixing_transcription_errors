@@ -9,7 +9,8 @@
 * ------------------------------------------------------------
 
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 
 use year sex age race bpl histid using "$D_CENSUS/1930_1940_full_w_women.dta" ///
     if year == 1940 & age >= 8, clear

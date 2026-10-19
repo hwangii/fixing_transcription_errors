@@ -5,7 +5,8 @@ set more off
 
 * ---- Path bootstrap: single source of truth ----
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 
 
 local a_dataset "$ABE_SRC/matching_intgen1930.dta"

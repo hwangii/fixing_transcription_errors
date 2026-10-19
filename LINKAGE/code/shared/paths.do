@@ -15,19 +15,33 @@
 *     do "X:/somewhere/Census_Transcriptions/code/shared/paths.do"
 * ------------------------------------------------------------
 
+* 2026-10-18: CODE AND DATA NOW LIVE IN DIFFERENT PLACES. The code is the
+* copy in the fixing_transcription_errors repo (LINKAGE/code), which is now
+* canonical; ROOT is the data root on machine B and holds data only. Every
+* script loads this file through $LCODE, never $ROOT/code -- otherwise it
+* would silently run the old copy still sitting under F:/Deaglan.
 if "$ROOT" == "" {
     global ROOT "F:/Deaglan/Census_Transcriptions"
 }
+if "$LCODE" == "" {
+    global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+}
 
-capture confirm file "$ROOT/code/shared/paths.do"
+capture confirm file "$LCODE/shared/paths.do"
 if _rc {
-    di as error "paths.do: ROOT does not look like the project root:"
+    di as error "paths.do: LCODE does not look like the LINKAGE/code folder:"
+    di as error "  $LCODE"
+    exit 601
+}
+local has_data : dir "$ROOT" dirs "data"
+if `"`has_data'"' == "" {
+    di as error "paths.do: ROOT has no data/ folder -- not the data root:"
     di as error "  $ROOT"
     exit 601
 }
 
 * ---- code ----
-global CODE         "$ROOT/code"
+global CODE         "$LCODE"
 global C_ABEJW      "$CODE/01_abe_jw"
 global C_HLINK      "$CODE/02_hlink"
 global C_MORT       "$CODE/03_mortality"

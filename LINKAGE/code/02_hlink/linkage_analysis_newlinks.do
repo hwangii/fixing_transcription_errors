@@ -20,7 +20,8 @@ set more off
 
 * ---- Path bootstrap: single source of truth ----
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 
 * ---- Common file paths (all derived from paths.do) ----
 local names1930   "$D_APPENDED/divided_file1930_ans_cleaned_women_added.dta"

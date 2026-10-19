@@ -15,7 +15,8 @@ clear all
 set more off
 
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 
 global output_dir "$D_MORT/working"
 global bunmd_raw  "$D_MORT/raw/bunmd_v2/bunmd_v2.csv"

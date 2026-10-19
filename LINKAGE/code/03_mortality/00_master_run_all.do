@@ -37,7 +37,8 @@ capture gtools, upgrade
 * Bootstrap. If a master runner has already set ROOT, keep it.
 * This is the only path literal in the mortality pipeline.
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 
 * ---- legacy global names, kept so steps 0-5 run unchanged ----
 global base_path    "$ROOT"

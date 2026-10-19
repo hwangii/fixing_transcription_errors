@@ -42,7 +42,8 @@ set more off
 
 * ---- Path bootstrap ----
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 
 * ============================================================
 * SETTINGS (reconstructed -- see PROVENANCE above)

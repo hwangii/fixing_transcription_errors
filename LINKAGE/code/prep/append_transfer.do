@@ -23,7 +23,8 @@ set more off
 * results were moved by hand -- an undocumented manual step that broke
 * replication.
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 *------------------------------------------------------------------ settings --
 local root    "$D_TRANSCRIPT"
 local outdir  "$D_APPENDED"

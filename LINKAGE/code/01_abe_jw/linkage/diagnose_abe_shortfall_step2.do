@@ -24,7 +24,8 @@ clear all
 set more off
 
 if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
-do "$ROOT/code/shared/paths.do"
+if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
+do "$LCODE/shared/paths.do"
 
 local tag "ans_cleaned"
 local original "$D_LINKS/link1930_1940_`tag'_noraceblock0.dta"
