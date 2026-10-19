@@ -221,6 +221,14 @@ keep histid
 tempfile men1940
 save `men1940'
 
+* Denominator populations, one per sample: the numerator is restricted to
+* these (fix 2026-10-19).
+local den1940_full `men1940'
+use `cn1940_restr', clear
+keep histid
+tempfile den1940_restr
+save `den1940_restr'
+
 * True pairs: restricted to 1940 men
 use `true_links', clear
 keep histid1930 histid1940
@@ -269,22 +277,20 @@ foreach samp in full restr {
 
         prep_links "`link_`ver''" "`id1930'" "`id1940'" "`keepif'"
 
-        * If restricted, keep only pairs where histid1940 is in restricted set
-        if "`samp'" == "restr" {
-            rename histid1940 histid
-            merge m:1 histid using `restr1940', keep(3) nogenerate
-            rename histid histid1940
-        }
+        * Numerator restricted to this sample's denominator population: age 8+,
+        * and congruent == 0 when restricted. Fix 2026-10-19; before, the full
+        * sample kept every pair and the restricted one checked congruence only.
+        rename histid1940 histid
+        merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
+        rename histid histid1940
 
         scalar N_linked_`samp'_`ver' = _N
         scalar rate_`samp'_`ver'     = N_linked_`samp'_`ver' / N_men_1940_`samp'
 
-        * Replication package (2026-10-18), output only. The table's
-        * numerator counts every pair, including pairs whose 1940 person is
-        * outside the age-8+ denominator. The draft quotes the full-sample
-        * rate with the numerator restricted to the denominator population
-        * (Codex review, PROVENANCE.md Q5). Computed on a preserved copy, so
-        * the table itself is unchanged.
+        * Replication package (2026-10-18), output only: the full-sample rate
+        * with the numerator restricted to the denominator population
+        * (PROVENANCE.md Q5). Since the 2026-10-19 fix above restricts the
+        * table's own numerator, this now equals the table's rate.
         if "`samp'" == "full" {
             preserve
             rename histid1940 histid
@@ -309,11 +315,12 @@ foreach samp in full restr {
 
         prep_links "`link_`ver''" "`id1930'" "`id1940'" "`keepif'"
 
-        if "`samp'" == "restr" {
-            rename histid1940 histid
-            merge m:1 histid using `restr1940', keep(3) nogenerate
-            rename histid histid1940
-        }
+        * Numerator restricted to this sample's denominator population: age 8+,
+        * and congruent == 0 when restricted. Fix 2026-10-19; before, the full
+        * sample kept every pair and the restricted one checked congruence only.
+        rename histid1940 histid
+        merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
+        rename histid histid1940
 
         * Classify matched pairs (1940-centric)
         merge m:1 histid1940 using `true_by1940', keep(1 3) gen(person_merge)
@@ -372,11 +379,12 @@ foreach samp in full restr {
 
     * ---- Load new transcription pairs ----
     prep_links "`link_new'" "`id1930'" "`id1940'" "`keepif'"
-    if "`samp'" == "restr" {
-        rename histid1940 histid
-        merge m:1 histid using `restr1940', keep(3) nogenerate
-        rename histid histid1940
-    }
+    * Numerator restricted to this sample's denominator population: age 8+,
+    * and congruent == 0 when restricted. Fix 2026-10-19; before, the full
+    * sample kept every pair and the restricted one checked congruence only.
+    rename histid1940 histid
+    merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
+    rename histid histid1940
     duplicates drop histid1930, force
     rename histid1940 histid1940_new
     tempfile newlinks_`samp'
@@ -384,11 +392,12 @@ foreach samp in full restr {
 
     * ---- Load old transcription pairs ----
     prep_links "`link_old'" "`id1930'" "`id1940'" "`keepif'"
-    if "`samp'" == "restr" {
-        rename histid1940 histid
-        merge m:1 histid using `restr1940', keep(3) nogenerate
-        rename histid histid1940
-    }
+    * Numerator restricted to this sample's denominator population: age 8+,
+    * and congruent == 0 when restricted. Fix 2026-10-19; before, the full
+    * sample kept every pair and the restricted one checked congruence only.
+    rename histid1940 histid
+    merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
+    rename histid histid1940
     duplicates drop histid1930, force
     rename histid1940 histid1940_old
 
