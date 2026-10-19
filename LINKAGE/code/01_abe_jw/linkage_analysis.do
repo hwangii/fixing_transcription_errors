@@ -101,6 +101,21 @@ rename histid1930 true_histid1930
 tempfile true_by1940
 save `true_by1940'
 
+* Person-level true links, 1930 side (histid1930 -> true_histid1940), from the
+* FULL truth file: a 1930 person whose true 1940 match lies outside the
+* denominator is still known to be linked to someone else. The truth file is
+* one-to-one on both sides (36,143,407 pairs; checked 2026-10-19).
+* Fix 2026-10-19: a pair is Directly Contradicted if EITHER of its people is
+* truly linked to someone else. Before, only the 1940 side was checked, so a
+* wrong link whose 1940 person is outside the truth set was Unverifiable.
+use `true_links', clear
+keep histid1930 histid1940
+duplicates drop histid1930 histid1940, force
+isid histid1930
+rename histid1940 true_histid1940
+tempfile true_by1930
+save `true_by1930'
+
 
 * ============================================================
 * OUTER LOOP: run all analyses for full and restricted samples
@@ -176,15 +191,17 @@ foreach samp in full restr {
             rename histid histid1940
         }
 
-        * Classify matched pairs (1940-centric)
+        * Classify matched pairs (two-sided; fix 2026-10-19)
         merge m:1 histid1940 using `true_by1940', keep(1 3) gen(person_merge)
+        merge m:1 histid1930 using `true_by1930', keep(1 3) gen(merge30)
 
-        count if person_merge == 1
+        count if person_merge == 1 & merge30 == 1
         scalar unverifiable_`samp'_`combo' = r(N)
         count if person_merge == 3 & histid1930 == true_histid1930
         scalar verified_`samp'_`combo' = r(N)
-        count if person_merge == 3 & histid1930 != true_histid1930
+        count if (person_merge == 3 & histid1930 != true_histid1930) | (person_merge == 1 & merge30 == 3)
         scalar contradicted_`samp'_`combo' = r(N)
+        drop merge30 true_histid1940
 
         * Recall: FN = true pairs not recovered
         preserve
@@ -289,13 +306,16 @@ foreach samp in full restr {
         * For net_removed: classify using histid1940_old
         * We need to merge twice — once per 1940 ID column
 
+        * 1930 side of the truth check (two-sided; fix 2026-10-19)
+        merge m:1 histid1930 using `true_by1930', keep(1 3) gen(merge30)
+
         * Classify new link (net_added, changed)
         gen new_cat = .
         rename histid1940_new histid1940
         merge m:1 histid1940 using `true_by1940', keep(1 3) gen(merge_new)
-        replace new_cat = 2 if inlist(status,"net_added","changed") & merge_new == 1
+        replace new_cat = 2 if inlist(status,"net_added","changed") & merge_new == 1 & merge30 == 1
         replace new_cat = 1 if inlist(status,"net_added","changed") & merge_new == 3 & histid1930 == true_histid1930
-        replace new_cat = 3 if inlist(status,"net_added","changed") & merge_new == 3 & histid1930 != true_histid1930
+        replace new_cat = 3 if inlist(status,"net_added","changed") & ((merge_new == 3 & histid1930 != true_histid1930) | (merge_new == 1 & merge30 == 3))
         rename histid1940 histid1940_new
         drop true_histid1930 merge_new
 
@@ -303,11 +323,11 @@ foreach samp in full restr {
         gen old_cat = .
         rename histid1940_old histid1940
         merge m:1 histid1940 using `true_by1940', keep(1 3) gen(merge_old)
-        replace old_cat = 2 if inlist(status,"net_removed","changed") & merge_old == 1
+        replace old_cat = 2 if inlist(status,"net_removed","changed") & merge_old == 1 & merge30 == 1
         replace old_cat = 1 if inlist(status,"net_removed","changed") & merge_old == 3 & histid1930 == true_histid1930
-        replace old_cat = 3 if inlist(status,"net_removed","changed") & merge_old == 3 & histid1930 != true_histid1930
+        replace old_cat = 3 if inlist(status,"net_removed","changed") & ((merge_old == 3 & histid1930 != true_histid1930) | (merge_old == 1 & merge30 == 3))
         rename histid1940 histid1940_old
-        drop true_histid1930 merge_old
+        drop true_histid1930 merge_old merge30 true_histid1940
 
         * ---- NET ADDED ----
         count if status == "net_added"
