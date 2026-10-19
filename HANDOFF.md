@@ -1,8 +1,110 @@
-# HANDOFF — state as of 2026-10-14
+# HANDOFF — state as of 2026-10-18
 
 Written for continuing this work on **either** of the two servers. Each holds a
 different and equally important dataset, so analysis runs on both and both edit
 `CODE/`. Read this first, then `CLAUDE.md`.
+
+## Machine B replication — the next job, to be done on machine B (written 2026-10-18)
+
+**Decided 2026-10-18 by the author:** Deaglan's code and data on machine B
+(`F:\Deaglan\Census_Transcriptions\`) are now ours to work on, and he is not
+expected to edit them again. The copy of his code in this repo becomes the
+canonical one. His folder on F: then holds data only.
+
+**Goal:** Tables 5-8, and every draft number quoted from them, reproduce from a
+single command on B, as machine A's already do (§ below, 2026-10-15). Today
+the draft's `figures/deaglan_*.tex` were extracted from
+`deaglan_results/current/` **by hand**, and his package's "all five tables
+verified byte-identical" claim has never been checked.
+
+Do these steps in order and commit after each one.
+
+1. **Sync first.** Run `.\Sync.ps1 -Pull` here and `git pull` in B's paper repo
+   (`F:\github_repos\6638fa0fd89fbec05130caeb`, per
+   `review/scopes/deaglan-census-transcriptions.md`; confirm it). Read
+   `replication/README.md`, then this repo's copy of the review of his
+   package (item 6 below).
+2. **Bring his code into the repo as `LINKAGE/`.** Copy code only: `code/`, his
+   `README.md`, `DOCUMENTATION.md` and `LINKAGE_README.md`. Leave out data,
+   `output/` and logs.
+   - `Sync.ps1` commits with `git add -u`, which never picks up new files. So
+     run `git add LINKAGE/` explicitly, then read `git status` and
+     `git diff --cached --stat` before committing.
+   - Nothing in `LINKAGE/` may be a `.dta`, `.csv`, or anything bigger than a
+     script.
+   - Commit the copy **unmodified** first, so the history shows exactly what
+     he handed over.
+   - Then repoint `code/shared/paths.do`. Code is read from the repo; data is
+     still read from `F:\Deaglan\Census_Transcriptions` through `$ROOT`.
+     That is the one path change agreed in advance; ask before changing any
+     others.
+3. **Add machine B to the package.**
+   - A hostname block in `replication/config.do`. Machine A's block is the
+     model; add a global for his data root, e.g. `REP_LINK`.
+   - A `[machines.<B hostname>] paper_repo = ...` entry in
+     `replication/claims.toml`.
+4. **`replication/run_machineB.do` and `replication/Run-MachineB.ps1`**, built
+   from the machine-A pair:
+   - Set `version 15.1` (or whatever B has; record it in the README).
+   - Preflight every input file his scripts read.
+   - Run `LINKAGE/code/00_run_all_tables.do`.
+   - Then run a new extraction script, written in Python, that writes the
+     `tabular` from his output tables into the paper repo's
+     `figures/deaglan_{abe_jw,abe_jw_restricted,hlink,hlink_restricted}.tex`
+     in exactly today's format. Before the first real run, test the script
+     against today's committed `deaglan_results/current/` files: it must
+     reproduce today's four `figures/` files byte-for-byte.
+   - Then run `check_claims.py`, and `git status` / `git diff` in both repos.
+   - Exactly as on A, a changed `figures/deaglan_*.tex` means the table did
+     **not** reproduce. That run is the first real check of his
+     byte-identical claim.
+5. **Script the numbers that are now unchecked.** Add `repnum` calls to his
+   scripts so that they write `replication/results/linkage_*.tex`. Then point
+   these claims in `claims.toml` at the new keys:
+   - `deaglan-denom-abe`: 57,589,273
+   - `deaglan-denom-abe-disc`: 15,003,537
+   - `deaglan-denom-hlink`: 115,030,746
+   - `deaglan-denom-hlink-disc`: 30,754,309
+   - `deaglan-hlink-restriction`: 58.06 and 59.52. These came from a Codex
+     review, not from any script.
+
+   Each comes from `PROVENANCE.md` Q3 and Q5 in the paper repo's
+   `deaglan_results/current/`. Machine A never writes a `linkage_*.tex`, so
+   the two machines cannot collide on a results file.
+6. **Run the package, then push both repos.** Push the paper repo only after
+   asking: its remote is Overleaf itself, so coauthors see the push at once.
+   Machine A then pulls, and one `check_claims.py` run covers the whole draft.
+
+**Reproduce first, fix afterwards.** The review of his package (item 6) found
+real problems:
+- the HLINK numerator counts links outside its denominator;
+- `keep if age >= 8` keeps missing ages;
+- "Directly Contradicted" is one-sided;
+- the mortality numerator is missing the filter its denominator has.
+
+Do **not** fix any of these during steps 2-5. First get his tables to
+reproduce **exactly as they are**, so the package proves what the draft
+currently says. Then fix them one at a time, each as its own commit, and
+let the rerun and the checker show what each fix changes. A fix that moves a
+number is a draft change, and needs the author's sign-off.
+
+**Traps from machine A that will hit his Stata code too:**
+- Launch Stata batch runs from PowerShell, never Git Bash. Git Bash rewrites
+  `/b` into a path.
+- `Run-Stata.ps1` is the only reliable way to tell a batch run failed. A failed
+  batch run stops its log without writing `r()`, and the Stata process does
+  not exit.
+- Any log that a script reads back as data has to be written at
+  `set linesize 255`. In batch mode Stata wraps the log at 80 characters,
+  which splits each row and breaks the import. Look for `infile`, `import`
+  or `insheet` reading a `.log` or `.smcl`.
+- `shell` is ignored in batch mode. Globals survive `clear all`; timers do not.
+  A `version` set inside a do-file reverts when that do-file ends.
+- Stata PDFs can differ only in their embedded font bytes. Use
+  `compare_figures.py` before calling a figure not reproduced.
+
+When B's work is done, run Codex and Antigravity on it
+(`review/Run-Review.ps1`), and disposition every finding.
 
 ## Session of 2026-10-15 — replication package
 
