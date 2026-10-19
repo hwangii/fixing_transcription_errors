@@ -13,7 +13,7 @@
 #              - contra("<deaglan table>", <column>)  = 100 * contradicted / all pairs in that column
 #            or "" to leave that number unchecked (a year, an age cutoff, a parameter).
 #   assert   optional: an expression that must be true (for claims with no single number)
-#   status   scripted  produced by a script in CODE/ on this repo's machine A
+#   status   scripted  produced by a script in this repo: CODE/ (machine A) or LINKAGE/ (machine B)
 #            table     read off an exhibit .tex that a script in CODE/ writes
 #            external  from Deaglan's linkage package, which runs on machine B
 #            nocode    no producing code exists anywhere in the package -- UNVERIFIABLE
@@ -486,42 +486,41 @@ issue = "'the two full-sample ABE columns' are one Jaro-Winkler and one ABE colu
 [[claim]]
 id = "deaglan-denom-abe"
 text = 'Denominator is the 57,589,273 men aged 8 and above'
-values = ["", ""]
-status = "external"
-script = "deaglan_results/current/PROVENANCE.md Q3 (tabulated by hand); not in any table file"
+values = ["linkDenomAbe", ""]
+status = "scripted"
+script = "LINKAGE/code/01_abe_jw/linkage_analysis.do"
 machine = "B"
 
 [[claim]]
 id = "deaglan-denom-abe-disc"
 text = 'restricted throughout to the 15,003,537 men aged 8 and above'
-values = ["", ""]
-status = "external"
-script = "deaglan_results/current/PROVENANCE.md Q3"
+values = ["linkDenomAbeDisc", ""]
+status = "scripted"
+script = "LINKAGE/code/01_abe_jw/linkage_analysis.do"
 machine = "B"
 
 [[claim]]
 id = "deaglan-denom-hlink"
 text = 'Denominator is the 115,030,746 men and women aged 8 and above'
-values = ["", ""]
-status = "external"
-script = "deaglan_results/current/PROVENANCE.md Q3"
+values = ["linkDenomHlink", ""]
+status = "scripted"
+script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
 machine = "B"
 
 [[claim]]
 id = "deaglan-hlink-restriction"
 text = 'changes the match rates from 58.08 and 59.55 to 58.06 and 59.52'
-values = ['cell("figures/deaglan_hlink.tex", "Match Rate", 1)', 'cell("figures/deaglan_hlink.tex", "Match Rate", 2)', "", ""]
-status = "external"
-script = "Deaglan: code/00_run_all_tables.do; 58.06/59.52 from a Codex review"
+values = ['cell("figures/deaglan_hlink.tex", "Match Rate", 1)', 'cell("figures/deaglan_hlink.tex", "Match Rate", 2)', "linkHlinkInDenomOld", "linkHlinkInDenomNew"]
+status = "scripted"
+script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do (58.08/59.55 from its table; 58.06/59.52 by repnum, added 2026-10-18)"
 machine = "B"
-issue = "58.06 and 59.52 were computed in a Codex review, not by any script (PROVENANCE.md Q5)."
 
 [[claim]]
 id = "deaglan-denom-hlink-disc"
 text = 'restricted throughout to the 30,754,309 men and women aged 8 and above'
-values = ["", ""]
-status = "external"
-script = "deaglan_results/current/PROVENANCE.md Q3"
+values = ["linkDenomHlinkDisc", ""]
+status = "scripted"
+script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
 machine = "B"
 
 

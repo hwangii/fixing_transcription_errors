@@ -23,6 +23,12 @@ if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
 if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
 do "$LCODE/shared/paths.do"
 
+* ---- Replication package (2026-10-18): the numbers the draft quotes ----
+* Written by repnum to the tracked replication/results/linkage_hlink.tex.
+* Adds output only; nothing below that writes the table is changed.
+if `"$REP_REPO"' == "" do "F:/github_repos/fixing_transcription_errors/replication/config.do"
+repnum open using "$REP_RESULTS/linkage_hlink.tex", script(LINKAGE/code/02_hlink/linkage_analysis_newlinks.do)
+
 * ---- Common file paths (all derived from paths.do) ----
 local names1930   "$D_APPENDED/divided_file1930_ans_cleaned_women_added.dta"
 local names1940   "$D_APPENDED/divided_file1940_true_cleaned_women_added.dta"
@@ -182,6 +188,7 @@ use `names1940', clear
 normalize_names
 keep if age >= 8
 scalar N_men_1940_full = _N
+repnum linkDenomHlink = N_men_1940_full, format(%15.0fc)
 keep histid mi
 tempfile cn1940_full
 save `cn1940_full'
@@ -197,6 +204,7 @@ save `restr1940'
 use `cn1940_full', clear
 merge 1:1 histid using `restr1940', keep(3) nogenerate
 scalar N_men_1940_restr = _N
+repnum linkDenomHlinkDisc = N_men_1940_restr, format(%15.0fc)
 tempfile cn1940_restr
 save `cn1940_restr'
 
@@ -270,6 +278,21 @@ foreach samp in full restr {
 
         scalar N_linked_`samp'_`ver' = _N
         scalar rate_`samp'_`ver'     = N_linked_`samp'_`ver' / N_men_1940_`samp'
+
+        * Replication package (2026-10-18), output only. The table's
+        * numerator counts every pair, including pairs whose 1940 person is
+        * outside the age-8+ denominator. The draft quotes the full-sample
+        * rate with the numerator restricted to the denominator population
+        * (Codex review, PROVENANCE.md Q5). Computed on a preserved copy, so
+        * the table itself is unchanged.
+        if "`samp'" == "full" {
+            preserve
+            rename histid1940 histid
+            quietly merge m:1 histid using `men1940', keep(3) nogenerate
+            if "`ver'" == "old" repnum linkHlinkInDenomOld = 100*_N/N_men_1940_full, format(%4.2f)
+            if "`ver'" == "new" repnum linkHlinkInDenomNew = 100*_N/N_men_1940_full, format(%4.2f)
+            restore
+        }
 
         di "`mtag'_`ver': " N_linked_`samp'_`ver' " pairs linked" ///
            "  |  rate = " %6.4f rate_`samp'_`ver'
@@ -537,3 +560,5 @@ foreach samp in full restr {
     file close f
     di _newline "LaTeX table written to: `outtex'"
 }
+
+repnum close

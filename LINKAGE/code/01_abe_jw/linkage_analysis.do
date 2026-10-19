@@ -18,6 +18,12 @@ if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
 if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
 do "$LCODE/shared/paths.do"
 
+* ---- Replication package (2026-10-18): the numbers the draft quotes ----
+* Written by repnum to the tracked replication/results/linkage_abe_jw.tex.
+* Adds output only; nothing below that writes the table is changed.
+if `"$REP_REPO"' == "" do "F:/github_repos/fixing_transcription_errors/replication/config.do"
+repnum open using "$REP_RESULTS/linkage_abe_jw.tex", script(LINKAGE/code/01_abe_jw/linkage_analysis.do)
+
 * ---- File paths (all derived from paths.do) ----
 local names1930   "$D_NAMES/clean_names_1930_old.dta"
 local names1940   "$D_NAMES/clean_names_1940_new.dta"
@@ -38,6 +44,7 @@ local true_links "$D_TRUTH/mlp_training1930_1940.dta"
 use `names1940', clear
 keep if age >= 8
 scalar N_men_1940_full = _N
+repnum linkDenomAbe = N_men_1940_full, format(%15.0fc)
 keep histid mi
 tempfile cn1940_full
 save `cn1940_full'
@@ -53,6 +60,7 @@ save `restr1940'
 use `cn1940_full', clear
 merge 1:1 histid using `restr1940', keep(3) nogenerate
 scalar N_men_1940_restr = _N
+repnum linkDenomAbeDisc = N_men_1940_restr, format(%15.0fc)
 tempfile cn1940_restr
 save `cn1940_restr'
 
@@ -436,3 +444,5 @@ foreach samp in full restr {
     file close f
     di _newline "LaTeX table written to: `outtex'"
 }
+
+repnum close
