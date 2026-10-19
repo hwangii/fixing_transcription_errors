@@ -43,6 +43,15 @@ qui count
 global denom = r(N)
 di "Denominator: $denom"
 
+* The denominator's people, so the numerator can be restricted to them.
+* Fix 2026-10-19: the matched links were counted whatever the BUNMD
+* record's sex or birth year, so the numerator was not a subset of the
+* denominator. ssn is unique in the denominator (checked 2026-10-19).
+keep ssn
+isid ssn
+tempfile denom_ssn
+save `denom_ssn'
+
 *****************************************
 * Counts from each of the four final matched files
 *****************************************
@@ -56,9 +65,17 @@ foreach spec in oldnames oldnames_conservative newnames newnames_conservative {
 		local mi "mi_new_A"
 	}
 
-	use timediff_A timediff_B `mi' mname_B using ///
+	use timediff_A timediff_B `mi' mname_B ssn_B using ///
 		"$output_dir/censoc_bunmd_matched_`spec'.dta", clear
 	drop if missing(timediff_A) | missing(timediff_B)
+
+	* Numerator restricted to the denominator (BUNMD men, byear <= 1940).
+	* ssn_B is the BUNMD SSN; the files' own ssn column is empty.
+	rename ssn_B ssn
+	qui count
+	local pre = r(N)
+	merge m:1 ssn using `denom_ssn', keep(3) nogenerate
+	di "`spec': " `pre' - _N " of " `pre' " links dropped: BUNMD record outside the denominator"
 
 	* linked records
 	qui count
