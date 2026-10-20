@@ -9,13 +9,13 @@
 #   text     an exact substring of the draft (TOML '...' strings are literal: \% stays \%)
 #   values   one entry per number in `text`, in order. Each is an expression over
 #              - result keys written by repnum into replication/results/*.tex
-#              - cell("<table in paper repo>", "<row label>", <column>)   (column 1 = first number)
+#              - cell("<table in paper repo>", "<row label>", <column>[, <nth>])   (column 1 = first number;
+#                nth picks the nth row with that label, default 1)
 #              - contra("<deaglan table>", <column>)  = 100 * contradicted / all pairs in that column
 #            or "" to leave that number unchecked (a year, an age cutoff, a parameter).
 #   assert   optional: an expression that must be true (for claims with no single number)
 #   status   scripted  produced by a script in this repo: CODE/ (machine A) or LINKAGE/ (machine B)
-#            table     read off an exhibit .tex that a script in CODE/ writes
-#            external  from Deaglan's linkage package, which runs on machine B
+#            table     read off an exhibit .tex that a script in CODE/ or LINKAGE/ writes
 #            nocode    no producing code exists anywhere in the package -- UNVERIFIABLE
 #   script   the producing script
 #   machine  A = holds the transcription data (ARTS-ECON-CM); B = holds Deaglan's package
@@ -96,7 +96,7 @@ machine = "A"
 
 [[claim]]
 id = "intro-validation"
-text = 'rises from 515,555 to 1,300,253 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 3.19 to 1.56 percent on that sample and from 0.44 to 0.43 percent under the machine-learning linker'
+text = 'rises from 515,555 to 1,300,253 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 5.07 to 2.56 percent on that sample and from 0.75 to 0.74 percent under the machine-learning linker'
 values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 3)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 4)',
@@ -107,8 +107,8 @@ values = [
   'contra("figures/deaglan_hlink.tex", 1)',
   'contra("figures/deaglan_hlink.tex", 2)',
 ]
-status = "external"
-script = "Deaglan: code/00_run_all_tables.do (F:/Deaglan/Census_Transcriptions)"
+status = "table"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[claim]]
@@ -408,24 +408,24 @@ values = [
   '100*(cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 4)/cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 3)-1)',
   "linkGainTarget",
 ]
-status = "external"
-script = "Deaglan: code/00_run_all_tables.do"
+status = "table"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[claim]]
 id = "deaglan-jw-disc"
 text = 'rises from 14.9 to 22.1 percent'
 values = ['cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 1)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 2)']
-status = "external"
-script = "Deaglan: code/00_run_all_tables.do"
+status = "table"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[claim]]
 id = "deaglan-hlink-disc"
-text = 'rises from 49.7 to 56.6 percent'
+text = 'rises from 49.7 to 56.5 percent'
 values = ['cell("figures/deaglan_hlink_restricted.tex", "Match Rate", 1)', 'cell("figures/deaglan_hlink_restricted.tex", "Match Rate", 2)']
-status = "external"
-script = "Deaglan: code/00_run_all_tables.do"
+status = "table"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[claim]]
@@ -436,8 +436,8 @@ values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 1)', 'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 2)',
   'cell("figures/deaglan_hlink_restricted.tex", "MI Match Rate", 1)', 'cell("figures/deaglan_hlink_restricted.tex", "MI Match Rate", 2)',
 ]
-status = "external"
-script = "Deaglan: code/00_run_all_tables.do"
+status = "table"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 issue = "These are discordant-sample values (full-sample MI rates are 86-87); the sentence does not say which sample."
 
@@ -450,26 +450,26 @@ values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 1)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 2)',
   'cell("figures/deaglan_hlink_restricted.tex", "Recall", 1)', 'cell("figures/deaglan_hlink_restricted.tex", "Recall", 2)',
 ]
-status = "external"
-script = "Deaglan: code/00_run_all_tables.do"
+status = "table"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[claim]]
 id = "deaglan-contradicted-counts"
-text = 'it falls under ABE and Jaro-Winkler, from 190,805 to 171,174 in the full sample, but rises under HLINK, from 293,078 to 296,657, and on the discordant sample under exact names, from 40,919 to 43,715'
+text = 'in the full sample it falls under Jaro-Winkler and exact names, from 308,848 to 275,442 under Jaro-Winkler, but rises under HLINK, from 501,010 to 503,357, and on the discordant sample under exact names, from 65,148 to 71,863'
 values = [
   'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 2)',
   'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 2)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Directly Contradicted", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Directly Contradicted", 4)',
 ]
-status = "external"
-script = "Deaglan: code/00_run_all_tables.do"
+status = "table"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
-issue = "Mislabelled: 190,805 -> 171,174 is the Jaro-Winkler column only. ABE full is 210,054 -> 194,387. The HLINK discordant rise (67,636 -> 70,375) is not mentioned."
+issue = "The HLINK discordant rise (116,233 -> 125,607) is not mentioned."
 
 [[claim]]
 id = "deaglan-contradicted-shares"
-text = 'from 1.51 to 1.27 and from 1.68 to 1.44 percent in the two full-sample ABE columns, from 2.59 to 1.36 and from 3.19 to 1.56 percent on the discordant sample, and from 0.44 to 0.43 and from 0.44 to 0.41 percent under HLINK'
+text = 'from 2.44 to 2.04 percent under Jaro-Winkler and from 2.75 to 2.33 percent under exact names in the full sample, from 4.07 to 2.25 and from 5.07 to 2.56 percent on the discordant sample, and from 0.75 to 0.74 and from 0.76 to 0.72 percent under HLINK'
 values = [
   'contra("figures/deaglan_abe_jw.tex", 1)', 'contra("figures/deaglan_abe_jw.tex", 2)',
   'contra("figures/deaglan_abe_jw.tex", 3)', 'contra("figures/deaglan_abe_jw.tex", 4)',
@@ -478,10 +478,9 @@ values = [
   'contra("figures/deaglan_hlink.tex", 1)', 'contra("figures/deaglan_hlink.tex", 2)',
   'contra("figures/deaglan_hlink_restricted.tex", 1)', 'contra("figures/deaglan_hlink_restricted.tex", 2)',
 ]
-status = "external"
-script = "hand-computed from Deaglan's tables"
+status = "table"
+script = "computed from the exhibit tables (contra)"
 machine = "B"
-issue = "'the two full-sample ABE columns' are one Jaro-Winkler and one ABE column."
 
 [[claim]]
 id = "deaglan-denom-abe"
@@ -508,14 +507,6 @@ script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
 machine = "B"
 
 [[claim]]
-id = "deaglan-hlink-restriction"
-text = 'changes the match rates from 58.08 and 59.55 to 58.06 and 59.52'
-values = ['cell("figures/deaglan_hlink.tex", "Match Rate", 1)', 'cell("figures/deaglan_hlink.tex", "Match Rate", 2)', "linkHlinkInDenomOld", "linkHlinkInDenomNew"]
-status = "scripted"
-script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do (58.08/59.55 from its table; 58.06/59.52 by repnum, added 2026-10-18)"
-machine = "B"
-
-[[claim]]
 id = "deaglan-denom-hlink-disc"
 text = 'restricted throughout to the 30,754,309 men and women aged 8 and above'
 values = ["linkDenomHlinkDisc", ""]
@@ -523,6 +514,58 @@ status = "scripted"
 script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
 machine = "B"
 
+
+# ===================================================== SECTION: LINKING TO MORTALITY RECORDS
+
+[[claim]]
+id = "intro-mortality"
+text = 'where the number of links rises by 7.08 percent'
+values = ['cell("figures/deaglan_mortality_bunmd.tex", "Exact matches", 4)']
+status = "table"
+script = "LINKAGE/code/03_mortality/05_make_linkage_table.do"
+machine = "B"
+
+[[claim]]
+id = "mortality-denominator"
+text = 'The denominator is the 20,886,324 men in the BUNMD born in or before 1940'
+values = ["mortDenom", ""]
+status = "scripted"
+script = "LINKAGE/code/03_mortality/05_make_linkage_table.do"
+machine = "B"
+
+[[claim]]
+id = "mortality-exact"
+text = 'the number of exact matches rises from 5,658,793 to 6,059,234, a 7.08 percent increase, and the linkage rate from 27.09 to 29.01 percent'
+values = ['cell("figures/deaglan_mortality_bunmd.tex", "Exact matches", 1)', 'cell("figures/deaglan_mortality_bunmd.tex", "Exact matches", 2)', 'cell("figures/deaglan_mortality_bunmd.tex", "Exact matches", 4)',
+          'cell("figures/deaglan_mortality_bunmd.tex", "Linkage rate", 1)', 'cell("figures/deaglan_mortality_bunmd.tex", "Linkage rate", 2)']
+status = "table"
+script = "LINKAGE/code/03_mortality/05_make_linkage_table.do"
+machine = "B"
+
+[[claim]]
+id = "mortality-conservative"
+text = 'Under the conservative variant the linkage rate rises from 20.22 to 21.79 percent'
+values = ['cell("figures/deaglan_mortality_bunmd.tex", "Linkage rate", 1, 2)', 'cell("figures/deaglan_mortality_bunmd.tex", "Linkage rate", 2, 2)']
+status = "table"
+script = "LINKAGE/code/03_mortality/05_make_linkage_table.do"
+machine = "B"
+
+[[claim]]
+id = "mortality-initials"
+text = 'increases from 83.14 to 85.33 percent for exact matches and from 87.60 to 89.36 percent for conservative ones'
+values = ['cell("figures/deaglan_mortality_bunmd.tex", "Initials agree", 1)', 'cell("figures/deaglan_mortality_bunmd.tex", "Initials agree", 2)',
+          'cell("figures/deaglan_mortality_bunmd.tex", "Initials agree", 1, 2)', 'cell("figures/deaglan_mortality_bunmd.tex", "Initials agree", 2, 2)']
+status = "table"
+script = "LINKAGE/code/03_mortality/05_make_linkage_table.do"
+machine = "B"
+
+[[claim]]
+id = "mortality-note-denominator"
+text = 'Linkage rates use a denominator of the 20,886,324 BUNMD men born in or before 1940'
+values = ["mortDenom", ""]
+status = "scripted"
+script = "LINKAGE/code/03_mortality/05_make_linkage_table.do"
+machine = "B"
 
 # ===================================================== SECTION 5: HETEROGENEITY
 
@@ -676,26 +719,32 @@ machine = "A"
 [[exhibit]]
 file = "figures/deaglan_abe_jw.tex"
 label = "tab:deaglan_abe_jw"
-script = "Deaglan: code/00_run_all_tables.do -> deaglan_results/current/linkage_table_abe_jw.tex (tabular extracted by hand)"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 issue = "The extraction step from deaglan_results/current/ into figures/ has no script."
 
 [[exhibit]]
 file = "figures/deaglan_abe_jw_restricted.tex"
 label = "tab:deaglan_abe_jw_restricted"
-script = "Deaglan: code/00_run_all_tables.do"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[exhibit]]
 file = "figures/deaglan_hlink.tex"
 label = "tab:deaglan_hlink"
-script = "Deaglan: code/00_run_all_tables.do"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[exhibit]]
 file = "figures/deaglan_hlink_restricted.tex"
 label = "tab:deaglan_hlink_restricted"
-script = "Deaglan: code/00_run_all_tables.do"
+script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
+machine = "B"
+
+[[exhibit]]
+file = "figures/deaglan_mortality_bunmd.tex"
+label = "tab:deaglan_mortality"
+script = "LINKAGE/code/03_mortality/05_make_linkage_table.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[exhibit]]

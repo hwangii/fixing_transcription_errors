@@ -1,12 +1,11 @@
 # What the 2026-10-19 fixes to Deaglan's tables change
 
-**Status: awaiting the author's sign-off.** The fixes are committed in
-`LINKAGE/` and their reruns are done on machine B. Nothing in the paper repo
-has changed: `figures/deaglan_*.tex`, `deaglan_results/current/` and the
-draft are exactly as they were on 2026-10-19. The regenerated (fixed) tables
-are in `F:\Deaglan\Census_Transcriptions\output\tables\`; until the paper
-repo is updated, `Run-MachineB.ps1` will report them as DIFFERS. That is
-expected, not a failure.
+**Status: ADOPTED by the author on 2026-10-19.** The fixed tables are
+committed in the paper repo's `linkage_tables/` (generated; Deaglan's
+originals stay frozen in `deaglan_results/current/`). The draft was updated
+to them the same day, and the mortality table was added as Table 9
+(Section 4.3, `sec:mortality`). The draft-lines table below lists what was
+changed.
 
 Each fix was rerun on its own so its effect is separable. "Before" is the
 committed table; for fix 4 on HLINK, "before" is the table after fix 3.

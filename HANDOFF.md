@@ -16,11 +16,13 @@ different and equally important dataset, so analysis runs on both and both edit
 > `replication/results/linkage_{abe_jw,hlink}.tex`. The four denominators
 > and 58.06 / 59.52 all match the draft. The checker's only failures are the
 > five known draft errors in the 2026-10-15 table below.
-> Review done and dispositioned (`96743b5`). **The four fixes below are
-> committed and rerun (2026-10-19); their effects are in
-> `replication/fix_effects_2026-10-19.md`, awaiting the author's sign-off.**
-> Until the paper repo takes them, the paper repo is unchanged and
-> `Run-MachineB.ps1` reports the regenerated tables on F: as DIFFERS.
+> Review done and dispositioned (`96743b5`). **The four fixes below were
+> committed, rerun and ADOPTED on 2026-10-19** (effects in
+> `replication/fix_effects_2026-10-19.md`). The paper repo now takes Tables
+> 5-9 from a new generated folder, `linkage_tables/`; `deaglan_results/`
+> stays frozen. The draft was updated to the fixed numbers, and the mortality
+> linkage added as Section 4.3 / Table 9. TODO in the draft: a citation for
+> BUNMD/CenSoc (no bib entry yet).
 
 **Decided 2026-10-18 by the author:** Deaglan's code and data on machine B
 (`F:\Deaglan\Census_Transcriptions\`) are now ours to work on, and he is not

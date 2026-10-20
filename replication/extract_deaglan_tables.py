@@ -1,11 +1,17 @@
-"""Write the paper's figures/deaglan_*.tex from Deaglan's linkage tables.
+"""Write the paper's figures/deaglan_*.tex from the linkage tables.
 
-Each of Deaglan's tables is a complete table float with his own caption and
-label. The paper supplies its own caption (his HLINK caption says "all men";
-the denominator is men AND women aged 8+), so only the tabular is taken. This
-script does mechanically what was done by hand on 2026-10-12.
+Each linkage table (written by LINKAGE/code, Deaglan's code as fixed in this
+repo) is a complete table float with its own caption and label. The paper
+supplies its own caption (the HLINK caption says "all men"; the denominator is
+men AND women aged 8+), so only the tabular is taken. This script does
+mechanically what was done by hand on 2026-10-12.
 
-    # default: extract from the committed copies, deaglan_results/current/
+The committed reference copies live in the paper repo's linkage_tables/
+(since 2026-10-19, when the fixes in replication/fix_effects_2026-10-19.md
+were adopted). deaglan_results/current/ keeps Deaglan's original output,
+frozen, as the historical record.
+
+    # default: extract from the committed copies, linkage_tables/
     python replication/extract_deaglan_tables.py
 
     # after a rerun on machine B: compare the regenerated tables with the
@@ -17,11 +23,10 @@ script does mechanically what was done by hand on 2026-10-12.
 
 With --regenerated, two separate checks run:
 
-1. REPRODUCTION. All five of Deaglan's tables -- the four above and the
-   mortality table, which the draft does not use -- are compared with the
-   committed copies by SHA-256 of their raw bytes, and both hashes are printed.
-   This is the test of his "byte-identical" claim. (Review 2026-10-19: the
-   first version compared four tables, as text.)
+1. REPRODUCTION. All five tables (ABE/JW and HLINK, full and restricted, and
+   mortality) are compared with the committed copies by SHA-256 of their raw
+   bytes, and both hashes are printed. (Review 2026-10-19: the first version
+   compared four tables, as text.)
 2. EXTRACTION. A table whose regenerated text equals the committed copy is
    extracted from the committed copy, so figures/ does not change. A table
    that differs is extracted from the regenerated file, and its header names
@@ -41,9 +46,9 @@ import tomllib
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-TABLES = ["abe_jw", "abe_jw_restricted", "hlink", "hlink_restricted"]
-ALL_TABLES = TABLES + ["mortality_bunmd"]  # mortality is reproduced, not extracted
-COMMITTED = "deaglan_results/current"
+TABLES = ["abe_jw", "abe_jw_restricted", "hlink", "hlink_restricted", "mortality_bunmd"]
+ALL_TABLES = TABLES
+COMMITTED = "linkage_tables"
 
 
 def sha256(path):

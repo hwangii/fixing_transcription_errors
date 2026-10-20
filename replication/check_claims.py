@@ -62,22 +62,23 @@ class Tables:
             path = self.root / file
             if not path.exists():
                 raise FileNotFoundError(f"table {file} not in paper repo")
-            rows = {}
+            rows = []  # (label, cells) in table order; a label may repeat
             for line in path.read_text(encoding="utf-8").splitlines():
                 if "&" not in line or line.lstrip().startswith("%"):
                     continue
                 cells = [c.strip() for c in line.split("&")]
-                label = cells[0]
-                rows.setdefault(label, cells[1:])  # first occurrence wins
+                # indentation is not part of the label: "\quad Linkage rate" -> "Linkage rate"
+                label = re.sub(r"^(\\quad\s*)+", "", cells[0])
+                rows.append((label, cells[1:]))
             self.cache[file] = rows
         return self.cache[file]
 
-    def cell(self, file, row, col):
-        rows = self.rows(file)
-        hits = [lab for lab in rows if lab.startswith(row)]
-        if not hits:
-            raise KeyError(f'no row starting "{row}" in {file}')
-        raw = rows[hits[0]][col - 1]
+    def cell(self, file, row, col, nth=1):
+        """Column `col` of the nth row whose label starts with `row` (default: the first)."""
+        hits = [cells for lab, cells in self.rows(file) if lab.startswith(row)]
+        if len(hits) < nth:
+            raise KeyError(f'fewer than {nth} rows starting "{row}" in {file}')
+        raw = hits[nth - 1][col - 1]
         clean = re.sub(r"\\\\|\\%|[,*+$]", "", raw).strip()
         return float(clean)
 

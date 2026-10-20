@@ -18,6 +18,12 @@ if "$ROOT" == "" global ROOT "F:/Deaglan/Census_Transcriptions"
 if "$LCODE" == "" global LCODE "F:/github_repos/fixing_transcription_errors/LINKAGE/code"
 do "$LCODE/shared/paths.do"
 
+* ---- Replication package (2026-10-19): the numbers the draft quotes ----
+* Written by repnum to the tracked replication/results/linkage_mortality.tex.
+* Adds output only; nothing that writes the table changes.
+if `"$REP_REPO"' == "" do "F:/github_repos/fixing_transcription_errors/replication/config.do"
+repnum open using "$REP_RESULTS/linkage_mortality.tex", script(LINKAGE/code/03_mortality/05_make_linkage_table.do)
+
 global output_dir "$D_MORT/working"
 global bunmd_raw  "$D_MORT/raw/bunmd_v2/bunmd_v2.csv"
 global tables     "$OUT_TABLES"
@@ -42,6 +48,7 @@ else {
 qui count
 global denom = r(N)
 di "Denominator: $denom"
+repnum mortDenom = $denom, format(%15.0fc)
 
 * The denominator's people, so the numerator can be restricted to them.
 * Fix 2026-10-19: the matched links were counted whatever the BUNMD
@@ -229,3 +236,5 @@ file write tex "\end{table}" _n
 file close tex
 
 di "Wrote $tables/linkage_table_mortality_bunmd.tex"
+
+repnum close
