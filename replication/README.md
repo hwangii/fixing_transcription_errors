@@ -236,7 +236,20 @@ individually.
 6. **Data provenance dates and licences** (see the table above).
 7. **Known hazards, not yet fixed.** All of these are recorded in the review
    reports:
-   - No merge uses `assert()`.
+   - No merge uses `assert()`. Sized for the pipeline on 2026-10-30
+     (`diagnostics/size_merge_outcomes.do`, `results/size_merges.tex`). Its
+     three merges are in `create_figures_SSHA2025.do`, and every unmatched
+     group is one the sample excludes by design:
+     - the women (the socio-demographic extract is 100% men);
+     - men with no transcription;
+     - unlinked people, and links to 1940 records outside the labeled data.
+
+     The 14 merges in the build-tier scripts are not sized, because those
+     scripts are not rerun.
+   - The draft's sample counts (draft lines 399-400) come from the balance
+     file, while the linkage results use the analysis sample, which is 29,344
+     records smaller (51,036,859). The two census totals of men aged 10+
+     differ by 2,991.
    - `munir_figures_for_nber.do` still writes old versions of Tables 2-3 if run.
    - `choosing_edist_with_blacks_nber.do` samples after an unstable sort, so
      its `set seed` does not make the sample reproducible.
