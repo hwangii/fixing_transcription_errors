@@ -41,6 +41,9 @@ local inputs `"`inputs' "`snu_ed'/INTERMEDIATE/link1930_1940_ans_cleaned_noraceb
 local inputs `"`inputs' "`snu_ed'/INTERMEDIATE/link1930_1940_true_cleaned_noraceblock0.dta""'
 local inputs `"`inputs' "`f_ed'/ORIGINAL/all_states_socio_demo_char_for_SSHA2025.dta""'
 local inputs `"`inputs' "$REP_REPO/CODE/label_socio_demo.do""'
+foreach s of global REP_A_STATES {
+	local inputs `"`inputs' "`f_ft'/INTERMEDIATE/merged_`s'1940.dta""'
+}
 foreach s in al ar az ca co ct dc de fl ga ia id il in ks ky la ma md me mi mn mo ms mt nc nd ne nh nj nm nv ny oh ok or pa ri sc sd tn tx ut va vt wa wi wv wy {
 	local inputs `"`inputs' "`model'/`s'/merged_data.dta""'
 }

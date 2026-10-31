@@ -18,7 +18,7 @@ Result files read: compare_sample_counts.tex, compute_legibility_quartiles.tex, 
 | **MISMATCH** | `intro-target-link` | 97 | A | 28.3: MISMATCH, source gives 28.2 (raw 28.2473)<br>8.9: ok<br>19.4: ok<br>119: ok | 28.3 is the balance-table sample's share; on Table 4's own sample (the one the rest of this sentence describes) it is pctTargetOfTable, which rounds to 28.2. |
 | **MISMATCH** | `intro-legibility` | 101 | A | 20: ok<br>1.4: MISMATCH, source gives 1.6 (raw 1.55278) |  |
 | **MISMATCH** | `sec3-disagree` | 180 | A | 28.3: MISMATCH, source gives 28.2 (raw 28.2473) |  |
-| **MISMATCH** | `n-males-ten` | 399 | A | 55,350,482: MISMATCH, source gives 55343368 (raw 5.53434e+07)<br>10: unchecked<br>1940: unchecked |  |
+| **MISMATCH** | `n-males-ten` | 399 | A | 55,350,482: MISMATCH, source gives 55347491 (raw 5.53475e+07)<br>10: unchecked<br>1940: unchecked |  |
 | **MISMATCH** | `n-analysis` | 401 | A | 51,066,203: MISMATCH, source gives 51036859 (raw 5.10369e+07) |  |
 | **MISMATCH** | `n-incongruent` | 404 | A | 14,427,780: MISMATCH, source gives 14416543 (raw 1.44165e+07)<br>28.3: MISMATCH, source gives 28.2 (raw 28.2473) |  |
 | **MISMATCH** | `balance-disagree` | 449 | A | 28.3: MISMATCH, source gives 28.2 (raw 28.2473) |  |

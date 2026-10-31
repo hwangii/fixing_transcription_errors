@@ -53,35 +53,40 @@ local chars "black american_indian asian northeast_bpl midwest_bpl south_bpl wes
 /*EXTRACT KEEPS ONLY IPUMS'S GENERAL CODES FOR race, bpl, fbpl AND higrade,  */
 /*AND create_socio_demographic_vars.do IS WRITTEN FOR THE DETAILED ONES      */
 /*(TRIED 2026-10-31: RACE CAME OUT MISSING, BIRTH REGIONS ZERO).             */
-/*FORWARD SLASHES: A BACKSLASH BEFORE A MACRO ESCAPES IT (r(601) 2026-10-31).*/
-local trans_intermediate_f "F:/fixing_transcription_errors/DATA/INTERMEDIATE/"
-local original_ed "F:\enum_date\DATA\ORIGINAL\"
-local intermediate "`dropbox'enum_date\DATA\INTERMEDIATE\"
-local code "D:\repos\fixing_transcription_errors\CODE\"
+/*PATHS FROM replication/config.do, WITH FORWARD SLASHES: A BACKSLASH BEFORE */
+/*A MACRO ESCAPES IT (r(601) ON 2026-10-31).                                 */
+local trans_intermediate_f "$REP_F/fixing_transcription_errors/DATA/INTERMEDIATE/"
+local original_ed "$REP_F/enum_date/DATA/ORIGINAL/"
+local intermediate "$REP_SNU/enum_date/DATA/INTERMEDIATE/"
+local code "$REP_REPO/CODE/"
 
-/*THE SAME 50 FILES munir_figures_for_nber.do:233-278 READ, AND ITS _merge   */
-/*RULE (ANCESTRY RECORDS, WITH OR WITHOUT A FAMILYSEARCH MATCH).             */
-local files : dir "`trans_intermediate_f'" files "merged_*1940.dta"
+/*THE SAME 50 FILES munir_figures_for_nber.do:233-278 READ, LISTED IN        */
+/*config.do, AND ITS _merge RULE (ANCESTRY RECORDS, WITH OR WITHOUT A        */
+/*FAMILYSEARCH MATCH). use STOPS ON A MISSING FILE; THE COUNT IS CHECKED TOO. */
 tempfile chars_all
 local z = 0
-foreach f of local files {
-	use histid _merge race_anc higrade bpl fbpl school relate marst occ1950 urban farm incwage using `"`trans_intermediate_f'`f'"', clear
+foreach s of global REP_A_STATES {
+	use histid _merge race_anc higrade bpl fbpl school relate marst occ1950 urban farm incwage using `"`trans_intermediate_f'merged_`s'1940.dta"', clear
 	keep if _merge==1 | _merge==3
 	drop _merge
 	if `z' > 0 append using `chars_all'
 	save `chars_all', replace
 	local ++z
 }
-display "state files read: `z'"
+assert `z' == 50
 rename race_anc race
 
-/*SEX AND AGE FROM THE EXTRACT. A STATE-FILE RECORD NOT IN THE EXTRACT HAS   */
-/*NO sex THERE AND DROPS OUT, AS IT DOES FROM THE ANALYSIS SAMPLE.            */
+/*SEX AND AGE FROM THE EXTRACT, AND EVERY MAN 10+ IN IT IS KEPT, SO THE US    */
+/*COLUMN IS THE WHOLE EXTRACT POPULATION. 4,123 OF THEM HAVE NO STATE-FILE    */
+/*RECORD (2026-10-31): THEIR CHARACTERISTICS ARE MISSING, SO THEY COUNT IN    */
+/*THE OBSERVATIONS ROW AND DROP OUT OF EACH ROW'S MEAN. STATE-FILE RECORDS    */
+/*NOT IN THE EXTRACT HAVE NO sex THERE AND DROP OUT, AS THEY DO FROM THE      */
+/*ANALYSIS SAMPLE.                                                           */
 merge 1:1 histid using `"`original_ed'all_states_socio_demo_char_for_SSHA2025.dta"', keepusing(serial pernum sex age)
 tab _merge
 quietly count if _merge==2 & sex==1 & age>=10 & age<.
 display "men 10+ in the extract with no state-file record (no characteristics): " r(N)
-keep if _merge==3
+keep if _merge>=2
 drop _merge
 
 /*age<. : MISSING AGE WOULD OTHERWISE PASS age>=10 (0 MISSING IN THE EXTRACT).*/

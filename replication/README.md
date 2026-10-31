@@ -87,7 +87,7 @@ and its licence terms. Data editors require both.
 | `...\fixing_transcription_errors\DATA\ORIGINAL\census1940_all_labeled_data.dta` | 43 GB | 2025-01-10 | `clean_FS_and_combineV5_nber.do`, block 5 (**now commented out**) |
 | `F:\enum_date\DATA\ORIGINAL\all_states_socio_demo_char_for_SSHA2025.dta` | 5.9 GB | 2025-11-21 | `usa00647_for_SSHA2025_socio_demo_char.do` |
 | `...\enum_date\DATA\INTERMEDIATE\link1930_1940_{ans,true}_cleaned_noraceblock0.dta` | 2.8 / 3.1 GB | 2026-02-15 | external (`enum_date` project) |
-| `F:\fixing_transcription_errors\DATA\INTERMEDIATE\temp.dta` | 14 GB | 2026-09-08 | `munir_figures_for_nber.do` (state loop) |
+| `F:\fixing_transcription_errors\DATA\INTERMEDIATE\merged_<state>1940.dta`, 50 jurisdictions (listed in `config.do`, `REP_A_STATES`) | 39 GB total | 2024-11-18 | `clean_FS_and_combineV5_nber.do:102` (stage commented out) |
 | `...\output_and_output1_ssha2025\<st>\merged_data.dta`, 49 jurisdictions | ~1 GB each | 2025-11 | external (ML pipeline) |
 | `...\enum_date\DATA\INTERMEDIATE\temp.dta` (the analysis file) | 22 GB | 2026-09-13 | `create_figures_SSHA2025.do`, rebuilt by a full run |
 

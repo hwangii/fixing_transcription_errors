@@ -43,6 +43,12 @@ else {
 global REP_RESULTS "$REP_REPO/replication/results"
 adopath ++ "$REP_REPO/replication/stata"
 
+/*MACHINE A: THE 50 ANCESTRY-FAMILYSEARCH STATE FILES THAT                  */
+/*CODE/make_balance_exhibits.do READS, AS $REP_F/fixing_transcription_errors/ */
+/*DATA/INTERMEDIATE/merged_<name>1940.dta. ONE LIST, SO run_machineA.do'S    */
+/*PREFLIGHT AND THE SCRIPT CANNOT DISAGREE. ALASKA HAS NO FILE.              */
+global REP_A_STATES "alabama arizona arkansas california colorado connecticut delaware district_of_columbia florida georgia hawaii idaho illinois indiana iowa kansas kentucky louisiana maine maryland massachusetts michigan minnesota mississippi missouri montana nebraska nevada new_hampshire new_jersey new_mexico new_york north_carolina north_dakota ohio oklahoma oregon pennsylvania rhode_island south_carolina south_dakota tennessee texas utah vermont virginia washington west_virginia wisconsin wyoming"
+
 /*`version` SET IN A DO-FILE REVERTS WHEN THAT FILE ENDS, SO THE ONE ABOVE  */
 /*COVERS ONLY THIS FILE. run_machineA.do SETS IT FOR THE SCRIPTS. Results    */
 /*were produced on Stata/MP 15.1; record what this run uses.                */
