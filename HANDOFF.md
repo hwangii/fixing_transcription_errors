@@ -1,10 +1,10 @@
-# HANDOFF — state as of 2026-10-18
+# HANDOFF — state as of 2026-10-30
 
 Written for continuing this work on **either** of the two servers. Each holds a
 different and equally important dataset, so analysis runs on both and both edit
 `CODE/`. Read this first, then `CLAUDE.md`.
 
-## Machine B replication — the next job, to be done on machine B (written 2026-10-18)
+## Machine B replication — DONE 2026-10-19 (do not redo; kept as the record of what was built)
 
 > **DONE 2026-10-19 on machine B (`ARTS-ECON-SHSRV`).** Steps 1-5 are
 > committed (`83d8b98` unmodified copy, `c49e135` `$LCODE` repoint across
