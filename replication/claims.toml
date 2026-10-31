@@ -292,7 +292,6 @@ values = ["nMalesTen", "", ""]
 status = "scripted"
 script = "CODE/make_balance_exhibits.do"
 machine = "A"
-issue = "keep if age>=10 & female==0 retains records with missing age (missing > every number)."
 
 [[claim]]
 id = "n-analysis"

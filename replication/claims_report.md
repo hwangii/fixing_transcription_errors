@@ -16,9 +16,9 @@ Result files read: compute_legibility_quartiles.tex, compute_model_agreement_on_
 | result | id | draft line | machine | checks | known issue |
 |---|---|---|---|---|---|
 | **MISMATCH** | `intro-legibility` | 101 | A | 20: ok<br>1.4: MISMATCH, source gives 1.6 (raw 1.55278) |  |
-| **MISMATCH** | `county-percentiles` | 749 | A | 5: unchecked<br>95: unchecked<br>18: ok<br>42: MISMATCH, source gives 43 (raw 42.5321) | The 95th percentile is 42.5 at one decimal, which would normally be printed as 43. |
-| **MISMATCH** | `legibility-headline` | 756 | A | 20: ok<br>1.4: MISMATCH, source gives 1.6 (raw 1.55278) |  |
-| **ASSERT FAILED** | `conclusion-least-covered` | 786 | A | assert: FAILS  [linkGainNonwhite > linkGainWhite and linkGainNoschool > linkGainAll] | Contradicted by the draft's own numbers: the non-white gain (6.4%) is below the white gain (7.9%), and no-schooling (7.0%) is below the overall 8%. Line 755 and line 770 make the same claim. |
+| **MISMATCH** | `county-percentiles` | 748 | A | 5: unchecked<br>95: unchecked<br>18: ok<br>42: MISMATCH, source gives 43 (raw 42.5321) | The 95th percentile is 42.5 at one decimal, which would normally be printed as 43. |
+| **MISMATCH** | `legibility-headline` | 755 | A | 20: ok<br>1.4: MISMATCH, source gives 1.6 (raw 1.55278) |  |
+| **ASSERT FAILED** | `conclusion-least-covered` | 785 | A | assert: FAILS  [linkGainNonwhite > linkGainWhite and linkGainNoschool > linkGainAll] | Contradicted by the draft's own numbers: the non-white gain (6.4%) is below the white gain (7.9%), and no-schooling (7.0%) is below the overall 8%. Line 755 and line 770 make the same claim. |
 | **UNCHECKED** | `training-labels` | 184 | ? | 392,085: unchecked<br>121,465: unchecked | No training-set construction code in the package. Also: this line says the sample is 'Rhode Island and selected regions of other states'; line 393 says the method was developed 'on Rhode Island alone'. |
 | **UNCHECKED** | `training-unique-names` | 191 | ? | 29,641: unchecked<br>28,032: unchecked |  |
 | **UNCHECKED** | `table1-accuracy` | 270 | ? | 97.38: unchecked<br>98.61: unchecked | Table 1 is hand-typed and has no producing code (HANDOFF item 4). Same numbers at 276-277 and 924. |
@@ -27,18 +27,18 @@ Result files read: compute_legibility_quartiles.tex, compute_model_agreement_on_
 | **UNCHECKED** | `accuracy-prose-last` | 278 | ? | 94.5: unchecked<br>98.3: unchecked |  |
 | **UNCHECKED** | `gpu-benchmark` | 377 | ? | 299,880: unchecked<br>0.22: unchecked<br>1940: unchecked<br>1,600: unchecked | No benchmark code or log. 1940 Rhode Island had roughly 713,000 persons, so 299,880 as 'the complete Rhode Island sample' needs a definition. |
 | **UNCHECKED** | `gpu-extrapolation` | 378 | ? | 730,000: unchecked |  |
-| **UNCHECKED** | `n-males-ten` | 399 | A | 55,350,482: ok<br>10: unchecked<br>1940: unchecked | keep if age>=10 & female==0 retains records with missing age (missing > every number). |
+| **UNCHECKED** | `n-males-ten` | 399 | A | 55,350,482: ok<br>10: unchecked<br>1940: unchecked |  |
 | **UNCHECKED** | `deaglan-denom-abe` | 598 | B | 57,589,273: ok<br>8: unchecked |  |
 | **UNCHECKED** | `deaglan-denom-abe-disc` | 613 | B | 15,003,537: ok<br>8: unchecked |  |
 | **UNCHECKED** | `deaglan-denom-hlink` | 630 | B | 115,030,746: ok<br>8: unchecked |  |
 | **UNCHECKED** | `deaglan-denom-hlink-disc` | 645 | B | 30,754,309: ok<br>8: unchecked |  |
-| **UNCHECKED** | `mortality-denominator` | 657 | B | 20,886,324: ok<br>1940: unchecked |  |
-| **UNCHECKED** | `mortality-note-denominator` | 674 | B | 20,886,324: ok<br>1940: unchecked |  |
-| **UNCHECKED** | `county-correlates` | 749 | A | 30: unchecked |  |
-| **UNCHECKED** | `appendix-labels` | 941 | ? | 392,085: unchecked |  |
-| **UNCHECKED** | `training-names-appendix` | 942 | ? | 29,641: unchecked |  |
-| **UNCHECKED** | `appendix-last-labels` | 947 | ? | 121,465: unchecked<br>28,032: unchecked |  |
-| **UNCHECKED** | `appendix-accuracy` | 954 | ? | 97.38: unchecked<br>98.61: unchecked<br>94.54: unchecked<br>98.29: unchecked |  |
+| **UNCHECKED** | `mortality-denominator` | 656 | B | 20,886,324: ok<br>1940: unchecked |  |
+| **UNCHECKED** | `mortality-note-denominator` | 673 | B | 20,886,324: ok<br>1940: unchecked |  |
+| **UNCHECKED** | `county-correlates` | 748 | A | 30: unchecked |  |
+| **UNCHECKED** | `appendix-labels` | 940 | ? | 392,085: unchecked |  |
+| **UNCHECKED** | `training-names-appendix` | 941 | ? | 29,641: unchecked |  |
+| **UNCHECKED** | `appendix-last-labels` | 946 | ? | 121,465: unchecked<br>28,032: unchecked |  |
+| **UNCHECKED** | `appendix-accuracy` | 953 | ? | 97.38: unchecked<br>98.61: unchecked<br>94.54: unchecked<br>98.29: unchecked |  |
 | **MATCH** | `abstract-disagree` | 67 | A | 28: ok |  |
 | **MATCH** | `abstract-disagree-groups` | 67 | A | assert: holds  [cell("figures/incongruent_allstates.tex", "Foreign-born", 2) > cell("figures/incongruent_allstates.tex", "Foreign-born", 1)] | Foreign-born half is checked. Non-English half: no exhibit or script measures disagreement by mother tongue (non_english_mtongue is not among the 18 balance-table characteristics). |
 | **MATCH** | `abstract-link-gain` | 68 | A | 119: ok<br>28: ok |  |
@@ -74,17 +74,17 @@ Result files read: compute_legibility_quartiles.tex, compute_model_agreement_on_
 | **MATCH** | `deaglan-verified` | 575 | B | 515,555: ok<br>1,300,253: ok<br>11.1: ok<br>28.1: ok<br>20.6: ok<br>32.5: ok<br>69.5: ok<br>77.4: ok |  |
 | **MATCH** | `deaglan-contradicted-counts` | 576 | B | 308,848: ok<br>275,442: ok<br>501,010: ok<br>503,357: ok<br>65,148: ok<br>71,863: ok | The HLINK discordant rise (116,233 -> 125,607) is not mentioned. |
 | **MATCH** | `deaglan-contradicted-shares` | 578 | B | 2.44: ok<br>2.04: ok<br>2.75: ok<br>2.33: ok<br>4.07: ok<br>2.25: ok<br>5.07: ok<br>2.56: ok<br>0.75: ok<br>0.74: ok<br>0.76: ok<br>0.72: ok |  |
-| **MATCH** | `mortality-exact` | 658 | B | 5,658,793: ok<br>6,059,234: ok<br>7.08: ok<br>27.09: ok<br>29.01: ok |  |
-| **MATCH** | `mortality-conservative` | 659 | B | 20.22: ok<br>21.79: ok |  |
-| **MATCH** | `mortality-initials` | 660 | B | 83.14: ok<br>85.33: ok<br>87.60: ok<br>89.36: ok |  |
-| **MATCH** | `socio-all-improved` | 732 | A | assert: holds  [socioGroupsNotImproved == 0 and socioGroupsMissing == 0] | The figure note's list of grouping variables omits non-English mother tongue, which the figure includes and line 712 quotes. |
-| **MATCH** | `race-baseline` | 739 | A | 11.0: ok<br>24.1: ok |  |
-| **MATCH** | `race-gain` | 740 | A | 6.4: ok<br>7.9: ok |  |
-| **MATCH** | `subgroups` | 742 | A | 16.6: ok<br>18.0: ok<br>8.1: ok<br>11.9: ok<br>12.7: ok<br>7.0: ok<br>19.9: ok<br>21.5: ok<br>7.8: ok |  |
-| **MATCH** | `inmates` | 743 | A | 15.0: ok<br>7.3: ok |  |
-| **MATCH** | `no-group-fell` | 743 | A | assert: holds  [socioGroupsNotImproved == 0 and socioGroupsMissing == 0] |  |
-| **MATCH** | `legibility-detail` | 776 | A | 46.2: ok<br>14.0: ok<br>16.9: ok<br>27.7: ok | Quartiles are record-weighted; the prose says 'districts in the lowest quartile'. |
-| **MATCH** | `legibility-gain` | 777 | A | 16.9: ok<br>20.3: ok<br>20: ok<br>27.7: ok<br>28.1: ok |  |
+| **MATCH** | `mortality-exact` | 657 | B | 5,658,793: ok<br>6,059,234: ok<br>7.08: ok<br>27.09: ok<br>29.01: ok |  |
+| **MATCH** | `mortality-conservative` | 658 | B | 20.22: ok<br>21.79: ok |  |
+| **MATCH** | `mortality-initials` | 659 | B | 83.14: ok<br>85.33: ok<br>87.60: ok<br>89.36: ok |  |
+| **MATCH** | `socio-all-improved` | 731 | A | assert: holds  [socioGroupsNotImproved == 0 and socioGroupsMissing == 0] | The figure note's list of grouping variables omits non-English mother tongue, which the figure includes and line 712 quotes. |
+| **MATCH** | `race-baseline` | 738 | A | 11.0: ok<br>24.1: ok |  |
+| **MATCH** | `race-gain` | 739 | A | 6.4: ok<br>7.9: ok |  |
+| **MATCH** | `subgroups` | 741 | A | 16.6: ok<br>18.0: ok<br>8.1: ok<br>11.9: ok<br>12.7: ok<br>7.0: ok<br>19.9: ok<br>21.5: ok<br>7.8: ok |  |
+| **MATCH** | `inmates` | 742 | A | 15.0: ok<br>7.3: ok |  |
+| **MATCH** | `no-group-fell` | 742 | A | assert: holds  [socioGroupsNotImproved == 0 and socioGroupsMissing == 0] |  |
+| **MATCH** | `legibility-detail` | 775 | A | 46.2: ok<br>14.0: ok<br>16.9: ok<br>27.7: ok | Quartiles are record-weighted; the prose says 'districts in the lowest quartile'. |
+| **MATCH** | `legibility-gain` | 776 | A | 16.9: ok<br>20.3: ok<br>20: ok<br>27.7: ok<br>28.1: ok |  |
 
 ## Exhibits
 
@@ -93,13 +93,13 @@ Result files read: compute_legibility_quartiles.tex, compute_model_agreement_on_
 | `figures/balance_allstates.tex` | tab:sample_characteristics | yes | 459 | A | header: generated | munir_figures_for_nber.do still contains balancetable writers for this file; running it after make_balance_exhibits.do overwrites the table with the old version. |
 | `figures/incongruent_allstates.tex` | tab:cong_vs_incong | yes | 480 | A | header: generated | Same overwrite risk as balance_allstates.tex. |
 | `figures/avg_performance_allstates.tex` | tab:avg_performance | yes | 538 | A | NO GENERATED-BY HEADER |  |
-| `figures/all_states_hetero_combinedV2.pdf` | fig:hetero_legibility | yes | 765 | A |  |  |
-| `figures/all_states_socio_demo_combinedV2.pdf` | fig:hetero_socio | yes | 726 | A |  |  |
+| `figures/all_states_hetero_combinedV2.pdf` | fig:hetero_legibility | yes | 764 | A |  |  |
+| `figures/all_states_socio_demo_combinedV2.pdf` | fig:hetero_socio | yes | 725 | A |  |  |
 | `figures/deaglan_abe_jw.tex` | tab:deaglan_abe_jw | yes | 594,609 | B | header: extracted from Deaglan's package | The extraction step from deaglan_results/current/ into figures/ has no script. |
 | `figures/deaglan_abe_jw_restricted.tex` | tab:deaglan_abe_jw_restricted | yes | 609 | B | header: extracted from Deaglan's package |  |
 | `figures/deaglan_hlink.tex` | tab:deaglan_hlink | yes | 626,641 | B | header: extracted from Deaglan's package |  |
 | `figures/deaglan_hlink_restricted.tex` | tab:deaglan_hlink_restricted | yes | 641 | B | header: extracted from Deaglan's package |  |
-| `figures/deaglan_mortality_bunmd.tex` | tab:deaglan_mortality | yes | 670 | B | header: extracted from Deaglan's package |  |
+| `figures/deaglan_mortality_bunmd.tex` | tab:deaglan_mortality | yes | 669 | B | header: extracted from Deaglan's package |  |
 | `figures/rhode_island_4_252_61.png` | fig:schedule | yes | 159 | ? |  | The choice of ED 4-252 as closest to mean legibility survives only as commented-out Rhode Island code. |
 | `figures/ernest_bassette_RI_kent_2_52_701_16.png` | fig:error_examples | yes | 346 | ? |  |  |
 | `figures/rhode_island_providence_4_60_692_34.png` | fig:error_examples | yes | 358 | ? |  |  |

@@ -236,11 +236,17 @@ individually.
 6. **Data provenance dates and licences** (see the table above).
 7. **Known hazards, not yet fixed.** All of these are recorded in the review
    reports:
-   - `keep if age>=10` retains records with a missing age.
    - No merge uses `assert()`.
    - `munir_figures_for_nber.do` still writes old versions of Tables 2-3 if run.
    - `choosing_edist_with_blacks_nber.do` samples after an unstable sort, so
      its `set seed` does not make the sample reproducible.
+
+   Closed: `keep if age>=10` retaining missing ages. The pipeline has two age
+   filters, `create_figures_SSHA2025.do:94` and `make_balance_exhibits.do:49`.
+   Both carry `& age<.` since 2026-10-15. Missing ages measured 0 in both
+   input files (`results/size_hazards_{balance,analysis}.tex`), so no number
+   moved. Swept again on 2026-10-30: no other script in `run_machineA.do`
+   filters or groups on age.
 
 ## Moving the draft onto generated numbers
 
