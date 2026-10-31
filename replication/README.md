@@ -250,6 +250,26 @@ individually.
      file, while the linkage results use the analysis sample, which is 29,344
      records smaller (51,036,859). The two census totals of men aged 10+
      differ by 2,991.
+
+     The gap is fully decomposed (2026-10-31,
+     `diagnostics/decompose_sample_gap.do`, which rebuilds both samples
+     exactly). Both samples come from the same per-state
+     `merged_<state>1940.dta` files, and they share 51,003,396 records.
+
+     In the balance sample only (62,807):
+     - 21,493 have no FamilySearch age; the labeled data requires `age_fs`
+       (`clean_FS_and_combineV5_nber.do:224`).
+     - 40,626 have an age of 10+ in the state file, but under 10 in the IPUMS
+       extract.
+     - 688 have a `histid` that is not in the extract.
+
+     In the analysis sample only (33,463): the state file has them as not
+     male or under 10, while the extract has them as male and 10+.
+
+     So the two samples take sex and age from different sources, and the
+     analysis sample also requires a FamilySearch age.
+     `diagnostics/compare_sample_counts.do` shows the gap is spread across
+     every state, not concentrated in particular districts.
    - `munir_figures_for_nber.do` still writes old versions of Tables 2-3 if run.
    - `choosing_edist_with_blacks_nber.do` samples after an unstable sort, so
      its `set seed` does not make the sample reproducible.
