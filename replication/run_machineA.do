@@ -40,7 +40,6 @@ local inputs `""`snu_ft'/ORIGINAL/census1940_all_labeled_data.dta""'
 local inputs `"`inputs' "`snu_ed'/INTERMEDIATE/link1930_1940_ans_cleaned_noraceblock0.dta""'
 local inputs `"`inputs' "`snu_ed'/INTERMEDIATE/link1930_1940_true_cleaned_noraceblock0.dta""'
 local inputs `"`inputs' "`f_ed'/ORIGINAL/all_states_socio_demo_char_for_SSHA2025.dta""'
-local inputs `"`inputs' "`f_ft'/INTERMEDIATE/temp.dta""'
 local inputs `"`inputs' "$REP_REPO/CODE/label_socio_demo.do""'
 foreach s in al ar az ca co ct dc de fl ga ia id il in ks ky la ma md me mi mn mo ms mt nc nd ne nh nj nm nv ny oh ok or pa ri sc sd tn tx ut va vt wa wi wv wy {
 	local inputs `"`inputs' "`model'/`s'/merged_data.dta""'
@@ -71,9 +70,9 @@ display as text "preflight: all `ninputs' inputs present"
 /*================================== RUN ====================================*/
 /*ORDER MATTERS: create_figures_SSHA2025.do WRITES THE ANALYSIS FILE          */
 /*(enum_date/DATA/INTERMEDIATE/temp.dta) THAT THE FOUR compute/verify         */
-/*SCRIPTS READ. make_balance_exhibits.do READS A DIFFERENT temp.dta, ON F:,   */
-/*BUILT BY munir_figures_for_nber.do -- WHICH IS NOT RUN HERE, BECAUSE IT     */
-/*ALSO STILL WRITES THE OLD balancetable VERSIONS OF THE TWO BALANCE TABLES.  */
+/*SCRIPTS AND make_balance_exhibits.do READ. SINCE 2026-10-31 THE BALANCE    */
+/*TABLES NO LONGER READ THE F: temp.dta BUILT BY munir_figures_for_nber.do;   */
+/*THE WHOLE PAPER USES ONE SAMPLE DEFINITION.                                 */
 
 local scripts ""
 if $REP_SKIP_REBUILD == 0 local scripts "create_figures_SSHA2025"

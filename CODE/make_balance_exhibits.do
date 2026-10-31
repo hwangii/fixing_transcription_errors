@@ -32,21 +32,72 @@ repnum open using "$REP_RESULTS/make_balance_exhibits.tex", script(CODE/make_bal
 
 local dropbox "D:\SNU ECON Dropbox\sam hwang\"
 local overleaf "D:\repos\6638fa0fd89fbec05130caeb\"
-local trans_intermediate_f "F:\fixing_transcription_errors\DATA\INTERMEDIATE\"
 local figure "`overleaf'figures\"
 
 /*THE 18 CHARACTERISTICS, IN THE ORDER THE COMMITTED TABLES USE.*/
 local chars "black american_indian asian northeast_bpl midwest_bpl south_bpl west_bpl foreign_born father_foreign_born urban farm no_ed grad_elem white_color skilled unskilled farmer incwage"
 
-use `"`trans_intermediate_f'temp.dta"', clear
+/*ONE SAMPLE DEFINITION FOR THE WHOLE PAPER (2026-10-31). THESE TABLES USED  */
+/*TO READ F:/fixing_transcription_errors/DATA/INTERMEDIATE/temp.dta, BUILT  */
+/*BY munir_figures_for_nber.do                                              */
+/*FROM THE ANCESTRY STATE FILES. THAT FILE TOOK SEX AND AGE FROM ANCESTRY    */
+/*AND DID NOT REQUIRE A FAMILYSEARCH AGE, SO ITS "ANALYSIS SAMPLE" WAS 29,344 */
+/*RECORDS LARGER THAN THE ONE EVERY LINKAGE RESULT USES (DECOMPOSED IN       */
+/*replication/diagnostics/decompose_sample_gap.do). BOTH COLUMNS NOW COME    */
+/*FROM THE SAME SOURCE AS THE LINKAGE RESULTS:                               */
+/*  US              ALL MEN 10+ BY THE sex AND age OF THE IPUMS EXTRACT THAT */
+/*                  create_figures_SSHA2025.do:66 MERGES ON                  */
+/*  ANALYSIS SAMPLE THE RECORDS create_figures_SSHA2025.do SAVES, WHICH IS   */
+/*                  THEREFORE A PREREQUISITE (run_machineA.do RUNS IT FIRST). */
+/*THE 18 CHARACTERISTICS STILL COME FROM THE STATE FILES, AS BEFORE: THE      */
+/*EXTRACT KEEPS ONLY IPUMS'S GENERAL CODES FOR race, bpl, fbpl AND higrade,  */
+/*AND create_socio_demographic_vars.do IS WRITTEN FOR THE DETAILED ONES      */
+/*(TRIED 2026-10-31: RACE CAME OUT MISSING, BIRTH REGIONS ZERO).             */
+/*FORWARD SLASHES: A BACKSLASH BEFORE A MACRO ESCAPES IT (r(601) 2026-10-31).*/
+local trans_intermediate_f "F:/fixing_transcription_errors/DATA/INTERMEDIATE/"
+local original_ed "F:\enum_date\DATA\ORIGINAL\"
+local intermediate "`dropbox'enum_date\DATA\INTERMEDIATE\"
+local code "D:\repos\fixing_transcription_errors\CODE\"
+
+/*THE SAME 50 FILES munir_figures_for_nber.do:233-278 READ, AND ITS _merge   */
+/*RULE (ANCESTRY RECORDS, WITH OR WITHOUT A FAMILYSEARCH MATCH).             */
+local files : dir "`trans_intermediate_f'" files "merged_*1940.dta"
+tempfile chars_all
+local z = 0
+foreach f of local files {
+	use histid _merge race_anc higrade bpl fbpl school relate marst occ1950 urban farm incwage using `"`trans_intermediate_f'`f'"', clear
+	keep if _merge==1 | _merge==3
+	drop _merge
+	if `z' > 0 append using `chars_all'
+	save `chars_all', replace
+	local ++z
+}
+display "state files read: `z'"
+rename race_anc race
+
+/*SEX AND AGE FROM THE EXTRACT. A STATE-FILE RECORD NOT IN THE EXTRACT HAS   */
+/*NO sex THERE AND DROPS OUT, AS IT DOES FROM THE ANALYSIS SAMPLE.            */
+merge 1:1 histid using `"`original_ed'all_states_socio_demo_char_for_SSHA2025.dta"', keepusing(serial pernum sex age)
+tab _merge
+quietly count if _merge==2 & sex==1 & age>=10 & age<.
+display "men 10+ in the extract with no state-file record (no characteristics): " r(N)
+keep if _merge==3
+drop _merge
+
+/*age<. : MISSING AGE WOULD OTHERWISE PASS age>=10 (0 MISSING IN THE EXTRACT).*/
+keep if sex==1 & age>=10 & age<.
+
+do `"`code'create_socio_demographic_vars.do"'
 
 capture label var white_color "White-collar occupation"
 capture label var skilled "Skilled occupation"
 capture label var unskilled "Unskilled occupation"
 
-/*age<. : MISSING AGE WOULD OTHERWISE PASS age>=10. NO-OP ON THE CURRENT  */
-/*DATA (0 MISSING AGES; replication/results/size_hazards_balance.tex).     */
-keep if age>=10 & age<. & female==0
+/*EVERY ANALYSIS RECORD MUST BE A MAN 10+ IN THE EXTRACT: IT WAS SELECTED ON */
+/*THIS FILE'S sex AND age. 1:1 ALSO STOPS ON A DUPLICATE serial-pernum.      */
+merge 1:1 serial pernum using `"`intermediate'temp.dta"', keepusing(congruent) assert(master match)
+gen byte incongruent = 1 - congruent if _merge==3
+drop _merge congruent
 
 /*FAIL LOUDLY RATHER THAN WRITING A TABLE WITH SILENTLY MISSING ROWS.*/
 foreach v in incongruent `chars' {
