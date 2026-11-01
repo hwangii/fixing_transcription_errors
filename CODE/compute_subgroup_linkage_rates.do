@@ -16,7 +16,7 @@ if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config
 repnum open using "$REP_RESULTS/compute_subgroup_linkage_rates.tex", script(CODE/compute_subgroup_linkage_rates.do)
 local intermediate "D:/SNU ECON Dropbox/sam hwang/enum_date/DATA/INTERMEDIATE"
 
-use bpl higrade non_english_mtongue linked_before linked_after using `"`intermediate'/temp.dta"', clear
+use bpl higrade non_english_mtongue congruent linked_before linked_after using `"`intermediate'/temp.dta"', clear
 display "records: " _N
 
 recode bpl (1/120=1) (150/900=2)
@@ -37,5 +37,19 @@ foreach spec in "bpl==2 Foreignborn Foreign-born" "higrade==1 Noschool No-school
 	repnum linkAfter`key' = 100*`a',       format(%4.1f)
 	repnum linkGain`key'  = 100*(`a'/`b'-1), format(%4.1f)
 	repnum n`key'         = `n',           format(%15.0fc)
+}
+
+/*DISAGREEMENT (1 - congruent) FOR FOREIGN-BORN VS NATIVE-BORN AND NON-ENGLISH*/
+/*VS ENGLISH MOTHER TONGUE: THE ABSTRACT SAYS DISAGREEMENT IS HIGHER FOR BOTH */
+/*(2026-10-31). EACH COMPARISON GROUP IS NAMED EXPLICITLY, SO A MISSING VALUE */
+/*FALLS IN NEITHER GROUP RATHER THAN IN THE COMPLEMENT.                       */
+gen byte disagree = 1 - congruent
+foreach spec in "bpl==2 Foreignborn" "bpl==1 Nativeborn" "non_english_mtongue==1 Nonenglish" "non_english_mtongue==0 English" {
+	gettoken cond key : spec
+	local key = trim("`key'")
+	quietly summarize disagree if `cond'
+	local m=r(mean)
+	display "disagreement, `key': " %6.4f `m' "  (N=" r(N) ")"
+	repnum disagree`key' = 100*`m', format(%4.1f)
 }
 repnum close

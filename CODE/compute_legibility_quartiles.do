@@ -84,4 +84,16 @@ repnum legLinkAfterLowest  = 100*`a1', format(%4.1f)
 repnum legLinkAfterHighest = 100*`a4', format(%4.1f)
 repnum legGainLowest       = 100*(`a1'/`l1'-1), format(%4.1f)
 repnum legGainHighest      = 100*(`a4'/`l4'-1), format(%4.1f)
+
+/*THE MIDDLE QUARTILES, SO THE CONCLUSION'S "BY MOST WHERE THE RECORDS ARE   */
+/*HARDEST TO READ" IS CHECKED AGAINST ALL FOUR, NOT ONLY Q4 (2026-10-31).    */
+foreach q in 2 3 {
+	local qname = cond(`q'==2, "Second", "Third")
+	quietly sum linked_before if leg_q==`q'
+	local lq=r(mean)
+	quietly sum linked_after if leg_q==`q'
+	local aq=r(mean)
+	display "  improvement in Q`q': " %6.1f 100*(`aq'/`lq'-1) "%"
+	repnum legGain`qname' = 100*(`aq'/`lq'-1), format(%4.1f)
+}
 repnum close

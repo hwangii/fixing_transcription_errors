@@ -47,11 +47,11 @@ machine = "A"
 id = "abstract-disagree-groups"
 text = 'with higher disagreement rates for foreign-born individuals and non-English speakers'
 values = []
-assert = 'cell("figures/incongruent_allstates.tex", "Foreign-born", 2) > cell("figures/incongruent_allstates.tex", "Foreign-born", 1)'
-status = "table"
-script = "CODE/make_balance_exhibits.do"
+assert = 'cell("figures/incongruent_allstates.tex", "Foreign-born", 2) > cell("figures/incongruent_allstates.tex", "Foreign-born", 1) and disagreeForeignborn > disagreeNativeborn and disagreeNonenglish > disagreeEnglish'
+status = "scripted"
+script = "CODE/make_balance_exhibits.do + CODE/compute_subgroup_linkage_rates.do"
 machine = "A"
-issue = "Foreign-born half is checked. Non-English half: no exhibit or script measures disagreement by mother tongue (non_english_mtongue is not among the 18 balance-table characteristics)."
+note = "Non-English half added 2026-10-31: disagreement 35.3% (non-English mother tongue) vs 27.3% (English); foreign-born 34.1% vs native-born 27.5%."
 
 [[claim]]
 id = "abstract-link-gain"
@@ -647,6 +647,26 @@ machine = "A"
 # ======================================================================= CONCLUSION
 
 [[claim]]
+id = "intro-hardest-baseline"
+text = 'most valuable where records are hardest to read, which is also where baseline linking rates are lower'
+values = []
+assert = "legGainLowest > legGainSecond and legGainLowest > legGainThird and legGainLowest > legGainHighest and legLinkBaseLowest < legLinkBaseHighest"
+status = "scripted"
+script = "CODE/compute_legibility_quartiles.do"
+machine = "A"
+note = "Replaced 'addressing the most severe biases in linked samples' on 2026-10-31; no analysis estimates bias. Baseline 16.9 (least legible) vs 27.7 (most legible)."
+
+[[claim]]
+id = "conclusion-coverage"
+text = 'improve transcription quality and expand the coverage of linked census data'
+values = []
+assert = "linkGainAll > 0 and socioGroupsNotImproved == 0"
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+note = "Replaced 'while reducing demographic and geographic biases' on 2026-10-31, which line 784 itself says the paper does not establish."
+
+[[claim]]
 id = "conclusion-similar-gains"
 text = 'and those with low education levels by proportions similar to those for the population as a whole'
 values = []
@@ -660,11 +680,11 @@ note = "'Similar' read as within 1 percentage point of the overall gain (7.8): n
 id = "conclusion-hardest-to-read"
 text = 'and they do so by most where the records are hardest to read'
 values = []
-assert = "legGainLowest > legGainHighest and legGainLowest > linkGainAll"
+assert = "legGainLowest > legGainSecond and legGainLowest > legGainThird and legGainLowest > legGainHighest"
 status = "scripted"
 script = "CODE/compute_legibility_quartiles.do + CODE/create_figures_SSHA2025.do"
 machine = "A"
-note = "Replaced 'by most for groups that were previously least well covered' on 2026-10-31, which the subgroup gains contradicted (non-white 6.4 vs white 7.9; no schooling 7.0 vs all 7.8). Only the lowest and highest legibility quartiles are in the results file, so 'by most' is checked against the top quartile and the overall gain, not quartiles 2-3."
+note = "Replaced 'by most for groups that were previously least well covered' on 2026-10-31, which the subgroup gains contradicted (non-white 6.4 vs white 7.9; no schooling 7.0 vs all 7.8). Checked against all four quartiles since 2026-10-31: 20.1, 9.4, 5.1, 1.6 percent from least to most legible."
 
 
 # ========================================================================= EXHIBITS

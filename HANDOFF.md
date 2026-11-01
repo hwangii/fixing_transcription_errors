@@ -17,8 +17,10 @@ different and equally important dataset, so analysis runs on both and both edit
   - 1.4 -> 1.6 and 42 -> 43;
   - the over-selling of subgroup gains is removed (lines 90, 122, 782, 783):
     under-linked groups gain by about as much as everyone, and the largest
-    gains are in the hardest-to-read records.
-- **Claim check: 48 match, 0 fail.** The old "five known draft errors" are all
+    gains are in the hardest-to-read records;
+  - no claim of reduced bias (lines 102, 797), which line 784 says the paper
+    does not establish.
+- **Claim check: 50 match, 0 fail.** The old "five known draft errors" are all
   resolved.
 - Still open: the README gaps (items 1-6), the 2026-10-14 report dispositions,
   and PR #1.

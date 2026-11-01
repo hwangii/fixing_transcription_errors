@@ -2,7 +2,7 @@
 
 Draft: `DHTS-2026-10-12.tex` (paper repo, cloned from Overleaf).
 Package started 2026-10-15. **Status: in progress.** Latest claim check
-(2026-10-31): 48 claims match their source, none fail, and 21 cannot be
+(2026-10-31): 50 claims match their source, none fail, and 21 cannot be
 checked because no code produces them (mostly the ML pipeline, item 1 below)
 or because their text holds a number that is not a result, such as "5th".
 The section
@@ -176,9 +176,9 @@ or "no producing code".
 | `create_figures_SSHA2025.do` | `results/create_figures_SSHA2025.tex` | 8.9 → 19.4%, +119%, 65 → 84%, +28%, +8%, +1%; "every group improved" |
 | `compute_model_agreement_on_discordant.do` | `results/compute_model_agreement_on_discordant.tex` | 66%, 14%, 52%, 24%, 10%, 35.1 million, 66 → 73 |
 | `compute_race_linkage_rates.do` | `results/compute_race_linkage_rates.tex` | 11.0% / 24.1%; +6.4% / +7.9% |
-| `compute_subgroup_linkage_rates.do` | `results/compute_subgroup_linkage_rates.tex` | foreign-born, no-schooling and non-English baselines and gains; the conclusion's "similar proportions" (each within 1 point of the overall gain) |
+| `compute_subgroup_linkage_rates.do` | `results/compute_subgroup_linkage_rates.tex` | foreign-born, no-schooling and non-English baselines and gains; the conclusion's "similar proportions" (each within 1 point of the overall gain); the abstract's higher disagreement for foreign-born and non-English speakers |
 | `verify_inmates_and_county_stats.do` | `results/verify_inmates_and_county_stats.tex` | inmates 15.0%, +7.3%; county p5/p95 18% / 43% |
-| `compute_legibility_quartiles.do` | `results/compute_legibility_quartiles.tex` | 46.2 vs 14.0; 16.9 vs 27.7; +20% vs +1.6%; the conclusion's "by most where the records are hardest to read" |
+| `compute_legibility_quartiles.do` | `results/compute_legibility_quartiles.tex` | 46.2 vs 14.0; 16.9 vs 27.7; +20% vs +1.6%; gains in all four quartiles, behind "by most where the records are hardest to read" (lines 102, 783) |
 
 ## Two machines
 
