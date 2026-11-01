@@ -87,7 +87,7 @@ machine = "A"
 
 [[claim]]
 id = "intro-legibility"
-text = 'where the linkage rate rises by 20 percent against 1.4 percent in the most legible quartile'
+text = 'where the linkage rate rises by 20 percent against 1.6 percent in the most legible quartile'
 values = ["legGainLowest", "legGainHighest"]
 status = "scripted"
 script = "CODE/compute_legibility_quartiles.do"
@@ -604,12 +604,11 @@ machine = "A"
 
 [[claim]]
 id = "county-percentiles"
-text = 'the 5th and 95th percentile of the distribution of the share of records with incongruent transcription is 18\% and 42\%'
+text = 'the 5th and 95th percentile of the distribution of the share of records with incongruent transcription is 18\% and 43\%'
 values = ["", "", "countyIncongLow", "countyIncongHigh"]
 status = "scripted"
 script = "CODE/verify_inmates_and_county_stats.do"
 machine = "A"
-issue = "The 95th percentile is 42.5 at one decimal, which would normally be printed as 43."
 
 [[claim]]
 id = "county-correlates"
@@ -621,7 +620,7 @@ machine = "A"
 
 [[claim]]
 id = "legibility-headline"
-text = 'where the linkage rate rises by 20 percent, against 1.4 percent in the most legible quartile'
+text = 'where the linkage rate rises by 20 percent, against 1.6 percent in the most legible quartile'
 values = ["legGainLowest", "legGainHighest"]
 status = "scripted"
 script = "CODE/compute_legibility_quartiles.do"
