@@ -5,6 +5,22 @@ Written for continuing this work on **either** of the two servers. Each holds a
 different and equally important dataset, so analysis runs on both and both edit
 `CODE/`. Read this first, then `CLAUDE.md`.
 
+## Work on `main` from now on (2026-10-31)
+
+PR #1 is merged: `main` now holds everything that was on
+`add-codex-review-infrastructure`, with the same commits. **On machine B,
+before anything else:**
+
+```powershell
+git fetch
+git checkout main
+git pull --ff-only
+.\Sync.ps1
+```
+
+`Sync.ps1` follows whichever branch is checked out, so nothing else changes.
+The old branch is left on GitHub for now; do not commit to it.
+
 ## 2026-10-31 (machine A): one sample, draft corrected
 
 - **One sample for the whole paper.** Tables 2-3 now use the linkage analysis
