@@ -647,14 +647,24 @@ machine = "A"
 # ======================================================================= CONCLUSION
 
 [[claim]]
-id = "conclusion-least-covered"
-text = 'they do so by most for groups that were previously least well covered'
+id = "conclusion-similar-gains"
+text = 'and those with low education levels by proportions similar to those for the population as a whole'
 values = []
-assert = "linkGainNonwhite > linkGainWhite and linkGainNoschool > linkGainAll"
+assert = "abs(linkGainNonenglish - linkGainAll) < 1 and abs(linkGainForeignborn - linkGainAll) < 1 and abs(linkGainNoschool - linkGainAll) < 1"
 status = "scripted"
-script = "CODE/compute_race_linkage_rates.do + CODE/compute_subgroup_linkage_rates.do"
+script = "CODE/compute_subgroup_linkage_rates.do + CODE/create_figures_SSHA2025.do"
 machine = "A"
-issue = "Contradicted by the draft's own numbers: the non-white gain (6.4%) is below the white gain (7.9%), and no-schooling (7.0%) is below the overall 8%. Line 755 and line 770 make the same claim."
+note = "'Similar' read as within 1 percentage point of the overall gain (7.8): non-English 7.8, foreign-born 8.1, no schooling 7.0. Replaced 'notable improvements' on 2026-10-31."
+
+[[claim]]
+id = "conclusion-hardest-to-read"
+text = 'and they do so by most where the records are hardest to read'
+values = []
+assert = "legGainLowest > legGainHighest and legGainLowest > linkGainAll"
+status = "scripted"
+script = "CODE/compute_legibility_quartiles.do + CODE/create_figures_SSHA2025.do"
+machine = "A"
+note = "Replaced 'by most for groups that were previously least well covered' on 2026-10-31, which the subgroup gains contradicted (non-white 6.4 vs white 7.9; no schooling 7.0 vs all 7.8). Only the lowest and highest legibility quartiles are in the results file, so 'by most' is checked against the top quartile and the overall gain, not quartiles 2-3."
 
 
 # ========================================================================= EXHIBITS
