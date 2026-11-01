@@ -69,18 +69,22 @@ python replication\check_claims.py
 None of the data can be redistributed, and none of it is in git.
 `.gitignore` excludes `*.dta`, `*.csv` and `*.txt`.
 
-| Data | Source | Access | Location |
-|---|---|---|---|
-| 1940 full-count census with Ancestry.com name transcriptions | IPUMS USA restricted full count (`us1940b_usa_res.dat`) | IPUMS restricted-data agreement | A: `F:\updated_census_recvd_aug2021\` (zipped) |
-| 1940 FamilySearch.org name transcriptions | Scrape of FamilySearch, one CSV per state | Not redistributable; terms of FamilySearch | A: `F:\test_selection_on_unobservable\DATA\ORIGINAL\` (zipped) |
-| 1940 socio-demographic extract | IPUMS USA extract `usa_00647` | IPUMS registration | A: `F:\enum_date\DATA\ORIGINAL\usa_00647.dat` |
-| 1930-1940 link files (`link1930_1940_{ans,true}_cleaned_noraceblock0.dta`) | `enum_date` project; **no producing code in this repo** | — | A: `D:\SNU ECON Dropbox\sam hwang\enum_date\DATA\INTERMEDIATE\` |
-| Model transcriptions, per state (`merged_data.dta`) | ML pipeline; **no producing code in this repo** | — | A: `...\fixing_transcription_errors\DATA\TRANSCRIPTIONS\USCensus1940FullCount\output_and_output1_ssha2025\<st>\` |
-| 1940 census images | NARA, public S3 bucket `s3://nara-1940-census` | Public | Downloaded by `CODE/choosing_edist_with_blacks_nber.do`, `CODE/census1940_image_downloader_*.py` |
-| FamilySearch genealogical reference links | Used by Deaglan's package | — | B |
+| Data | Source | Obtained (evidence) | Licence / terms | Location |
+|---|---|---|---|---|
+| 1940 full-count census with Ancestry.com name transcriptions | IPUMS USA restricted full count (`us1940b_usa_res.dat`; the archive is named `ubc_1940_3-4.zip`, which suggests release 3.4, not confirmed) | August 2021: archive dated 2021-08-16, folder named `recvd_aug2021`. Name file `1940_letter.dta.zip` dated 2022-11-23 | IPUMS restricted-use data agreement; no redistribution | A: `F:\updated_census_recvd_aug2021\` (zipped) |
+| 1940 FamilySearch.org name transcriptions | Scrape of FamilySearch, one archive per state or territory | May-June 2020: 65 of the 66 state and territory archives dated 2020-05-04 to 2020-06-20; Arizona's is dated 2024-10-06, so it was replaced later. The folder also holds three non-FamilySearch folders | FamilySearch terms of use; not redistributable | A: `F:\test_selection_on_unobservable\DATA\ORIGINAL\` (zipped) |
+| 1940 socio-demographic extract | IPUMS USA extract `usa_00647` | 2025-11-21 (file date) | IPUMS USA terms of use: cite IPUMS, no redistribution | A: `F:\enum_date\DATA\ORIGINAL\usa_00647.dat` |
+| 1930-1940 link files (`link1930_1940_{ans,true}_cleaned_noraceblock0.dta`) | `enum_date` project; **no producing code in this repo** | 2026-02-15 (file date) | Derived from the IPUMS restricted data above | A: `D:\SNU ECON Dropbox\sam hwang\enum_date\DATA\INTERMEDIATE\` |
+| Model transcriptions, per state (`merged_data.dta`) | ML pipeline; **no producing code in this repo** | November 2025 (file dates) | Ours | A: `...\fixing_transcription_errors\DATA\TRANSCRIPTIONS\USCensus1940FullCount\output_and_output1_ssha2025\<st>\` |
+| 1940 census images | NARA, public S3 bucket `s3://nara-1940-census` | Not recorded | Public domain (US federal records, released 2012) | Downloaded by `CODE/choosing_edist_with_blacks_nber.do`, `CODE/census1940_image_downloader_*.py` |
+| FamilySearch genealogical reference links | Used by Deaglan's package | See `LINKAGE/DOCUMENTATION.md` | — | B |
+| BUNMD death records | CenSoc (Goldstein et al.), BUNMD v2 | See `LINKAGE/DOCUMENTATION.md` | CenSoc terms of use | B |
 
-**Still to write for each row:** the date each file was downloaded or scraped,
-and its licence terms. Data editors require both.
+File dates are the last-modified dates of the copies on machine A, not
+download receipts. They are the best evidence available, and the author
+should confirm or correct them. Still missing: the date the NARA images were
+downloaded, the IPUMS release of the full count, and why Arizona's
+FamilySearch archive was replaced in 2024.
 
 ### Frozen intermediate files the analysis tier reads
 
