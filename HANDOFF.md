@@ -1,4 +1,4 @@
-# HANDOFF — state as of 2026-10-31
+# HANDOFF — state as of 2026-11-01
 
 
 Written for continuing this work on **either** of the two servers. Each holds a
@@ -20,6 +20,56 @@ git pull --ff-only
 
 `Sync.ps1` follows whichever branch is checked out, so nothing else changes.
 The old branch is left on GitHub for now; do not commit to it.
+
+## Machine B: next job — input checksums (written 2026-11-01 on machine A)
+
+**Context.** On 2026-11-01 machine A reran its whole pipeline (170 min, rc 0,
+everything byte-identical) and wrote `replication/input_manifest.md`: a SHA-256
+for each of its 103 frozen data inputs, plus its analysis file. The script is
+`replication/hash_inputs.py`. Machine B's inputs have no manifest, which is the
+last open part of `replication/README.md`, "What is not covered", item 5.
+Nothing else is needed from B for now.
+
+**Do these in order on machine B.**
+
+1. **Sync.** Do the "Work on `main`" steps above first, then confirm
+   `git log --oneline -1` shows this HANDOFF commit or later.
+2. **Write `replication/hash_inputs_machineB.py`.** Make it a new file, not
+   an edit to `hash_inputs.py` (that one is machine A's). Import `sha256`
+   from it, and copy its structure: `--check` mode, the same table format,
+   and a hostname guard for `ARTS-ECON-SHSRV`.
+   - **The list must be the 17 data files `run_machineB.do` preflights**
+     (lines 50-67): the names, links, transcriptions, flags and truth files,
+     `mortality/temp.dta`, and the four `censoc_bunmd_matched_*.dta`. Paths
+     are relative to `$REP_LINK` (`F:/Deaglan/Census_Transcriptions`).
+   - **Leave out the five code files** (lines 44-48). They are in `LINKAGE/`
+     and versioned by git.
+   - **Parse the list from `run_machineB.do`** rather than retyping it, so
+     the two cannot drift apart. Stop with an error if the count is not 17.
+   - **Find out whether `mortality/temp.dta` is written by the run** (grep
+     `LINKAGE/code` for a `save` to it). If it is, label it in the manifest
+     as generated, not as an input, the way machine A's labels its `temp.dta`.
+     Both reviewers flagged exactly that on A.
+3. **Run it** and commit `replication/input_manifest_machineB.md` with the
+   script. Then run `--check` once to confirm it reads its own manifest back
+   and reports 0 changed.
+4. **Update `replication/README.md`, item 5.** It is a shared file, so pull
+   immediately before and push immediately after. Say the checksums now cover
+   both machines, and add the script and manifest to the package listing.
+5. **If the provenance is known on B,** fill in the "BUNMD death records" and
+   "FamilySearch genealogical reference links" rows of the data table in
+   `replication/README.md`: when each was obtained and on what terms.
+   `LINKAGE/DOCUMENTATION.md` may have it. Use file dates only as evidence,
+   and say so.
+6. **Review.** Run
+   `.\review\Run-Review.ps1 -Target "<first B commit>..HEAD" -Reviewer both`.
+   Do not pass `-Scope` through `powershell -File`, because the list arrives as
+   one string. Give every finding a disposition, then commit the reports.
+7. **Push** with `.\Sync.ps1 -Push -Message "..."`, and note here what was
+   done.
+
+**Do not** touch `CODE/`, `replication/hash_inputs.py`,
+`replication/input_manifest.md`, or the draft for this job.
 
 ## 2026-10-31 (machine A): one sample, draft corrected
 
