@@ -141,6 +141,8 @@ replication/
   claims.toml          registry: every number and exhibit in the draft -> its source
   check_claims.py      compares the draft with results/, the exhibit tables, and claims.toml
   compare_figures.py   says whether a regenerated PDF has the same drawing as the committed one
+  hash_inputs.py       SHA-256 of machine A's 104 inputs -> input_manifest.md; --check compares
+  input_manifest.md    the input checksums as of the last full run
   diagnostics/         one-off sizing scripts: missing ages, blank names, merge outcomes,
                        and the 2026-10-31 decomposition of the old two-sample gap
   claims_report.md     the latest check (generated)
@@ -247,10 +249,15 @@ individually.
 4. **Deaglan's matching is not rerun.** Machine B reruns his table tier
    only. The ABE/JW and HLINK link files it reads are frozen; HLINK matching
    was done by a third party. See `LINKAGE/DOCUMENTATION.md`, "Known gaps".
-5. **Inputs with no checksum.** Nothing records which version of each frozen
-   file produced the results. Adding a SHA-256 manifest of the inputs to each
-   run's log would close this.
-6. **Data provenance dates and licences** (see the table above).
+5. **Checksums cover machine A only.** `input_manifest.md` holds the SHA-256
+   of all 104 inputs as of the 2026-11-01 full run (written by
+   `hash_inputs.py`, 17 minutes; `--check` recomputes and lists any that
+   changed). Machine B's 22 inputs have no manifest yet, and the raw files the
+   build tier would read are not hashed.
+6. **Data provenance: partly filled** from file dates (see the table above).
+   The author should confirm the dates. Unknown: the IPUMS full-count release,
+   the NARA image download date, and why Arizona's FamilySearch archive was
+   replaced in 2024.
 7. **Known hazards, not yet fixed.** All of these are recorded in the review
    reports:
    - No merge uses `assert()`. Sized for the pipeline on 2026-10-30
