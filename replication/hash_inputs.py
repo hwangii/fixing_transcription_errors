@@ -1,4 +1,4 @@
-"""Write a SHA-256 manifest of every frozen input machine A's analysis reads.
+"""Write a SHA-256 manifest of machine A's 103 frozen data inputs, plus the analysis file.
 
     python replication/hash_inputs.py            # all inputs (about 150 GB; tens of minutes)
     python replication/hash_inputs.py --check    # recompute and compare with the manifest
@@ -7,6 +7,10 @@ The input list is the one run_machineA.do preflights, rebuilt from the same
 sources: the state names in config.do ($REP_A_STATES) and the model-output
 state codes in run_machineA.do. If either file changes shape, this script
 stops rather than hashing a different list.
+
+The analysis file (temp.dta) is hashed last and labelled as such: a full run
+writes it, and only a -SkipRebuild run reads it. Code inputs such as
+CODE/label_socio_demo.do are versioned by git and not hashed.
 
 Output: replication/input_manifest.md (tracked). A changed hash means a frozen
 input changed since the manifest was written, and every number downstream of
@@ -62,6 +66,9 @@ def input_list():
     if len(states) != 50 or len(codes) != 49:
         sys.exit(f"expected 50 state files and 49 model folders, found {len(states)} and {len(codes)}")
     return files
+
+
+NOTE = '103 rows are frozen inputs. The last, `temp.dta`, is the analysis file: a full run writes it (`create_figures_SSHA2025.do`) and a `-SkipRebuild` run reads it, so its hash identifies the analysis file as of this manifest, not a full-run input. Code inputs (e.g. `CODE/label_socio_demo.do`) are versioned by git, not hashed here.'
 
 
 def sha256(path):
@@ -121,6 +128,8 @@ def main():
         f"Written {time.strftime('%Y-%m-%d %H:%M')} on {socket.gethostname()}, "
         f"{len(files)} files, {total / 1e9:,.1f} GB, {(time.time() - t0) / 60:.0f} min.",
         "Paths use `config.do`'s roots. Check with `python replication/hash_inputs.py --check`.",
+        "",
+        NOTE,
         "",
         "| File | Bytes | Modified | SHA-256 |",
         "|---|---|---|---|",

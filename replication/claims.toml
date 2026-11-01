@@ -271,7 +271,7 @@ values = ["nDiscordantMillions"]
 status = "scripted"
 script = "CODE/compute_model_agreement_on_discordant.do"
 machine = "A"
-issue = "Different universe from the 14,416,543 at line 403: all persons, both sexes, all ages, versus males 10+. The draft does not say so."
+note = "Different universe from the 14,416,543 at line 403 (all persons vs males 10+); the draft says so since 2026-11-01."
 
 [[claim]]
 id = "disc-conditioned"

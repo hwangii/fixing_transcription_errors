@@ -50,7 +50,7 @@ Result files read: compare_sample_counts.tex, compute_legibility_quartiles.tex, 
 | **MATCH** | `disc-one-of-two` | 301 | A | 66: ok |  |
 | **MATCH** | `disc-anc-fs` | 302 | A | 14: ok<br>52: ok |  |
 | **MATCH** | `disc-neither` | 306 | A | 24: ok<br>10: ok |  |
-| **MATCH** | `disc-denominator` | 307 | A | 35.1: ok | Different universe from the 14,416,543 at line 403: all persons, both sexes, all ages, versus males 10+. The draft does not say so. |
+| **MATCH** | `disc-denominator` | 307 | A | 35.1: ok |  |
 | **MATCH** | `disc-conditioned` | 308 | A | 66: ok<br>73: ok |  |
 | **MATCH** | `n-analysis` | 401 | A | 51,036,859: ok |  |
 | **MATCH** | `n-incongruent` | 403 | A | 14,416,543: ok<br>28.2: ok |  |

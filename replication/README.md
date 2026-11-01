@@ -141,7 +141,7 @@ replication/
   claims.toml          registry: every number and exhibit in the draft -> its source
   check_claims.py      compares the draft with results/, the exhibit tables, and claims.toml
   compare_figures.py   says whether a regenerated PDF has the same drawing as the committed one
-  hash_inputs.py       SHA-256 of machine A's 104 inputs -> input_manifest.md; --check compares
+  hash_inputs.py       SHA-256 of machine A's 103 data inputs + temp.dta -> input_manifest.md
   input_manifest.md    the input checksums as of the last full run
   diagnostics/         one-off sizing scripts: missing ages, blank names, merge outcomes,
                        and the 2026-10-31 decomposition of the old two-sample gap
@@ -250,7 +250,8 @@ individually.
    only. The ABE/JW and HLINK link files it reads are frozen; HLINK matching
    was done by a third party. See `LINKAGE/DOCUMENTATION.md`, "Known gaps".
 5. **Checksums cover machine A only.** `input_manifest.md` holds the SHA-256
-   of all 104 inputs as of the 2026-11-01 full run (written by
+   of its 103 frozen data inputs, plus the analysis file `temp.dta` that a
+   full run writes and `-SkipRebuild` reads, as of the 2026-11-01 full run (written by
    `hash_inputs.py`, 17 minutes; `--check` recomputes and lists any that
    changed). Machine B's 22 inputs have no manifest yet, and the raw files the
    build tier would read are not hashed.
