@@ -1,8 +1,27 @@
-# HANDOFF — state as of 2026-10-30
+# HANDOFF — state as of 2026-10-31
+
 
 Written for continuing this work on **either** of the two servers. Each holds a
 different and equally important dataset, so analysis runs on both and both edit
 `CODE/`. Read this first, then `CLAUDE.md`.
+
+## 2026-10-31 (machine A): one sample, draft corrected
+
+- **One sample for the whole paper.** Tables 2-3 now use the linkage analysis
+  sample (51,036,859), with sex and age taken from the IPUMS extract
+  (`CODE/make_balance_exhibits.do`). The old 29,344-record gap is explained in
+  `replication/README.md`, item 7, "Closed: two samples".
+- **Draft corrected and pushed to Overleaf** (paper repo `8a0300b`, `ee246b8`,
+  `a4cb3f4`):
+  - the counts are now 55,347,491 / 51,036,859 / 14,416,543, and the share 28.2%;
+  - 1.4 -> 1.6 and 42 -> 43;
+  - the over-selling of subgroup gains is removed (lines 90, 122, 782, 783):
+    under-linked groups gain by about as much as everyone, and the largest
+    gains are in the hardest-to-read records.
+- **Claim check: 48 match, 0 fail.** The old "five known draft errors" are all
+  resolved.
+- Still open: the README gaps (items 1-6), the 2026-10-14 report dispositions,
+  and PR #1.
 
 ## Machine B replication — DONE 2026-10-19 (do not redo; kept as the record of what was built)
 

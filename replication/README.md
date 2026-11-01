@@ -1,7 +1,11 @@
 # Replication package: *Fixing Transcription Errors in Historical Census Records*
 
 Draft: `DHTS-2026-10-12.tex` (paper repo, cloned from Overleaf).
-Package started 2026-10-15. **Status: in progress.** The section
+Package started 2026-10-15. **Status: in progress.** Latest claim check
+(2026-10-31): 48 claims match their source, none fail, and 21 cannot be
+checked because no code produces them (mostly the ML pipeline, item 1 below)
+or because their text holds a number that is not a result, such as "5th".
+The section
 [What is not covered](#what-is-not-covered) is part of the package. It is not a
 footnote to it.
 
@@ -80,14 +84,15 @@ and its licence terms. Data editors require both.
 
 ### Frozen intermediate files the analysis tier reads
 
-`run_machineA.do` checks for all 56 before it runs anything.
+`run_machineA.do` checks for all 104 before it runs anything (105 with
+`-SkipRebuild`, which also needs the existing analysis file).
 
 | File | Size | Dated | Built by |
 |---|---|---|---|
 | `...\fixing_transcription_errors\DATA\ORIGINAL\census1940_all_labeled_data.dta` | 43 GB | 2025-01-10 | `clean_FS_and_combineV5_nber.do`, block 5 (**now commented out**) |
-| `F:\enum_date\DATA\ORIGINAL\all_states_socio_demo_char_for_SSHA2025.dta` | 5.9 GB | 2025-11-21 | `usa00647_for_SSHA2025_socio_demo_char.do` |
+| `F:\enum_date\DATA\ORIGINAL\all_states_socio_demo_char_for_SSHA2025.dta` | 5.9 GB | 2025-11-21 | `usa00647_for_SSHA2025_socio_demo_char.do`. Supplies sex and age to both the linkage results and Tables 2-3 |
 | `...\enum_date\DATA\INTERMEDIATE\link1930_1940_{ans,true}_cleaned_noraceblock0.dta` | 2.8 / 3.1 GB | 2026-02-15 | external (`enum_date` project) |
-| `F:\fixing_transcription_errors\DATA\INTERMEDIATE\merged_<state>1940.dta`, 50 jurisdictions (listed in `config.do`, `REP_A_STATES`) | 39 GB total | 2024-11-18 | `clean_FS_and_combineV5_nber.do:102` (stage commented out) |
+| `F:\fixing_transcription_errors\DATA\INTERMEDIATE\merged_<state>1940.dta`, 50 jurisdictions (listed in `config.do`, `REP_A_STATES`) | 39 GB total | 2024-11-18 | `clean_FS_and_combineV5_nber.do:102` (stage commented out). Supplies the detailed-coded characteristics in Tables 2-3 |
 | `...\output_and_output1_ssha2025\<st>\merged_data.dta`, 49 jurisdictions | ~1 GB each | 2025-11 | external (ML pipeline) |
 | `...\enum_date\DATA\INTERMEDIATE\temp.dta` (the analysis file) | 22 GB | 2026-09-13 | `create_figures_SSHA2025.do`, rebuilt by a full run |
 
@@ -105,8 +110,10 @@ and its licence terms. Data editors require both.
 - **Python 3.11+**, standard library only, for `check_claims.py`.
 - **Hardware.** Machine A has 128 GB RAM and 16 logical cores. The full run
   reads a 43 GB file and writes a 22 GB one.
-- **Runtime.** With `-SkipRebuild`, 33 minutes (2026-10-15). The full run takes about
-  TBD hours. Fill both in from the first complete run's log.
+- **Runtime.** With `-SkipRebuild`, 33 minutes on 2026-10-15. Since
+  2026-10-31 `make_balance_exhibits.do` reads the 50 state files and takes
+  about 37 minutes on its own, so expect roughly an hour. The full run takes
+  about TBD hours. Fill both in from the next complete run's log.
 
 ## Description of the package
 
@@ -125,7 +132,8 @@ replication/
   claims.toml          registry: every number and exhibit in the draft -> its source
   check_claims.py      compares the draft with results/, the exhibit tables, and claims.toml
   compare_figures.py   says whether a regenerated PDF has the same drawing as the committed one
-  diagnostics/         one-off sizing scripts (e.g. missing ages, blank names)
+  diagnostics/         one-off sizing scripts: missing ages, blank names, merge outcomes,
+                       and the 2026-10-31 decomposition of the old two-sample gap
   claims_report.md     the latest check (generated)
 ```
 
@@ -164,13 +172,13 @@ or "no producing code".
 
 | Script | Result file | What the draft quotes from it |
 |---|---|---|
-| `make_balance_exhibits.do` | `results/make_balance_exhibits.tex` | 55,350,482; 51,066,203; 14,427,780; 28.3%; 72%; urban and farm shares |
-| `create_figures_SSHA2025.do` | `results/create_figures_SSHA2025.tex` | 8.9 → 19.4%, +119%, 65 → 84%, +28%, +8%, +1%; 51,036,859; "every group improved" |
+| `make_balance_exhibits.do` | `results/make_balance_exhibits.tex` | 55,347,491; 51,036,859; 14,416,543; 28.2%; 72%; urban and farm shares |
+| `create_figures_SSHA2025.do` | `results/create_figures_SSHA2025.tex` | 8.9 → 19.4%, +119%, 65 → 84%, +28%, +8%, +1%; "every group improved" |
 | `compute_model_agreement_on_discordant.do` | `results/compute_model_agreement_on_discordant.tex` | 66%, 14%, 52%, 24%, 10%, 35.1 million, 66 → 73 |
 | `compute_race_linkage_rates.do` | `results/compute_race_linkage_rates.tex` | 11.0% / 24.1%; +6.4% / +7.9% |
-| `compute_subgroup_linkage_rates.do` | `results/compute_subgroup_linkage_rates.tex` | foreign-born, no-schooling and non-English baselines and gains |
-| `verify_inmates_and_county_stats.do` | `results/verify_inmates_and_county_stats.tex` | inmates 15.0%, +7.3%; county p5/p95 18% / 42% |
-| `compute_legibility_quartiles.do` | `results/compute_legibility_quartiles.tex` | 46.2 vs 14.0; 16.9 vs 27.7; +20% vs +1.4% |
+| `compute_subgroup_linkage_rates.do` | `results/compute_subgroup_linkage_rates.tex` | foreign-born, no-schooling and non-English baselines and gains; the conclusion's "similar proportions" (each within 1 point of the overall gain) |
+| `verify_inmates_and_county_stats.do` | `results/verify_inmates_and_county_stats.tex` | inmates 15.0%, +7.3%; county p5/p95 18% / 43% |
+| `compute_legibility_quartiles.do` | `results/compute_legibility_quartiles.tex` | 46.2 vs 14.0; 16.9 vs 27.7; +20% vs +1.6%; the conclusion's "by most where the records are hardest to read" |
 
 ## Two machines
 
@@ -246,36 +254,29 @@ individually.
 
      The 14 merges in the build-tier scripts are not sized, because those
      scripts are not rerun.
-   - The draft's sample counts (draft lines 399-400) come from the balance
-     file, while the linkage results use the analysis sample, which is 29,344
-     records smaller (51,036,859). The two census totals of men aged 10+
-     differ by 2,991.
-
-     The gap is fully decomposed (2026-10-31,
-     `diagnostics/decompose_sample_gap.do`, which rebuilds both samples
-     exactly). Both samples come from the same per-state
-     `merged_<state>1940.dta` files, and they share 51,003,396 records.
-
-     In the balance sample only (62,807):
-     - 21,493 have no FamilySearch age; the labeled data requires `age_fs`
-       (`clean_FS_and_combineV5_nber.do:224`).
-     - 40,626 have an age of 10+ in the state file, but under 10 in the IPUMS
-       extract.
-     - 688 have a `histid` that is not in the extract.
-
-     In the analysis sample only (33,463): the state file has them as not
-     male or under 10, while the extract has them as male and 10+.
-
-     So the two samples take sex and age from different sources, and the
-     analysis sample also requires a FamilySearch age.
-     `diagnostics/compare_sample_counts.do` shows the gap is spread across
-     every state, not concentrated in particular districts.
    - `munir_figures_for_nber.do` still writes old versions of Tables 2-3 if run.
    - `choosing_edist_with_blacks_nber.do` samples after an unstable sort, so
      its `set seed` does not make the sample reproducible.
 
+   Closed: two samples. Until 2026-10-31 Tables 2-3 used a balance sample of
+   51,066,203 records and the linkage results an analysis sample of
+   51,036,859. `diagnostics/decompose_sample_gap.do` rebuilt both exactly and
+   explained the whole 29,344-record gap: the two took sex and age from
+   different sources (the state files versus the IPUMS extract), and only the
+   analysis sample requires a FamilySearch age
+   (`clean_FS_and_combineV5_nber.do:224`). Now there is one sample.
+   `make_balance_exhibits.do` takes sex and age from the extract, as the
+   linkage results do, and keeps the characteristics from the state files,
+   which carry the detailed codes the variable definitions need. Its merge
+   with the analysis file uses `assert(master match)`, so a record in the
+   analysis sample that is not a man aged 10+ in the extract stops the run.
+   The census column (all men 10+ in the extract) is 55,347,491; it includes
+   4,123 men with no state-file record, who count in the N but have no
+   characteristics. The table means moved by at most 0.001 and wage income
+   by about $3. The draft was updated to match on 2026-10-31.
+
    Closed: `keep if age>=10` retaining missing ages. The pipeline has two age
-   filters, `create_figures_SSHA2025.do:94` and `make_balance_exhibits.do:49`.
+   filters, `create_figures_SSHA2025.do:94` and `make_balance_exhibits.do:93`.
    Both carry `& age<.` since 2026-10-15. Missing ages measured 0 in both
    input files (`results/size_hazards_{balance,analysis}.tex`), so no number
    moved. Swept again on 2026-10-30: no other script in `run_machineA.do`
