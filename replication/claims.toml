@@ -63,12 +63,11 @@ machine = "A"
 
 [[claim]]
 id = "intro-target-link"
-text = '28.3 percent of our sample---our improved transcriptions increase the linking rate from 8.9 to 19.4 percent, representing a 119 percent improvement'
+text = '28.2 percent of our sample---our improved transcriptions increase the linking rate from 8.9 to 19.4 percent, representing a 119 percent improvement'
 values = ["pctIncongruent", "linkRateTargetBefore", "linkRateTargetAfter", "linkGainTarget"]
 status = "scripted"
 script = "CODE/make_balance_exhibits.do + CODE/create_figures_SSHA2025.do"
 machine = "A"
-issue = "28.3 is the balance-table sample's share; on Table 4's own sample (the one the rest of this sentence describes) it is pctTargetOfTable, which rounds to 28.2."
 
 [[claim]]
 id = "intro-val-gain"
@@ -225,7 +224,7 @@ machine = "?"
 
 [[claim]]
 id = "sec3-disagree"
-text = 'The frequency of disagreement between transcribers---28.3 percent in our sample'
+text = 'The frequency of disagreement between transcribers---28.2 percent in our sample'
 values = ["pctIncongruent"]
 status = "scripted"
 script = "CODE/make_balance_exhibits.do"
@@ -272,7 +271,7 @@ values = ["nDiscordantMillions"]
 status = "scripted"
 script = "CODE/compute_model_agreement_on_discordant.do"
 machine = "A"
-issue = "Different universe from the 14,427,780 at line 403: all persons, both sexes, all ages, versus males 10+. The draft does not say so."
+issue = "Different universe from the 14,416,543 at line 403: all persons, both sexes, all ages, versus males 10+. The draft does not say so."
 
 [[claim]]
 id = "disc-conditioned"
@@ -287,7 +286,7 @@ machine = "A"
 
 [[claim]]
 id = "n-males-ten"
-text = 'There were 55,350,482 males aged 10 or above in the 1940 census'
+text = 'There were 55,347,491 males aged 10 or above in the 1940 census'
 values = ["nMalesTen", "", ""]
 status = "scripted"
 script = "CODE/make_balance_exhibits.do"
@@ -295,24 +294,15 @@ machine = "A"
 
 [[claim]]
 id = "n-analysis"
-text = 'Of these, 51,066,203 records are transcribed by both'
+text = 'Of these, 51,036,859 records are transcribed by both'
 values = ["nAnalysis"]
 status = "scripted"
 script = "CODE/make_balance_exhibits.do"
 machine = "A"
 
 [[claim]]
-id = "n-table4"
-text = 'small difference between that count and the 51,036,859 records reported'
-values = ["nRecordsAll"]
-status = "scripted"
-script = "CODE/create_figures_SSHA2025.do"
-machine = "A"
-issue = "'accounts for most of the small difference' -- no script decomposes the 29,344-record gap, so 'most' is unverified."
-
-[[claim]]
 id = "n-incongruent"
-text = 'we identify 14,427,780 records (28.3\%) where the Ancestry.com and FamilySearch.org transcriptions disagree'
+text = 'we identify 14,416,543 records (28.2\%) where the Ancestry.com and FamilySearch.org transcriptions disagree'
 values = ["nIncongruent", "pctIncongruent"]
 status = "scripted"
 script = "CODE/make_balance_exhibits.do"
@@ -328,7 +318,7 @@ machine = "A"
 
 [[claim]]
 id = "balance-disagree"
-text = 'within that sample the disagreement rate is 28.3 percent'
+text = 'within that sample the disagreement rate is 28.2 percent'
 values = ["pctIncongruent"]
 status = "scripted"
 script = "CODE/make_balance_exhibits.do"
@@ -346,7 +336,7 @@ machine = "A"
 
 [[claim]]
 id = "table3-note-n"
-text = 'the sample the difference is computed on, 51,066,203 records'
+text = 'the sample the difference is computed on, 51,036,859 records'
 values = ["nAnalysis"]
 status = "scripted"
 script = "CODE/make_balance_exhibits.do"
@@ -360,15 +350,6 @@ text = 'the linking rate increased from 8.9 to 19.4\%, representing a 119 percen
 values = ["linkRateTargetBefore", "linkRateTargetAfter", "linkGainTarget"]
 status = "scripted"
 script = "CODE/create_figures_SSHA2025.do"
-machine = "A"
-
-[[claim]]
-id = "table4-note-counts"
-text = '51,036,859 against 51,066,203 overall, and 14,416,543 against 14,427,780 in the target group, differences of 0.06 and 0.08 percent'
-values = ["nRecordsAll", "nAnalysis", "nRecordsTarget", "nIncongruent",
-          "100*(nAnalysis-nRecordsAll)/nAnalysis", "100*(nIncongruent-nRecordsTarget)/nIncongruent"]
-status = "scripted"
-script = "CODE/create_figures_SSHA2025.do + CODE/make_balance_exhibits.do"
 machine = "A"
 
 [[claim]]
