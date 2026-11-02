@@ -77,18 +77,6 @@ foreach src in anc fs {
 	gen byte va_`src' = mi1930_new==mi_`src' if mi1930_new!="" & mi_`src'!="" & linked_after==1
 	/*A KEPT LINK NOW HAS ONE VALIDATOR, SO IT CANNOT CHANGE.*/
 	assert vb_`src'==va_`src' if status==1
-	/*SINCE 2026-11-01 create_figures_SSHA2025.do SCORES BOTH VERSIONS WITH THE */
-	/*ANCESTRY INITIAL, SO ITS STORED FLAGS MUST EQUAL THE anc RESCORE.         */
-	/*A temp.dta BUILT BEFORE THAT CHANGE (E.G. UNDER -SkipRebuild) FAILS HERE */
-	/*WITH A MESSAGE, NOT A BARE r(9).                                        */
-	if "`src'"=="anc" {
-		quietly count if vb_anc!=validated_before | va_anc!=validated_after
-		if r(N) > 0 {
-			display as error "temp.dta's validated_* flags are not the fixed-Ancestry-initial ones (" r(N) " records differ)."
-			display as error "It predates the 2026-11-01 change to create_figures_SSHA2025.do: run a full rebuild, not -SkipRebuild."
-			exit 9
-		}
-	}
 	foreach smp in All Target {
 		local c = cond("`smp'"=="Target", "& congruent==0", "")
 		quietly summarize vb_`src' if 1 `c'
@@ -116,6 +104,38 @@ foreach src in anc fs {
 			repnum nMi`2'`Src'`smp'   = `nn', format(%15.0fc)
 			repnum pctMi`2'`Src'`smp' = 100*`nn'/`nl', format(%4.1f)
 		}
+	}
+}
+/*=========================== DECOMPOSITION ==============================*/
+/*THE PAPER KEEPS THE ORIGINAL MEASURE: EACH VERSION SCORED AGAINST ITS OWN   */
+/*LINK FILE'S 1940 INITIAL (vb_own/va_own; THE ASSERT BELOW TIES THEM TO THE  */
+/*FLAGS IN temp.dta). ITS RISE, own_a - own_b, SPLITS EXACTLY INTO            */
+/*  links   = fix_a - fix_b : THE RISE WITH ONE FIXED 1940 INITIAL FOR EVERY  */
+/*            LINK, OLD AND NEW (KEPT, SWITCHED AND ADDED ALIKE)              */
+/*  reading = (own_a - fix_a) - (own_b - fix_b) : THE EXTRA RISE FROM EACH    */
+/*            VERSION USING ITS OWN TRANSCRIPTION'S 1940 INITIAL              */
+/*BOTH SOURCES OF THE FIXED INITIAL ARE REPORTED. IN PERCENTAGE POINTS.       */
+assert vb_own==validated_before
+assert va_own==validated_after
+foreach smp in All Target {
+	local c = cond("`smp'"=="Target", "& congruent==0", "")
+	quietly summarize vb_own if 1 `c'
+	local ob = r(mean)
+	quietly summarize va_own if 1 `c'
+	local oa = r(mean)
+	repnum ppTotal`smp' = 100*(`oa'-`ob'), format(%4.1f)
+	foreach src in anc fs {
+		local Src = proper("`src'")
+		quietly summarize vb_`src' if 1 `c'
+		local fb = r(mean)
+		quietly summarize va_`src' if 1 `c'
+		local fa = r(mean)
+		local links = 100*(`fa'-`fb')
+		local reading = 100*((`oa'-`fa')-(`ob'-`fb'))
+		display "`smp', fixed `src' initial: total " %5.2f 100*(`oa'-`ob') " pp = links " %5.2f `links' " + reading " %5.2f `reading'
+		repnum ppLinks`Src'`smp'   = `links', format(%4.1f)
+		repnum ppReading`Src'`smp' = `reading', format(%4.1f)
+		repnum pctLinks`Src'`smp'  = 100*`links'/(100*(`oa'-`ob')), format(%3.0f)
 	}
 }
 repnum close

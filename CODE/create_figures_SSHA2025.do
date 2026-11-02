@@ -67,41 +67,23 @@ merge 1:1 histid using `"`original_ed'all_states_socio_demo_char_for_SSHA2025.dt
 
 capture drop _merge
 rename histid id_B
-
-/*ONE FIXED 1940 MIDDLE INITIAL FOR BOTH VERSIONS (2026-11-01). EACH LINK FILE */
-/*CARRIES ITS OWN mi1940: THE OLD-NAMES FILE ANCESTRY'S, THE NEW-NAMES FILE    */
-/*ONE FROM OUR TRANSCRIPTION. SCORING EACH VERSION AGAINST ITS OWN INITIAL LET */
-/*THE SAME LINK VALIDATE DIFFERENTLY BEFORE AND AFTER, AND OVERSTATED THE GAIN */
-/*(TARGET GROUP +28% AGAINST +16% WITH A FIXED INITIAL; SEE                    */
-/*replication/diagnostics/validation_fixed_initials.do). BOTH VERSIONS NOW USE */
-/*ANCESTRY'S 1940 INITIAL, THE TRANSCRIPTION MOST USERS WORK WITH: THE FIRST   */
-/*LETTER OF THE SECOND WORD OF namefrst, WHICH REPRODUCES THE OLD FILE'S mi1940*/
-/*FOR 99.97% OF RECORDS. A SUFFIX (JR, SR, II-IV) IS NOT AN INITIAL. mi1930 IS */
-/*IDENTICAL IN THE TWO FILES (diagnostics/middle_initial_sources.do).          */
-gen mi1940_anc = lower(substr(word(strtrim(namefrst), 2), 1, 1))
-replace mi1940_anc = "" if !regexm(mi1940_anc, "^[a-z]$")
-replace mi1940_anc = "" if inlist(lower(subinstr(word(strtrim(namefrst), 2), ".", "", .)), "jr", "sr", "ii", "iii", "iv")
-
-merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_ans_cleaned_noraceblock`linksuf'.dta"',keepusing(mi`beg_yr' id_A fiveyr) keep(1 3)
+merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_ans_cleaned_noraceblock`linksuf'.dta"',keepusing(mi`beg_yr' mi1940 id_A fiveyr) keep(1 3)
 
 gen linked_before=_merge==3 & fiveyr==1
-gen validated_before=mi`beg_yr'==mi1940_anc if mi`beg_yr'!="" & mi1940_anc!="" & linked_before==1
+gen validated_before=mi`beg_yr'==mi1940 if mi`beg_yr'!="" & mi1940!="" & linked_before==1
 
 rename id_A id_A_before
-drop mi`beg_yr' fiveyr _merge
+drop mi`beg_yr' mi1940 fiveyr _merge
 
 
 capture drop _merge
-merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_true_cleaned_noraceblock`linksuf'.dta"',keepusing(mi`beg_yr' id_A fiveyr) keep(1 3)
+merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_true_cleaned_noraceblock`linksuf'.dta"',keepusing(mi`beg_yr' mi1940 id_A fiveyr) keep(1 3)
 
 gen linked_after=_merge==3 & fiveyr==1
-gen validated_after=mi`beg_yr'==mi1940_anc if mi`beg_yr'!="" & mi1940_anc!="" & linked_after==1
-
-/*THE SAME PAIR NOW VALIDATES THE SAME WAY IN BOTH VERSIONS.*/
-assert validated_before==validated_after if linked_before==1 & linked_after==1 & id_A_before==id_A
+gen validated_after=mi`beg_yr'==mi1940 if mi`beg_yr'!="" & mi1940!="" & linked_after==1
 
 rename id_A id_A_after
-drop mi`beg_yr' mi1940_anc fiveyr _merge
+drop mi`beg_yr' mi1940 fiveyr _merge
 
 numlabel,add
 
