@@ -24,6 +24,8 @@ foreach src in anc fs {
 	local v = cond("`src'"=="anc", "namefrst", "fs_namefrst")
 	gen mi_`src' = lower(substr(word(strtrim(`v'), 2), 1, 1))
 	replace mi_`src' = "" if !regexm(mi_`src', "^[a-z]$")
+	/*A GENERATIONAL SUFFIX IN SECOND POSITION ("JOHN JR") IS NOT AN INITIAL.*/
+	replace mi_`src' = "" if inlist(lower(subinstr(word(strtrim(`v'), 2), ".", "", .)), "jr", "sr", "ii", "iii", "iv")
 }
 
 /*EACH LINK FILE'S OWN mi1930 AND mi1940.*/
@@ -78,13 +80,20 @@ foreach src in anc fs {
 		repnum valBefore`Src'`smp' = 100*`b', format(%4.1f)
 		repnum valAfter`Src'`smp'  = 100*`a', format(%4.1f)
 		repnum valGain`Src'`smp'   = 100*(`a'/`b'-1), format(%4.1f)
-		foreach spec in "3 Added va" "4 Dropped vb" {
+		repnum nMiBefore`Src'`smp' = `nb', format(%15.0fc)
+		repnum nMiAfter`Src'`smp'  = `na', format(%15.0fc)
+		/*BY LINK STATUS. A KEPT LINK HAS ONE VALUE (ASSERTED ABOVE).          */
+		foreach spec in "1 Kept va" "2 SwitchedOld vb" "2 SwitchedNew va" "3 Added va" "4 Dropped vb" {
 			tokenize `spec'
+			quietly count if status==`1' `c'
+			local nl = r(N)
 			quietly summarize `3'_`src' if status==`1' `c'
 			local m = r(mean)
 			local nn = r(N)
-			display "   `2': " %6.4f `m' " (N=`nn')"
-			repnum val`2'`Src'`smp' = 100*`m', format(%4.1f)
+			display "   `2': " %6.4f `m' " (with initials `nn' of `nl' links)"
+			repnum val`2'`Src'`smp'   = 100*`m', format(%4.1f)
+			repnum nMi`2'`Src'`smp'   = `nn', format(%15.0fc)
+			repnum pctMi`2'`Src'`smp' = 100*`nn'/`nl', format(%4.1f)
 		}
 	}
 }

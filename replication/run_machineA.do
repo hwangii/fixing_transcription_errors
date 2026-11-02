@@ -92,6 +92,19 @@ foreach s of local scripts {
 	display as text "DONE `s' in " %6.1f (`t1'-`t0')/60000 " min"
 }
 
+/*============================== DIAGNOSTICS ================================*/
+/*READ-ONLY CHECKS ON THE ANALYSIS FILE WHOSE RESULTS THE CLAIM CHECK USES:  */
+/*MIDDLE-INITIAL VALIDATION BY LINK STATUS AND WITH ONE FIXED 1940 INITIAL.  */
+/*ABOUT 15 MINUTES. middle_initial_sources.do IS A ONE-OFF AND WRITES NOTHING.*/
+foreach s in validation_by_link_status validation_fixed_initials {
+	local ++t
+	display as text _n "{hline 78}" _n "RUNNING replication/diagnostics/`s'.do" _n "{hline 78}"
+	local t0 = clock("`c(current_date)' `c(current_time)'", "DMYhms")
+	do "$REP_REPO/replication/diagnostics/`s'.do"
+	local t1 = clock("`c(current_date)' `c(current_time)'", "DMYhms")
+	display as text "DONE `s' in " %6.1f (`t1'-`t0')/60000 " min"
+}
+
 display as text _n "{hline 78}"
 display as text "run_machineA.do finished: `t' scripts. Next:"
 display as text "  python replication/check_claims.py"

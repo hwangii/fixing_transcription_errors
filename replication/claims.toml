@@ -73,9 +73,11 @@ machine = "A"
 id = "intro-val-gain"
 text = 'accompanied by a 28 percent increase in match quality'
 values = ["valGainTarget"]
+assert = "valGainTarget <= valGainAncTarget + 1 and valGainTarget <= valGainFsTarget + 1"
 status = "scripted"
 script = "CODE/create_figures_SSHA2025.do"
 machine = "A"
+issue = "Moving validator: each version scores links against its own 1940 middle initial. With one fixed initial the gain is smaller (replication/diagnostics/validation_fixed_initials.do). Fails until the draft and create_figures_SSHA2025.do use a fixed initial."
 
 [[claim]]
 id = "intro-all-gain"
@@ -356,17 +358,21 @@ machine = "A"
 id = "results-validated"
 text = 'increased from 65\% to 84\%, a 28 percent improvement'
 values = ["shareValTargetBefore", "shareValTargetAfter", "valGainTarget"]
+assert = "valGainTarget <= valGainAncTarget + 1 and valGainTarget <= valGainFsTarget + 1"
 status = "scripted"
 script = "CODE/create_figures_SSHA2025.do"
 machine = "A"
+issue = "Moving validator: each version scores links against its own 1940 middle initial. With one fixed initial the gain is smaller (replication/diagnostics/validation_fixed_initials.do). Fails until the draft and create_figures_SSHA2025.do use a fixed initial."
 
 [[claim]]
 id = "results-all"
 text = 'increased the overall linking rate by 8 percent and the overall validation rate by 1 percent'
 values = ["linkGainAll", "valGainAll"]
+assert = "valGainAll <= valGainAncAll + 0.5 and valGainAll <= valGainFsAll + 0.5"
 status = "scripted"
 script = "CODE/create_figures_SSHA2025.do"
 machine = "A"
+issue = "Moving validator: each version scores links against its own 1940 middle initial. With one fixed initial the gain is smaller (replication/diagnostics/validation_fixed_initials.do). Fails until the draft and create_figures_SSHA2025.do use a fixed initial."
 
 [[claim]]
 id = "results-congruent-share"
