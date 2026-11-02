@@ -361,6 +361,44 @@ script = "CODE/create_figures_SSHA2025.do"
 machine = "A"
 
 [[claim]]
+id = "validated-decomp-links"
+text = 'About half of this rise, 8 to 10 of its 18 percentage points, comes from the links themselves'
+values = ["ppLinksFsTarget", "ppLinksAncTarget", "ppTotalTarget"]
+assert = "pctLinksFsTarget > 40 and pctLinksFsTarget < 60 and pctLinksAncTarget > 40 and pctLinksAncTarget < 60"
+status = "scripted"
+script = "replication/diagnostics/validation_fixed_initials.do"
+machine = "A"
+note = "Added 2026-11-02 (author's decision to keep the own-initial measure and disclose its decomposition). links = the rise with one fixed 1940 initial for every link; FamilySearch 8.4, Ancestry 10.3 of 18.2 pp."
+
+[[claim]]
+id = "validated-decomp-reading"
+text = 'The rest arises because each version is scored against its own transcription of the'
+values = []
+assert = "ppReadingAncTarget > 0 and ppReadingFsTarget > 0"
+status = "scripted"
+script = "replication/diagnostics/validation_fixed_initials.do"
+machine = "A"
+
+[[claim]]
+id = "validated-added-dropped"
+text = 'links that only our transcriptions produce agree in 82 to 85 percent of cases, against 71 percent for the links they replace'
+values = ["valAddedAncTarget", "valAddedFsTarget", "valDroppedFsTarget"]
+assert = "abs(valDroppedAncTarget - 71) < 0.5 and pctMiAddedAncTarget < 25 and pctMiDroppedAncTarget < 25 and pctMiAddedFsTarget < 25 and pctMiDroppedFsTarget < 25"
+status = "scripted"
+script = "replication/diagnostics/validation_fixed_initials.do"
+machine = "A"
+note = "Fixed initial: Ancestry 81.5 vs 70.6, FamilySearch 85.4 vs 70.9; links with an initial in both censuses only (about 20 percent of links)."
+
+[[claim]]
+id = "results-all-reading"
+text = 'most of which reflects the different reading of middle initials rather than different links'
+values = []
+assert = "ppReadingAncAll > ppLinksAncAll and ppReadingFsAll > ppLinksFsAll"
+status = "scripted"
+script = "replication/diagnostics/validation_fixed_initials.do"
+machine = "A"
+
+[[claim]]
 id = "results-all"
 text = 'increased the overall linking rate by 8 percent and the overall validation rate by 1 percent'
 values = ["linkGainAll", "valGainAll"]
