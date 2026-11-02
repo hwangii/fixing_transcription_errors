@@ -1,0 +1,133 @@
+"""Write a SHA-256 manifest of machine B's 17 frozen data inputs.
+
+    python replication/hash_inputs_machineB.py            # all inputs (tens of GB; minutes)
+    python replication/hash_inputs_machineB.py --check    # recompute and compare with the manifest
+
+Machine B's counterpart to hash_inputs.py (machine A's, not edited here). The
+input list is parsed from the preflight in run_machineB.do -- the data files
+under `D' = $REP_LINK/data -- so the two cannot drift apart; the script stops
+if it does not find exactly 17. The five code files that preflight also
+checks are in LINKAGE/ and versioned by git, so they are not hashed.
+
+mortality/temp.dta is a frozen input here, not a generated file: only
+LINKAGE/code/03_mortality/04_post_match.do writes it, and run_machineB.do does
+not run that step (05_make_linkage_table.do only reads it).
+
+Output: replication/input_manifest_machineB.md (tracked). A changed hash means
+a frozen input changed since the manifest was written, and every number
+downstream of it should be treated as unverified until rerun.
+"""
+
+import os
+import re
+import socket
+import sys
+import time
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from hash_inputs import sha256  # noqa: E402  (machine A's helper, reused unchanged)
+
+REPO = HERE.parent
+MANIFEST = REPO / "replication" / "input_manifest_machineB.md"
+EXPECTED = 17
+
+
+def rep_link():
+    """$REP_LINK from config.do's ARTS-ECON-SHSRV block."""
+    config = (REPO / "replication" / "config.do").read_text(encoding="utf-8")
+    block = re.search(r'c\(hostname\) == "ARTS-ECON-SHSRV" \{(.*?)\n\}', config, re.S)
+    m = block and re.search(r'global REP_LINK\s+"([^"]+)"', block.group(1))
+    if not m:
+        sys.exit("config.do: REP_LINK not found in the ARTS-ECON-SHSRV block")
+    return m.group(1)
+
+
+def input_list():
+    """The data files run_machineB.do preflights, as paths relative to $REP_LINK."""
+    master = (REPO / "replication" / "run_machineB.do").read_text(encoding="utf-8")
+    rels = []
+    # Literal entries: local inputs `"`inputs' "`D'/names/cleaned/x.dta""'
+    for m in re.finditer(r'^\s*local inputs .*"`D\'/([^"`]+\.dta)"', master, re.M):
+        rels.append(m.group(1))
+    # Loop entries: foreach spec in a b c { ... "`D'/.../x_`spec'.dta" ... }
+    for m in re.finditer(r'^\s*foreach (\w+) in ([\w ]+)\{\s*\n\s*local inputs .*"`D\'/([^"]+\.dta)"', master, re.M):
+        var, values, template = m.group(1), m.group(2).split(), m.group(3)
+        token = f"`{var}'"
+        if token not in template:
+            sys.exit(f"run_machineB.do: loop template does not use {token}: {template}")
+        rels += [template.replace(token, v) for v in values]
+    if len(rels) != EXPECTED or len(set(rels)) != EXPECTED:
+        sys.exit(f"run_machineB.do: expected {EXPECTED} distinct data inputs, parsed {len(rels)}:\n  " + "\n  ".join(rels))
+    return ["data/" + r for r in rels]
+
+
+NOTE = ("17 rows, all frozen inputs: the data files `run_machineB.do` preflights. "
+        "`data/mortality/temp.dta` (the BUNMD denominator) is written upstream by "
+        "`LINKAGE/code/03_mortality/04_post_match.do`, which `run_machineB.do` does not run; "
+        "the run only reads it. The five code files the preflight also checks are in "
+        "`LINKAGE/` and versioned by git, not hashed here.")
+
+
+def read_manifest():
+    rows = {}
+    for line in MANIFEST.read_text(encoding="utf-8").splitlines():
+        m = re.match(r"\| `([^`]+)` \| [\d,]+ \| [\d-]+ \| `([0-9a-f]{64})` \|", line)
+        if m:
+            rows[m.group(1)] = m.group(2)
+    return rows
+
+
+def main():
+    if socket.gethostname().upper() != "ARTS-ECON-SHSRV":
+        sys.exit("this manifest describes machine B's inputs; run it on ARTS-ECON-SHSRV")
+    check = "--check" in sys.argv[1:]
+    root = rep_link()
+    rels = input_list()
+    files = [f"{root}/{r}" for r in rels]
+    missing = [f for f in files if not os.path.exists(f)]
+    if missing:
+        sys.exit("missing inputs:\n  " + "\n  ".join(missing))
+    old = read_manifest() if check else {}
+
+    rows, changed, t0 = [], [], time.time()
+    total = sum(os.path.getsize(f) for f in files)
+    done = 0
+    for i, (rel, f) in enumerate(zip(rels, files), 1):
+        size = os.path.getsize(f)
+        digest = sha256(f)
+        done += size
+        mtime = time.strftime("%Y-%m-%d", time.localtime(os.path.getmtime(f)))
+        label = f"$REP_LINK/{rel}"
+        rows.append(f"| `{label}` | {size:,} | {mtime} | `{digest}` |")
+        if check and old.get(label) != digest:
+            changed.append(label)
+        print(f"[{i}/{len(files)}] {done / total:6.1%}  {label}", flush=True)
+
+    if check:
+        print(f"\n{len(files) - len(changed)} unchanged, {len(changed)} changed or new")
+        for c in changed:
+            print("  CHANGED:", c)
+        sys.exit(1 if changed else 0)
+
+    header = [
+        "# Input manifest (machine B)",
+        "",
+        "Generated by `replication/hash_inputs_machineB.py`; do not edit by hand.",
+        f"Written {time.strftime('%Y-%m-%d %H:%M')} on {socket.gethostname()}, "
+        f"{len(files)} files, {total / 1e9:,.1f} GB, {(time.time() - t0) / 60:.0f} min.",
+        f"`$REP_LINK` is `{root}` (`config.do`). Check with "
+        "`python replication/hash_inputs_machineB.py --check`.",
+        "",
+        NOTE,
+        "",
+        "| File | Bytes | Modified | SHA-256 |",
+        "|---|---|---|---|",
+    ]
+    MANIFEST.write_text("\n".join(header + rows) + "\n", encoding="utf-8")
+    print(f"wrote {MANIFEST}")
+
+
+if __name__ == "__main__":
+    main()
