@@ -88,8 +88,11 @@ Nothing else is needed from B for now.
     does not establish.
 - **Claim check: 50 match, 0 fail.** The old "five known draft errors" are all
   resolved.
-- Still open: the README gaps (items 1-6), the 2026-10-14 report dispositions,
-  and PR #1.
+- Still open: the README gaps (items 1-6). *(Updated 2026-11-01 on machine B:
+  the 2026-10-14 report dispositions were filled in `3e5edcb`, and PR #1 is
+  merged.)* The 2026-10-14 reports stay in `review/reports/` as the audit
+  trail; their open findings are the transcription-quality wording (author's
+  call) and the missing ML-pipeline code for Table 1.
 
 ## Machine B replication — DONE 2026-10-19 (do not redo; kept as the record of what was built)
 
