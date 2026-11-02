@@ -23,6 +23,23 @@ The old branch is left on GitHub for now; do not commit to it.
 
 ## Machine B: next job — input checksums (written 2026-11-01 on machine A)
 
+> **DONE 2026-11-01 on machine B.** Steps 1-7 complete.
+> - `replication/hash_inputs_machineB.py` (new; parses the 17 data inputs
+>   from `run_machineB.do`'s preflight and stops unless it finds 17; imports
+>   `sha256` from `hash_inputs.py`, which is untouched) and
+>   `replication/input_manifest_machineB.md` (17 files, 66.8 GB, 5 min):
+>   commit `f389a74`. `--check`: 17 unchanged, 0 changed.
+> - `mortality/temp.dta` is labelled a **frozen input**, not a generated file:
+>   only `LINKAGE/code/03_mortality/04_post_match.do` writes it, and
+>   `run_machineB.do` does not run that step.
+> - `replication/README.md`: item 5 now says the checksums cover both machines;
+>   the package listing has both new files; the MLP truth-links and BUNMD rows
+>   are filled from file dates (licence terms marked "to confirm"): `35bddf8`,
+>   `c2caafd`.
+> - Review `f389a74~1..HEAD`, both reviewers: **no findings**; their stated
+>   limits are covered by the `--check` run (note in each report).
+> - `CODE/`, `hash_inputs.py`, `input_manifest.md` and the draft were not touched.
+
 **Context.** On 2026-11-01 machine A reran its whole pipeline (170 min, rc 0,
 everything byte-identical) and wrote `replication/input_manifest.md`: a SHA-256
 for each of its 103 frozen data inputs, plus its analysis file. The script is
