@@ -143,6 +143,8 @@ replication/
   compare_figures.py   says whether a regenerated PDF has the same drawing as the committed one
   hash_inputs.py       SHA-256 of machine A's 103 data inputs + temp.dta -> input_manifest.md
   input_manifest.md    the input checksums as of the last full run
+  hash_inputs_machineB.py     SHA-256 of machine B's 17 data inputs -> input_manifest_machineB.md
+  input_manifest_machineB.md  machine B's input checksums (2026-11-01)
   diagnostics/         one-off sizing scripts: missing ages, blank names, merge outcomes,
                        and the 2026-10-31 decomposition of the old two-sample gap
   claims_report.md     the latest check (generated)
