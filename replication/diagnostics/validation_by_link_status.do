@@ -45,7 +45,7 @@ local nkloss = r(N)
 quietly count if status==1 & validated_before<. & validated_after<. & validated_before!=validated_after
 local nkflip = r(N)
 display "kept links: `nk'; validation differs: `nkd' (MI newly available `nkgain', no longer available `nkloss', agreement flips `nkflip')"
-repnum nKeptAll = `nk', format(%15.0fc)
+repnum nKeptTotal = `nk', format(%15.0fc)
 repnum nKeptValDiffers = `nkd', format(%15.0fc)
 repnum nKeptMiGained = `nkgain', format(%15.0fc)
 repnum nKeptMiLost = `nkloss', format(%15.0fc)
@@ -63,10 +63,15 @@ foreach smp in All Target {
 		quietly count if status==`1' `c'
 		local nlinks = r(N)
 		quietly summarize `3' if status==`1' `c'
-		display "`smp' `2': links " %12.0fc `nlinks' "  with MI " %12.0fc r(N) "  validated " %6.4f r(mean)
 		local m = r(mean)
-		repnum val`2'`smp'  = 100*`m', format(%4.1f)
-		repnum n`2'`smp'    = `nlinks', format(%15.0fc)
+		local nmi = r(N)
+		display "`smp' `2': links " %12.0fc `nlinks' "  with MI " %12.0fc `nmi' "  validated " %6.4f `m'
+		/*THE SHARE IS OVER LINKS WITH A MIDDLE INITIAL IN BOTH CENSUSES ONLY, */
+		/*SO THAT COUNT AND ITS SHARE OF ALL LINKS ARE WRITTEN TOO.            */
+		repnum val`2'`smp'    = 100*`m', format(%4.1f)
+		repnum n`2'`smp'      = `nlinks', format(%15.0fc)
+		repnum nMi`2'`smp'    = `nmi', format(%15.0fc)
+		repnum pctMi`2'`smp'  = 100*`nmi'/`nlinks', format(%4.1f)
 	}
 	/*THE TWO OVERALL SHARES THE DRAFT QUOTES, FOR RECONCILIATION.*/
 	quietly summarize validated_before if 1 `c'
