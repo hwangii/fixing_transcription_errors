@@ -77,8 +77,8 @@ None of the data can be redistributed, and none of it is in git.
 | 1930-1940 link files (`link1930_1940_{ans,true}_cleaned_noraceblock0.dta`) | `enum_date` project; **no producing code in this repo** | 2026-02-15 (file date) | Derived from the IPUMS restricted data above | A: `D:\SNU ECON Dropbox\sam hwang\enum_date\DATA\INTERMEDIATE\` |
 | Model transcriptions, per state (`merged_data.dta`) | ML pipeline; **no producing code in this repo** | November 2025 (file dates) | Ours | A: `...\fixing_transcription_errors\DATA\TRANSCRIPTIONS\USCensus1940FullCount\output_and_output1_ssha2025\<st>\` |
 | 1940 census images | NARA, public S3 bucket `s3://nara-1940-census` | Not recorded | Public domain (US federal records, released 2012) | Downloaded by `CODE/choosing_edist_with_blacks_nber.do`, `CODE/census1940_image_downloader_*.py` |
-| FamilySearch genealogical reference links | Used by Deaglan's package | See `LINKAGE/DOCUMENTATION.md` | — | B |
-| BUNMD death records | CenSoc (Goldstein et al.), BUNMD v2 | See `LINKAGE/DOCUMENTATION.md` | CenSoc terms of use | B |
+| FamilySearch genealogical reference links (`data/truth/mlp_training1930_1940.dta`, the 1930-1940 truth set) | IPUMS Multigenerational Longitudinal Panel (MLP) census crosswalk v2.0, whose links come from FamilySearch family trees. Per `LINKAGE/DOCUMENTATION.md` the truth set was "almost certainly" extracted from it; the extraction step is not in the package | February 2026: the crosswalk archive `mlp_census_crosswalk_v2_0.stata.zip` is dated 2026-02-10 (file date only). The truth file's own date, 2026-08-18, records a move, not an edit (`LINKAGE/DOCUMENTATION.md`) | IPUMS MLP terms of use: cite IPUMS MLP, no redistribution (to confirm) | B: `F:\Deaglan\Census_Transcriptions\data\truth\` |
+| BUNMD death records | CenSoc: BUNMD v2 (`bunmd_v2.csv`), with the CenSoc DMF and Numident v3 files. Cited as the CenSoc Mortality File v3.0 (Goldstein et al. 2023), as the providers ask | November 2025: all three files and their codebooks are dated 2025-11-14 (file dates only) | CenSoc terms of use: cite as above, no redistribution (to confirm) | B: `F:\Deaglan\Census_Transcriptions\data\mortality\raw\` |
 
 File dates are the last-modified dates of the copies on machine A, not
 download receipts. They are the best evidence available, and the author
@@ -249,12 +249,16 @@ individually.
 4. **Deaglan's matching is not rerun.** Machine B reruns his table tier
    only. The ABE/JW and HLINK link files it reads are frozen; HLINK matching
    was done by a third party. See `LINKAGE/DOCUMENTATION.md`, "Known gaps".
-5. **Checksums cover machine A only.** `input_manifest.md` holds the SHA-256
-   of its 103 frozen data inputs, plus the analysis file `temp.dta` that a
+5. **Checksums cover both machines.** `input_manifest.md` holds the SHA-256
+   of machine A's 103 frozen data inputs, plus the analysis file `temp.dta` that a
    full run writes and `-SkipRebuild` reads, as of the 2026-11-01 full run (written by
    `hash_inputs.py`, 17 minutes; `--check` recomputes and lists any that
-   changed). Machine B's 22 inputs have no manifest yet, and the raw files the
-   build tier would read are not hashed.
+   changed). `input_manifest_machineB.md` holds the SHA-256 of machine B's 17
+   frozen data inputs, the data files `run_machineB.do` preflights, as of
+   2026-11-01 (written by `hash_inputs_machineB.py`, which parses its list from
+   that preflight; 66.8 GB, 5 minutes; `--check` as on A). B's five code inputs
+   are in `LINKAGE/` and versioned by git. Still not hashed: the raw files the
+   build tier would read, on either machine.
 6. **Data provenance: partly filled** from file dates (see the table above).
    The author should confirm the dates. Unknown: the IPUMS full-count release,
    the NARA image download date, and why Arizona's FamilySearch archive was
