@@ -42,7 +42,7 @@ Result files read: compare_sample_counts.tex, compute_legibility_quartiles.tex, 
 | **MATCH** | `intro-all-gain` | 99 | A | 8: ok |  |
 | **MATCH** | `intro-legibility` | 101 | A | 20: ok<br>1.6: ok |  |
 | **MATCH** | `intro-hardest-baseline` | 102 | A | assert: holds  [legGainLowest > legGainSecond and legGainLowest > legGainThird and legGainLowest > legGainHighest and legLinkBaseLowest < legLinkBaseHighest] |  |
-| **MATCH** | `intro-validation` | 107 | B | 515,555: ok<br>1,300,253: ok<br>11.1: ok<br>28.1: ok<br>5.07: ok<br>2.56: ok<br>0.75: ok<br>0.74: ok |  |
+| **MATCH** | `intro-validation` | 107 | B | 515,555: ok<br>1,300,253: ok<br>11.1: ok<br>28.1: ok<br>5.07: ok<br>2.56: ok<br>0.76: ok<br>0.72: ok |  |
 | **MATCH** | `intro-mortality` | 109 | B | 7.08: ok |  |
 | **MATCH** | `intro-doubling` | 134 | A | assert: holds  [linkRateTargetAfter / linkRateTargetBefore >= 2] |  |
 | **MATCH** | `sec3-disagree` | 180 | A | 28.2: ok |  |
@@ -67,7 +67,7 @@ Result files read: compare_sample_counts.tex, compute_legibility_quartiles.tex, 
 | **MATCH** | `deaglan-hlink-disc` | 564 | B | 49.7: ok<br>56.5: ok |  |
 | **MATCH** | `deaglan-mi` | 567 | B | 76.8: ok<br>83.5: ok<br>79.7: ok<br>83.8: ok<br>82.7: ok<br>83.4: ok | These are discordant-sample values (full-sample MI rates are 86-87); the sentence does not say which sample. |
 | **MATCH** | `deaglan-verified` | 573 | B | 515,555: ok<br>1,300,253: ok<br>11.1: ok<br>28.1: ok<br>20.6: ok<br>32.5: ok<br>69.5: ok<br>77.4: ok |  |
-| **MATCH** | `deaglan-contradicted-counts` | 574 | B | 308,848: ok<br>275,442: ok<br>501,010: ok<br>503,357: ok<br>65,148: ok<br>71,863: ok | The HLINK discordant rise (116,233 -> 125,607) is not mentioned. |
+| **MATCH** | `deaglan-contradicted-counts` | 574 | B | 308,848: ok<br>275,442: ok<br>501,010: ok<br>503,357: ok<br>65,148: ok<br>71,863: ok<br>116,233: ok<br>125,607: ok |  |
 | **MATCH** | `deaglan-contradicted-shares` | 576 | B | 2.44: ok<br>2.04: ok<br>2.75: ok<br>2.33: ok<br>4.07: ok<br>2.25: ok<br>5.07: ok<br>2.56: ok<br>0.75: ok<br>0.74: ok<br>0.76: ok<br>0.72: ok |  |
 | **MATCH** | `mortality-exact` | 655 | B | 5,658,793: ok<br>6,059,234: ok<br>7.08: ok<br>27.09: ok<br>29.01: ok |  |
 | **MATCH** | `mortality-conservative` | 656 | B | 20.22: ok<br>21.79: ok |  |

@@ -95,7 +95,7 @@ machine = "A"
 
 [[claim]]
 id = "intro-validation"
-text = 'rises from 515,555 to 1,300,253 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 5.07 to 2.56 percent on that sample and from 0.75 to 0.74 percent under the machine-learning linker'
+text = 'rises from 515,555 to 1,300,253 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 5.07 to 2.56 percent on that sample under exact names and from 0.76 to 0.72 percent under the machine-learning linker'
 values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 3)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 4)',
@@ -103,8 +103,8 @@ values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 4)',
   'contra("figures/deaglan_abe_jw_restricted.tex", 3)',
   'contra("figures/deaglan_abe_jw_restricted.tex", 4)',
-  'contra("figures/deaglan_hlink.tex", 1)',
-  'contra("figures/deaglan_hlink.tex", 2)',
+  'contra("figures/deaglan_hlink_restricted.tex", 1)',
+  'contra("figures/deaglan_hlink_restricted.tex", 2)',
 ]
 status = "table"
 script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
@@ -436,16 +436,16 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-contradicted-counts"
-text = 'in the full sample it falls under Jaro-Winkler and exact names, from 308,848 to 275,442 under Jaro-Winkler, but rises under HLINK, from 501,010 to 503,357, and on the discordant sample under exact names, from 65,148 to 71,863'
+text = 'in the full sample it falls under Jaro-Winkler and exact names, from 308,848 to 275,442 under Jaro-Winkler, but rises under HLINK, from 501,010 to 503,357, and on the discordant sample under exact names, from 65,148 to 71,863, and under HLINK, from 116,233 to 125,607'
 values = [
   'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 2)',
   'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 2)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Directly Contradicted", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Directly Contradicted", 4)',
+  'cell("figures/deaglan_hlink_restricted.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_hlink_restricted.tex", "Directly Contradicted", 2)',
 ]
 status = "table"
 script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
-issue = "The HLINK discordant rise (116,233 -> 125,607) is not mentioned."
 
 [[claim]]
 id = "deaglan-contradicted-shares"

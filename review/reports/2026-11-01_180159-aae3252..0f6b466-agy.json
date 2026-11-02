@@ -1,0 +1,106 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Compare contra('figures/deaglan_hlink.tex', 1) (0.75%) and contra('figures/deaglan_hlink.tex', 2) (0.74%) with contra('figures/deaglan_hlink_restricted.tex', 1) (0.76%) and contra('figures/deaglan_hlink_restricted.tex', 2) (0.72%). Note draft line 576 correctly quotes both pairs.",
+      "id": "intro-discordant-hlink-contradicted-share-mismatch",
+      "location": "DHTS-2026-10-12.tex:107",
+      "severity": "minor",
+      "suggested_fix": "In DHTS-2026-10-12.tex:107, change 'from 0.75 to 0.74 percent' to 'from 0.76 to 0.72 percent', or clarify that 0.75 to 0.74 percent applies to the full census population.",
+      "title": "Introduction quotes full-sample HLINK contradicted rate under discordant-records heading",
+      "what_the_code_does": "Table 7 (full sample HLINK) has Directly Contradicted rate falling from 0.750% to 0.735% (0.75 to 0.74 percent). Table 8 (discordant sample HLINK) has Directly Contradicted rate falling from 0.761% to 0.723% (0.76 to 0.72 percent). In DHTS-2026-10-12.tex:107, under the sentence 'Among records where the two human transcriptions disagree... while the share of links that the same data directly contradict falls in every specification we examine', the draft cites 'from 5.07 to 2.56 percent on that sample and from 0.75 to 0.74 percent under the machine-learning linker'. The 0.75 to 0.74 percent figure is from Table 7 (the full census population), whereas on the discordant sample (Table 8) HLINK falls from 0.76 to 0.72 percent.",
+      "why_it_matters": "The introduction misleads the reader into thinking 0.75 to 0.74 percent is the HLINK performance on discordant records, conflating the full sample and discordant subpopulation."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Read 05_make_linkage_table.do:91-102 and confirm that a_spec and v_spec are computed on the entire matched dataset rather than on added links.",
+      "id": "mortality-initial-agreement-claims-marginal-from-average",
+      "location": "DHTS-2026-10-12.tex:657-658",
+      "severity": "minor",
+      "suggested_fix": "In DHTS-2026-10-12.tex:658, revise 'this is an out-of-sample check on the additional links' to 'this is an out-of-sample check on overall match quality across the expanded linked sample' (or compute the agreement rate on net added links directly).",
+      "title": "Table 9 middle-initial agreement described as check on additional links rather than pooled sample",
+      "what_the_code_does": "LINKAGE/code/03_mortality/05_make_linkage_table.do:91-100 computes middle-initial agreement across all matched links in censoc_bunmd_matched_*.dta with non-missing middle initials in both sources (Panel B: 83.14% -> 85.33% exact, 87.60% -> 89.36% conservative). In DHTS-2026-10-12.tex:657-658, the text asserts: 'Because middle initials play no part in the matching, this is an out-of-sample check on the additional links.'",
+      "why_it_matters": "Table 9 does not perform a panel decomposition of links into added, unchanged, and removed categories (unlike Tables 5-8). The 85.33% and 89.36% numbers represent average agreement across all 1.49M links with middle initials, not the agreement rate among the net 58,637 additional validated links. Attributing an overall pool average to the marginal additional links is an unsupported claim."
+    },
+    {
+      "confidence": "likely",
+      "dimension": "identification",
+      "how_to_check": "Inspect Table 9 Panel B row 'Share of links (%)' (25.32% old vs 24.61% new).",
+      "id": "mortality-validation-sample-represents-minority-of-links",
+      "location": "DHTS-2026-10-12.tex:657-658, LINKAGE/code/03_mortality/05_make_linkage_table.do:91-102",
+      "severity": "minor",
+      "suggested_fix": "In Section 4.3, briefly acknowledge that middle initial validation is restricted to the ~25% of records with initials present in both sources and note whether initial availability varies across key subgroups.",
+      "title": "Mortality out-of-sample validation evaluated on selected 24% subsample with middle initials",
+      "what_the_code_does": "The validation sample in Table 9 Panel B requires non-empty middle initials in both Census and BUNMD (keep if mi != \"\" & mname_B != \"\"). This restriction leaves only 25.32% (old) and 24.61% (new) of exact matched links in the validation sample, declining by 0.71 percentage points.",
+      "why_it_matters": "A referee will note that middle initial presence is non-random (correlated with native-born status, race, and socioeconomic standing). Evaluating match quality exclusively on the ~25% subset with middle initials introduces selection, and the proportion of links verifiable under this standard declines under the new transcriptions."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Compare DHTS-2026-10-12.tex:574 with Table 8 Directly Contradicted row (116,233 -> 125,607).",
+      "id": "contradicted-discussion-omits-hlink-discordant-rise",
+      "location": "DHTS-2026-10-12.tex:574",
+      "severity": "nit",
+      "suggested_fix": "In DHTS-2026-10-12.tex:574, update the sentence to include HLINK discordant: '...and on the discordant sample under exact names, from 65,148 to 71,863, and under HLINK, from 116,233 to 125,607.'",
+      "title": "Text listing contradicted count increases omits the largest increase (HLINK discordant)",
+      "what_the_code_does": "In Table 8 (figures/deaglan_hlink_restricted.tex), Directly Contradicted links rise from 116,233 to 125,607 (+9,374 links). In DHTS-2026-10-12.tex:574, the text lists specifications where contradicted counts rise: 'in the full sample it falls under Jaro-Winkler and exact names, from 308,848 to 275,442 under Jaro-Winkler, but rises under HLINK, from 501,010 to 503,357, and on the discordant sample under exact names, from 65,148 to 71,863.' It omits the increase in HLINK on the discordant sample.",
+      "why_it_matters": "The text purports to detail where raw contradicted counts increase, but omits the specification with the largest absolute rise in contradicted links (+9,374). The author noted this in claims.toml (issue = \"The HLINK discordant rise (116,233 -> 125,607) is not mentioned.\") but did not update the draft."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "replication",
+      "how_to_check": "Inspect LINKAGE/code/03_mortality/05_make_linkage_table.do:24.",
+      "id": "mortality-standalone-config-path-hardcoded",
+      "location": "LINKAGE/code/03_mortality/05_make_linkage_table.do:24",
+      "severity": "nit",
+      "suggested_fix": "Derive the relative path from $LCODE (e.g. if '\"$REP_REPO\"' == \"\" do \"$LCODE/../../replication/config.do\") or rely on paths.do.",
+      "title": "Standalone configuration fallback in 05_make_linkage_table.do hardcodes drive F:",
+      "what_the_code_does": "Line 24 executes: if '\"$REP_REPO\"' == \"\" do \"F:/github_repos/fixing_transcription_errors/replication/config.do\". Unlike the preceding line which resolves $LCODE/shared/paths.do dynamically, this line hardcodes the absolute drive letter F:.",
+      "why_it_matters": "Running 05_make_linkage_table.do standalone on machine A (D:/repos) or on an external replication system without $REP_REPO preset will error on the missing F: path."
+    }
+  ],
+  "review_limits": [
+    "Full Stata pipeline execution (~4 hours) was not rerun end-to-end; reproduction was established via SHA-256 verification of regenerated tables produced on machine B against committed reference tables.",
+    "Raw multi-gigabyte census extracts and BUNMD raw files on machine B were not fully read into memory for independent data profiling.",
+    "The machine learning model training steps and upstream linkage generation files (matches_before.dta and matches_after.dta) were frozen inputs and not re-estimated."
+  ],
+  "summary": "The commit range aae3252..0f6b466 cleanly implements and adopts five key linkage table fixes: restricting HLINK and mortality numerators to their denominators, implementing two-sided contradiction classification, guarding age filters against missing values, and verifying byte-identical table reproduction via raw SHA-256 hashes. The empirical methodology and resulting tables are sound, and all 50 registered claim checks pass against the updated draft. The primary items to address before submission are minor drafting inconsistencies: line 107 in the introduction quotes the full-sample HLINK contradicted rate under a sentence scoped to discordant records, and Section 4.3 attributes the middle-initial agreement increase in Table 9 to 'additional links' rather than the pooled sample.",
+  "verified_clean": [
+    {
+      "evidence": "Traced in LINKAGE/code/01_abe_jw/linkage_analysis.do:194-204 and LINKAGE/code/02_hlink/linkage_analysis_newlinks.do:338-348. The four conditions (person_merge==1 & merge30==1 [unverifiable], person_merge==3 & histid1930==true_histid1930 [verified], person_merge==3 & histid1930!=true_histid1930 [contradicted], person_merge==1 & merge30==3 [contradicted]) partition all matched pairs without gaps or overlap.",
+      "item": "Two-sided Directly Contradicted classification partition"
+    },
+    {
+      "evidence": "Traced in LINKAGE/code/02_hlink/linkage_analysis_newlinks.do:296-300, 333-337, 402-404, 415-417. In all four pair loading routines, histid1940 is matched to den1940_full or den1940_restr with keep(3), ensuring matched links outside the denominator cannot inflate match rates.",
+      "item": "HLINK numerator restriction to age-8+ denominator population"
+    },
+    {
+      "evidence": "Traced in LINKAGE/code/03_mortality/05_make_linkage_table.do:75-87. Matched pairs are merged m:1 with denom_ssn (unique by isid ssn), correctly filtering out 1.6-1.7% of matches whose BUNMD records were female or born after 1940.",
+      "item": "BUNMD mortality numerator restriction to denominator population"
+    },
+    {
+      "evidence": "Verified by running replication/extract_deaglan_tables.py --check --regenerated F:/Deaglan/Census_Transcriptions/output/tables. All five tables match their reference copies in linkage_tables/ byte-for-byte by raw SHA-256 hash.",
+      "item": "Automated byte-identical reproduction verification of all five linkage tables"
+    },
+    {
+      "evidence": "Verified via replication/check_claims.py against DHTS-2026-10-12.tex: all 6 registered mortality claims (intro-mortality, mortality-denominator, mortality-exact, mortality-conservative, mortality-initials, mortality-note-denominator) match the regenerated Table 9 with 0 discrepancies.",
+      "item": "Mortality linkage results and Section 4.3 draft numbers consistency"
+    },
+    {
+      "evidence": "Traced in LINKAGE/code/01_abe_jw/linkage_analysis.do:45 and LINKAGE/code/02_hlink/linkage_analysis_newlinks.do:189. Adding '!missing(age)' prevents Stata's missing numeric values from silently qualifying for 'age >= 8'.",
+      "item": "Missing-age denominator filter"
+    },
+    {
+      "evidence": "Verified in HANDOFF.md:413-420 and replication/fix_effects_2026-10-19.md:91-98. All six link files are strictly 1:1 on both histid1930 and histid1940, confirming that dividing pair counts by denominator persons correctly computes the proportion of individuals linked.",
+      "item": "One-to-one link file structure and match rate interpretation"
+    }
+  ]
+}
