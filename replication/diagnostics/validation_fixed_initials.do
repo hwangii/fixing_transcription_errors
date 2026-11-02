@@ -34,11 +34,10 @@ rename (mi1930 mi1940) (mi1930_old mi1940_old)
 merge 1:1 id_B using `"`intermediate'link1930_1940_true_cleaned_noraceblock0.dta"', keepusing(mi1930 mi1940) keep(1 3) nogen
 rename (mi1930 mi1940) (mi1930_new mi1940_new)
 
-/*THE STORED FLAGS MUST BE REPRODUCED FROM THESE BEFORE ANYTHING IS RESCORED.*/
-gen byte chk_b = mi1930_old==mi1940_old if mi1930_old!="" & mi1940_old!="" & linked_before==1
-gen byte chk_a = mi1930_new==mi1940_new if mi1930_new!="" & mi1940_new!="" & linked_after==1
-assert chk_b==validated_before
-assert chk_a==validated_after
+/*THE MOVING-VALIDATOR RATES THE DRAFT QUOTED UNTIL 2026-11-01, KEPT FOR    */
+/*COMPARISON: EACH VERSION SCORED AGAINST ITS OWN FILE'S mi1940.             */
+gen byte vb_own = mi1930_old==mi1940_old if mi1930_old!="" & mi1940_old!="" & linked_before==1
+gen byte va_own = mi1930_new==mi1940_new if mi1930_new!="" & mi1940_new!="" & linked_after==1
 
 /*STEP 1: WHICH SOURCE DOES EACH FILE'S mi1940 MATCH? (WHERE BOTH ARE NON-EMPTY)*/
 foreach f in old new {
@@ -62,12 +61,34 @@ replace status = 2 if linked_before==1 & linked_after==1 & id_A_before!=id_A_aft
 replace status = 3 if linked_before==0 & linked_after==1
 replace status = 4 if linked_before==1 & linked_after==0
 
+foreach smp in All Target {
+	local c = cond("`smp'"=="Target", "& congruent==0", "")
+	quietly summarize vb_own if 1 `c'
+	local b = r(mean)
+	quietly summarize va_own if 1 `c'
+	local a = r(mean)
+	display "own-file initials, `smp': before " %6.4f `b' "  after " %6.4f `a' "  change " %5.1f 100*(`a'/`b'-1) "%"
+	repnum valGainOwn`smp' = 100*(`a'/`b'-1), format(%4.1f)
+}
+
 foreach src in anc fs {
 	local Src = proper("`src'")
 	gen byte vb_`src' = mi1930_old==mi_`src' if mi1930_old!="" & mi_`src'!="" & linked_before==1
 	gen byte va_`src' = mi1930_new==mi_`src' if mi1930_new!="" & mi_`src'!="" & linked_after==1
 	/*A KEPT LINK NOW HAS ONE VALIDATOR, SO IT CANNOT CHANGE.*/
 	assert vb_`src'==va_`src' if status==1
+	/*SINCE 2026-11-01 create_figures_SSHA2025.do SCORES BOTH VERSIONS WITH THE */
+	/*ANCESTRY INITIAL, SO ITS STORED FLAGS MUST EQUAL THE anc RESCORE.         */
+	/*A temp.dta BUILT BEFORE THAT CHANGE (E.G. UNDER -SkipRebuild) FAILS HERE */
+	/*WITH A MESSAGE, NOT A BARE r(9).                                        */
+	if "`src'"=="anc" {
+		quietly count if vb_anc!=validated_before | va_anc!=validated_after
+		if r(N) > 0 {
+			display as error "temp.dta's validated_* flags are not the fixed-Ancestry-initial ones (" r(N) " records differ)."
+			display as error "It predates the 2026-11-01 change to create_figures_SSHA2025.do: run a full rebuild, not -SkipRebuild."
+			exit 9
+		}
+	}
 	foreach smp in All Target {
 		local c = cond("`smp'"=="Target", "& congruent==0", "")
 		quietly summarize vb_`src' if 1 `c'

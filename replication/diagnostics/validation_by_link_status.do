@@ -14,6 +14,11 @@
 /*(incongruent transcriptions).                                               */
 /*                                                                           */
 /*READ-ONLY on temp.dta, the analysis file create_figures_SSHA2025.do writes. */
+/*                                                                           */
+/*SINCE 2026-11-01 BOTH VERSIONS ARE SCORED AGAINST ANCESTRY'S 1940 INITIAL,  */
+/*SO KEPT LINKS NO LONGER CHANGE (nKeptValDiffers SHOULD BE 0) AND THE RATES   */
+/*BELOW ARE FIXED-INITIAL RATES. THE FIRST RUN (5620c2b) WAS ON THE OLD,       */
+/*MOVING SCORING.                                                             */
 
 clear all
 set more off
