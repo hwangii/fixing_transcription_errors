@@ -14,8 +14,11 @@
 /*  south   born in a census-South state (munir_figures_for_nber.do:619;     */
 /*          temp.dta's bpl is the general code, 1-56 for states)             */
 /*  below30 age<30 (munir_figures_for_nber.do:667)                           */
-/*  noed    no schooling, higrade 1-3 (compute_subgroup_linkage_rates.do's    */
-/*          recode (1 3=1); 99 and 0 are missing)                             */
+/*  noed    no schooling at all: general higrade 1 ("None"), as Tables 2-3's */
+/*          "No education" (create_socio_demographic_vars.do:25, detailed    */
+/*          code 010). Nursery (2) and kindergarten (3) are not counted.      */
+/*          NOTE: compute_subgroup_linkage_rates.do's recode (1 3=1) instead  */
+/*          counts codes 1 and 3; the project has not settled one definition.*/
 /*READ-ONLY.                                                                  */
 clear all
 set more off
@@ -31,7 +34,7 @@ gen byte incong  = 1-congruent
 gen byte south   = inlist(bpl,1,5,10,11,12,13,21,22,24) | inlist(bpl,28,37,40,45,47,48,51,54) if bpl<.
 /*age IS NEVER MISSING HERE (temp.dta KEEPS age>=10 & age<.).*/
 gen byte below30 = age<30
-gen byte noed    = inrange(higrade,1,3) if inrange(higrade,1,23)
+gen byte noed    = higrade==1 if inrange(higrade,1,23)
 
 collapse (mean) incong south below30 noed, by(state_folder_name county_folder_name)
 display "counties: " _N

@@ -650,7 +650,7 @@ machine = "A"
 
 [[claim]]
 id = "county-correlates-south"
-text = 'above-median share of men born in the South (29.5 versus 28.2 percent), aged under'
+text = 'above-median share of men born in the South (29.5 versus 28.2 percent), aged'
 values = ["countyIncongAboveSouth", "countyIncongBelowSouth"]
 assert = "countyIncongAboveSouth > countyIncongBelowSouth and countyIncongAboveYoung > countyIncongBelowYoung and countyIncongAboveNoed > countyIncongBelowNoed"
 status = "scripted"
