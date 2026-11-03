@@ -1,0 +1,75 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Search for county-correlates in replication/claims.toml and replication/claims_report.md. Running python replication/check_claims.py --paper-repo D:/repos/6638fa0fd89fbec05130caeb shows county-correlates marked UNCHECKED despite the new script.",
+      "id": "county-correlates-remains-unchecked",
+      "location": "replication/claims.toml:651-657, replication/claims_report.md:10, replication/claims_report.md:32, CODE/compute_county_correlates.do:51-53, replication/check_claims.py:187-188",
+      "severity": "major",
+      "suggested_fix": "In replication/claims.toml, change status to \"scripted\", set script = \"CODE/compute_county_correlates.do\", and define an assert expression requiring each above-median rate to exceed the corresponding at-or-below rate (e.g., assert = \"countyIncongAboveSouth > countyIncongBelowSouth and countyIncongAboveYoung > countyIncongBelowYoung and countyIncongAboveNoed > countyIncongBelowNoed\"). Then execute the machine A pipeline to produce replication/results/compute_county_correlates.tex, rerun check_claims.py, and commit both the results file and the updated claims_report.md.",
+      "title": "The new producing script cannot verify the county-correlates claim because the registry still marks it as having no code",
+      "what_the_code_does": "The newly added script CODE/compute_county_correlates.do computes county-level incongruence means and exports countyMedian*, countyIncongAbove*, and countyIncongBelow*. However, replication/claims.toml:651-657 still retains status = \"nocode\", values = [\"\"], and script = \"none for all states...\". Because replication/check_claims.py:187-188 unconditionally forces row[\"result\"] = \"UNCHECKED\" whenever status == \"nocode\", the claim cannot be verified by the replication harness. Furthermore, replication/results/compute_county_correlates.tex is not committed and is absent from \"Result files read\" in replication/claims_report.md:10.",
+      "why_it_matters": "The paper draft at line 749 claims that notably higher incongruence rates occur in counties with above-median shares of individuals born in the South, below age 30, or without formal education. Adding the producing script to the pipeline does not verify this claim; replication/claims_report.md still reports it as UNCHECKED, and without an assertion or exported values in claims.toml, the claim remains unverified in the replication archive."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "correctness",
+      "how_to_check": "In a clean working tree, create a new file test.txt. Run .\\review\\Run-Review.ps1 -Target working. Observe that it prints \"WARNING: No uncommitted changes.\" and terminates at line 204 without launching Codex or Antigravity.",
+      "id": "untracked-only-review-exits-empty",
+      "location": "review/Run-Review.ps1:173, review/Run-Review.ps1:191-205",
+      "severity": "minor",
+      "suggested_fix": "Update the preflight check at review/Run-Review.ps1:202 to inspect both $diffStat and untracked files (e.g. using git status --porcelain or git ls-files --others --exclude-standard), exiting only when both are empty.",
+      "title": "Working-tree review exits immediately without reviewing when all modified files are untracked",
+      "what_the_code_does": "In review/Run-Review.ps1:173, the prompt description for Target \"working\" was updated to instruct reviewers to inspect git status --short for untracked (??) files. However, the preflight emptiness check at lines 191-205 tests only $diffStat = & git -c core.safecrlf=false --no-pager diff HEAD --stat and exits immediately if $diffStat is whitespace. Git diff ignores untracked files, so a working tree containing only new, unstaged files produces an empty $diffStat and exits early with \"No uncommitted changes.\"",
+      "why_it_matters": "When an author or subagent adds new scripts or analysis files without staging them first, running the review runner with -Target working will exit without running any review, allowing unreviewed code to go undetectedΓÇödirectly defeating the intent of the prompt update."
+    }
+  ],
+  "review_limits": [
+    "The external Stata data on D:/SNU ECON Dropbox and F: were not accessible in this sandbox, so the full Stata pipeline was not executed and the empirical direction and magnitude of the three county comparisons could not be directly computed.",
+    "The result file replication/results/compute_county_correlates.tex does not yet exist on disk, and the current replication/claims_report.md does not include it among result files read.",
+    "The review could verify Stata syntax and logic by static analysis, but cannot verify data-dependent properties such as whether specific counties lack bpl or higrade entries or whether ties at p50 cause unequal split sizes.",
+    "The review was restricted to the uncommitted working-tree changes and their immediate paper context, rather than a full re-audit of the entire repository."
+  ],
+  "summary": "The newly added county correlates script is well-structured and guards against Stata missing-value traps, but the claim registry still marks the county-level claim as 'nocode', leaving it permanently UNCHECKED in the replication harness. Additionally, the review runner's preflight check tests only tracked diffs, so reviews still exit early when a working tree contains only untracked files despite prompt changes instructing reviewers to examine them.",
+  "verified_clean": [
+    {
+      "evidence": "CODE/compute_county_correlates.do:36 collapses by state_folder_name county_folder_name, and lines 41-49 summarize county means unweighted; the draft frames the claim explicitly at county level at D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:749.",
+      "item": "The county analysis uses one observation per county and unweighted county summaries, matching the unit of observation stated in the paper."
+    },
+    {
+      "evidence": "CODE/compute_county_correlates.do:31 conditions south on bpl<.; line 34 conditions noed on inrange(higrade,1,23); line 44 conditions above-median summaries on `v' < .; and line 47 excludes missing values because Stata missing values exceed any finite median.",
+      "item": "The new Stata code properly guards missing-value semantics."
+    },
+    {
+      "evidence": "In create_figures_SSHA2025.do:94, temp.dta is restricted to age>=10 & age<., which is verified by size_hazards_analysis.tex (0 missing ages); CODE/compute_county_correlates.do:33 can therefore safely use age<30.",
+      "item": "The below-30 indicator does not misclassify missing ages as under 30 in the analysis sample."
+    },
+    {
+      "evidence": "In replication/run_machineA.do:80-83, compute_county_correlates runs after create_figures_SSHA2025; in -SkipRebuild mode, lines 50-52 confirm temp.dta exists before executing any scripts.",
+      "item": "The replication runner places the new county correlates script after creation of its input dataset."
+    },
+    {
+      "evidence": "CODE/compute_county_correlates.do:30 defines gen byte incong = 1 - congruent, directly matching the paper text at D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:749.",
+      "item": "The script correctly computes transcription incongruence as the complement of congruency."
+    },
+    {
+      "evidence": "D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:749 describes higher rates as 'occurring in counties with...', and CODE/compute_county_correlates.do:39-53 computes descriptive group means without causal modeling.",
+      "item": "The paper's county claim is descriptive rather than causal, matching the descriptive median splits in the code."
+    },
+    {
+      "evidence": "review/Run-Review.ps1:197-201 temporarily relaxes $ErrorActionPreference to Continue and passes core.safecrlf=false to git diff HEAD --stat.",
+      "item": "The review runner's preflight check avoids terminating errors on Git CRLF stderr warnings."
+    },
+    {
+      "evidence": "DHTS-2026-10-12.tex:756 adds 'the quartiles divide records, not districts, into four equal groups by the legibility of their enumeration district', aligning the text with xtile leg_q = legibility, nq(4) in CODE/compute_legibility_quartiles.do:35.",
+      "item": "The draft update clarifies that legibility quartiles are record-weighted rather than district-weighted."
+    }
+  ]
+}

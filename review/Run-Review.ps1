@@ -170,7 +170,7 @@ foreach ($d in $Scope) {
 
 # --- Describe the target -----------------------------------------------------
 switch ($Target) {
-    "working" { $TargetDesc = "the uncommitted changes in the working tree. Run ``git --no-pager diff HEAD`` to see them." }
+    "working" { $TargetDesc = "the uncommitted changes in the working tree. Run ``git --no-pager diff HEAD`` to see them, and ``git status --short``: a new file marked ?? is part of the change too, so read it in full." }
     "staged"  { $TargetDesc = "the staged changes. Run ``git --no-pager diff --cached`` to see them." }
     "full"    {
         if ($External) {
@@ -191,7 +191,15 @@ switch ($Target) {
 # Warn on an empty working-tree diff before spending a review on nothing.
 if ($Target -eq "working") {
     Push-Location $RepoRoot
-    $diffStat = & git --no-pager diff HEAD --stat 2>$null | Out-String
+    # Under $ErrorActionPreference='Stop', PowerShell 5.1 turns any stderr line
+    # from git (e.g. "LF will be replaced by CRLF") into a terminating error,
+    # even with 2>$null. That stopped two reviews on 2026-11-02/03.
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    $diffStat = & git -c core.safecrlf=false --no-pager diff HEAD --stat 2>$null | Out-String
+    # New files are part of the change too; git diff does not list them.
+    $diffStat += & git ls-files --others --exclude-standard 2>$null | Out-String
+    $ErrorActionPreference = $prevEAP
     Pop-Location
     if ([string]::IsNullOrWhiteSpace($diffStat)) {
         Write-Warning "No uncommitted changes. Use -Target full, or a commit range like -Target 'HEAD~3..HEAD'."

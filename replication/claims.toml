@@ -649,11 +649,21 @@ script = "CODE/verify_inmates_and_county_stats.do"
 machine = "A"
 
 [[claim]]
-id = "county-correlates"
-text = 'with notably higher rates occurring in counties with above-median share of individuals born in the South, below age 30, or without formal education'
-values = [""]
-status = "nocode"
-script = "none for all states (only commented-out Rhode Island code in munir_figures_for_nber.do)"
+id = "county-correlates-south"
+text = 'above-median share of men born in the South (29.5 versus 28.2 percent), aged under'
+values = ["countyIncongAboveSouth", "countyIncongBelowSouth"]
+assert = "countyIncongAboveSouth > countyIncongBelowSouth and countyIncongAboveYoung > countyIncongBelowYoung and countyIncongAboveNoed > countyIncongBelowNoed"
+status = "scripted"
+script = "CODE/compute_county_correlates.do"
+machine = "A"
+note = "All-state replacement (2026-11-03) for the Rhode Island-era 'notably higher rates' clause. Counties counted once, as in the 18/43 percentiles; above vs at-or-below the median county share."
+
+[[claim]]
+id = "county-correlates-young-noed"
+text = '(30.4 versus 27.3 percent), or without formal schooling (29.9 versus 27.8 percent)'
+values = ["countyIncongAboveYoung", "countyIncongBelowYoung", "countyIncongAboveNoed", "countyIncongBelowNoed"]
+status = "scripted"
+script = "CODE/compute_county_correlates.do"
 machine = "A"
 
 [[claim]]
@@ -671,7 +681,7 @@ values = ["legDisagreeLowest", "legDisagreeHighest", "legLinkBaseLowest", "legLi
 status = "scripted"
 script = "CODE/compute_legibility_quartiles.do"
 machine = "A"
-issue = "Quartiles are record-weighted; the prose says 'districts in the lowest quartile'."
+note = "Quartiles are record-weighted; since 2026-11-03 line 756 says so."
 
 [[claim]]
 id = "legibility-gain"

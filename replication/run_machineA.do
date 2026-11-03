@@ -79,7 +79,7 @@ display as text "preflight: all `ninputs' inputs present"
 
 local scripts ""
 if $REP_SKIP_REBUILD == 0 local scripts "create_figures_SSHA2025"
-local scripts "`scripts' compute_race_linkage_rates compute_subgroup_linkage_rates verify_inmates_and_county_stats compute_legibility_quartiles make_balance_exhibits compute_model_agreement_on_discordant"
+local scripts "`scripts' compute_race_linkage_rates compute_subgroup_linkage_rates verify_inmates_and_county_stats compute_county_correlates compute_legibility_quartiles make_balance_exhibits compute_model_agreement_on_discordant"
 
 local t 0
 foreach s of local scripts {
