@@ -924,5 +924,5 @@ text = 'of which we reserve 10\% as a test set'
 reason = "design choice of the ML pipeline"
 
 [[ignore]]
-text = 'of which we again reserve 10% as a test set'
+text = 'of which we again reserve 10\% as a test set'
 reason = "design choice of the ML pipeline"

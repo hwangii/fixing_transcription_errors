@@ -1,0 +1,142 @@
+# Codex review
+
+*Rendered 2026-11-03 00:36. Source: `D:\repos\fixing_transcription_errors\review\reports\2026-11-03_003109-replication-codex.json`*
+
+**Dimensions:** correctness, claims-vs-code, replication, identification
+
+**Result:** 4 major, 1 minor
+
+## Summary
+
+The analysis-tier checks are substantially improved, but the headline 28% match-quality claim still uses a validation measure whose 1940 middle initial changes between the before and after samples. The package also cannot reproduce the model, data-build, or primary linkage stages, and one geographic claim explicitly has no producing code. Machine A’s driver can additionally exit successfully when regenerated tables differ from their committed versions.
+
+## Triage
+
+| # | Sev | Conf | Finding | Location | Disposition |
+|---|-----|------|---------|----------|-------------|
+| 1 | MAJOR | verified | The headline 28% match-quality gain changes the validating middle initial between versions | `D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:68, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:98, CODE/create_figures_SSHA2025.do:70-83, replication/diagnostics/validation_fixed_initials.do:37-40, replication/results/validation_fixed_initials.tex:30-32, replication/results/validation_fixed_initials.tex:70-72` || Rebutted (author's decision, 2026-11-02): the abstract and intro keep 28 percent; Section 5.1 discloses the decomposition (8-10 of 18 points from the links). |
+| 2 | MAJOR | verified | The package cannot reproduce the model outputs, build intermediates, or primary link files | `replication/README.md:242-269, replication/run_machineA.do:10-18, replication/run_machineA.do:39-52, replication/run_machineB.do:10-13` || Accepted risk: known gaps, README 'What is not covered' items 1-4 (ML pipeline, build tier, enum_date link code, third-party matching). |
+| 3 | MAJOR | verified | The paper reports county-level correlates that the registry admits have no all-state computation | `D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:749, replication/claims.toml:651-657, replication/claims_report.md:31-32` || Accepted, for the author: verified (claims.toml marks it nocode; only commented-out Rhode Island code exists). Line 746's correlates clause needs an all-state county script or removal; the author decides which (Section 5 is the author's). |
+| 4 | MAJOR | verified | Machine A can exit zero even when regenerated TeX tables or result files changed | `replication/Run-MachineA.ps1:54-68, replication/check_claims.py:277-282` || Fixed: Run-MachineA.ps1 now exits 1 if any figures/*.tex in the paper repo or any replication/results file differs from HEAD after the run; PDFs still go through compare_figures.py. Run-MachineB.ps1 is machine B's and is left to B. |
+| 5 | minor | verified | “Enumeration districts in the lowest quartile” is computed as a record-weighted quartile | `CODE/compute_legibility_quartiles.do:21-35, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:755-777` || Accepted, for the author: verified that the quartiles are record-weighted (deliberately, per the script's comment). The draft's 'most legible quartile' (line 756) could say 'quartile of records ranked by their district's legibility'; wording left to the author. |
+
+> Fill the Disposition column: **Fixed** (with commit) / **Rebutted** (with reason) / **Accepted risk** (with why).
+
+## Findings
+
+### 1. The headline 28% match-quality gain changes the validating middle initial between versions
+
+`moving-validator-headline-quality-gain` · **MAJOR** · identification · confidence: **verified** (traced in source)
+
+**Where:** `D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:68, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:98, CODE/create_figures_SSHA2025.do:70-83, replication/diagnostics/validation_fixed_initials.do:37-40, replication/results/validation_fixed_initials.tex:30-32, replication/results/validation_fixed_initials.tex:70-72`
+
+**What the code does**  
+The reported gain is `100*((sv_after/sv_before)-1)`, where `validated_before` compares the old link file's `mi1930==mi1940` and `validated_after` compares the new file's separately constructed `mi1930==mi1940`. The fixed-initial diagnostic explicitly reconstructs these as `vb_own` and `va_own`; holding the validator fixed produces gains of 15.95% using Ancestry's initial or 11.51% using FamilySearch's, rather than 27.82%.
+
+**Why it matters**  
+The abstract and introduction describe 28% as an improvement in match quality, although roughly half of the 18.2 percentage-point rise comes from rereading the validation field rather than from different links. The later disclosure at paper lines 549-550 is sound, but it does not qualify the headline claim that readers and referees will encounter first.
+
+**How to check**  
+Compare `valGainOwnTarget`, `valGainAncTarget`, and `valGainFsTarget` in `replication/results/validation_fixed_initials.tex`, then tabulate `validated_before` and `validated_after` after replacing both 1940 initials with `mi_anc` or `mi_fs`.
+
+**Suggested fix**  
+Use the fixed-validator gain in the abstract and introduction, or explicitly call 28% the moving-validator statistic and state there that only 8-10 of the 18 percentage points remain when the same initial is used.
+
+---
+
+### 2. The package cannot reproduce the model outputs, build intermediates, or primary link files
+
+`central-pipelines-absent` · **MAJOR** · replication · confidence: **verified** (traced in source)
+
+**Where:** `replication/README.md:242-269, replication/run_machineA.do:10-18, replication/run_machineA.do:39-52, replication/run_machineB.do:10-13`
+
+**What the code does**  
+The masters begin from frozen `.dta` inputs and rerun only the analysis/table tiers. The README states that the ML pipeline has no code, the census/FamilySearch build tier cannot run, the `enum_date` code producing the main links is absent, and machine B reads frozen ABE/JW and HLINK links rather than rebuilding them.
+
+**Why it matters**  
+An external replicator cannot recreate Table 1, the treatment transcriptions, the analysis population, or the before/after link files from raw inputs. Consequently, every headline result depends on unreviewable upstream artifacts even though the downstream tables can be regenerated.
+
+**How to check**  
+Run `rg -n "not in this repo|cannot run|not rerun|frozen" replication/README.md replication/run_machineA.do replication/run_machineB.do` and inventory whether any master invokes segmentation, model training/inference, the full-count build, or link construction.
+
+**Suggested fix**  
+Add and document the ML evaluation/inference code, restore a runnable raw-data build master, and include or archive the exact primary linkage programs. Wire all three stages into a top-level master with checks against the frozen intermediates.
+
+---
+
+### 3. The paper reports county-level correlates that the registry admits have no all-state computation
+
+`county-correlates-has-no-code` · **MAJOR** · claims-vs-code · confidence: **verified** (traced in source)
+
+**Where:** `D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:749, replication/claims.toml:651-657, replication/claims_report.md:31-32`
+
+**What the code does**  
+For the claim about counties with above-median Southern birth, young age, or no education, the registry sets `status = "nocode"` and `script = "none for all states (only commented-out Rhode Island code...)"`. The checker therefore marks the claim UNCHECKED instead of testing it.
+
+**Why it matters**  
+This is an empirical geographic result stated as a finding in the paper, but it has neither a reproducible all-state calculation nor a logged source. Its sample, weighting, and effect sizes cannot be established.
+
+**How to check**  
+Run `rg -n "above-median share|county-correlates|born in the South" . D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex` and confirm that no active all-state script constructs the three county comparisons.
+
+**Suggested fix**  
+Either remove the clause or add an all-state county-level script that defines the denominator, weighting, above-median indicators, and reported contrasts, then register its numeric outputs.
+
+---
+
+### 4. Machine A can exit zero even when regenerated TeX tables or result files changed
+
+`machine-a-success-despite-table-differences` · **MAJOR** · replication · confidence: **verified** (traced in source)
+
+**Where:** `replication/Run-MachineA.ps1:54-68, replication/check_claims.py:277-282`
+
+**What the code does**  
+After regeneration, the driver merely prints `git ... status` and `git ... diff --stat` for tables and `replication/results/`; it finally executes `exit $checkExit`. Only the claim checker and PDF comparison can set that variable nonzero, so an unregistered table-cell change or other changed result file does not fail the run.
+
+**Why it matters**  
+A supposedly successful replication run can have failed to reproduce Tables 2-4 or a tracked result that is not directly registered as prose. This makes exit status unreliable for automated or external replication.
+
+**How to check**  
+Trace assignments to `$checkExit` with `rg -n "checkExit|git -C.*status|diff --stat|exit" replication/Run-MachineA.ps1`. There is no `git diff --exit-code` or status test for generated TeX/results after the run.
+
+**Suggested fix**  
+After generation, fail if tracked machine-A TeX outputs or result files differ from HEAD. Keep the specialized drawing comparison for PDFs, but make every unexplained generated-output difference affect the final exit code.
+
+---
+
+### 5. “Enumeration districts in the lowest quartile” is computed as a record-weighted quartile
+
+`legibility-quartiles-are-record-weighted` · **minor** · claims-vs-code · confidence: **verified** (traced in source)
+
+**Where:** `CODE/compute_legibility_quartiles.do:21-35, D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:755-777`
+
+**What the code does**  
+The script loads one row per person and applies `xtile leg_q = legibility, nq(4)` without first reducing to one row per enumeration district. It therefore creates quartiles of records ranked by their district's legibility, not quartiles containing equal numbers of districts.
+
+**Why it matters**  
+The published 46.2%, 14.0%, 16.9%, and 27.7% comparisons may differ from the natural district-level interpretation of the prose. The paper's figure note separately says that the figure's unit of observation is an enumeration district, increasing the ambiguity.
+
+**How to check**  
+Create an ED tag, compare `xtile` boundaries on all records with boundaries after `keep if tag`, and tabulate the number of unique EDs and records in each version of the quartiles.
+
+**Suggested fix**  
+Call these “record-weighted legibility quartiles” in the text, or construct quartiles on one row per ED and merge the resulting category back to records before calculating rates.
+
+---
+
+## Checked and sound
+
+- **Discordant-model agreement categories exclude missing human fields and form an asserted exhaustive partition.** — All four human name fields are required at CODE/compute_model_agreement_on_discordant.do:123-136, and the script aborts unless the four cells sum exactly to the denominator at CODE/compute_model_agreement_on_discordant.do:139-144.
+- **The current analysis sample guards against Stata's missing-age inequality behavior and contains no blank-name agreement cases.** — The active filter is `age>=10 & age<.` at CODE/create_figures_SSHA2025.do:92-94. The saved diagnostics report zero missing ages, zero blank names, and zero vacuous agreements at replication/results/size_hazards_analysis.tex:4-8.
+- **The fixed-initial diagnostic really uses the same validator for before and after links and checks unchanged pairs.** — It constructs both scores against `mi_anc` or `mi_fs` and asserts equality for kept pairs at replication/diagnostics/validation_fixed_initials.do:74-79.
+- **The paper now distinguishes name agreement from adjudicated transcription accuracy and states the limitations of its test set.** — The draft says Table 1 is agreement with commercial consensus rather than ground-truth accuracy and discusses shared errors and selection at D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:279-287; it likewise disclaims verified names at lines 104-106 and 301-305.
+- **The paper acknowledges genealogical-reference coverage limits, denominator differences, and that broader representativeness effects are not established.** — Reference-standard limitations and incomparable denominators are stated at D:/repos/6638fa0fd89fbec05130caeb/DHTS-2026-10-12.tex:582-586, while the conclusion limits claims about bias in downstream estimates at line 787.
+- **Machine B's table-extraction check currently finds all five committed extracted tables unchanged.** — The read-only command `python replication/extract_deaglan_tables.py --paper-repo D:\repos\6638fa0fd89fbec05130caeb --check` reported all five `figures/deaglan_*.tex` files unchanged; the comparison/extraction logic is at replication/extract_deaglan_tables.py:124-159.
+
+## What this review could not establish
+
+- The external census and linkage datasets were not readable in this sandbox, so recorded counts and merge outcomes could not be independently recomputed.
+- Stata was not available for a fresh pipeline run; Stata runtime behavior was assessed from source, committed result files, and existing logs.
+- The absent ML, `enum_date`, raw-data build, and third-party HLINK pipelines could not be reviewed, so their construction choices and determinism remain unknown.
+- Input-manifest structure and path coverage were inspected, but the approximately 217 GB of machine-specific inputs were unavailable for recomputing SHA-256 hashes.
+- The worktree already contained uncommitted changes to `replication/README.md` and `replication/claims.toml`; this review assessed the on-disk versions supplied for the run.

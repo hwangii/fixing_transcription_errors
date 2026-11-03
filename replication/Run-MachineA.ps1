@@ -52,7 +52,7 @@ Remove-Item $wrapper -ErrorAction SilentlyContinue
 if ($stataExit -ne 0) { Write-Host "Stata run failed; claim check not run." -ForegroundColor Red; exit $stataExit }
 
 Write-Host "`n=== claim check ==="
-python (Join-Path $PSScriptRoot "check_claims.py")
+python (Join-Path $PSScriptRoot "check_claims.py") --paper-repo $paper
 $checkExit = $LASTEXITCODE
 
 Write-Host "`n=== exhibits changed in the paper repo ==="
@@ -64,5 +64,16 @@ if ($LASTEXITCODE -ne 0) { $checkExit = 1 }
 Write-Host "`n=== result files changed in this repo (a changed line is a number that moved) ==="
 git -C $repo status --short replication/results/
 git -C $repo diff --stat replication/results/
+
+# A REPRODUCTION RUN SHOULD CHANGE NOTHING BUT PDF FONT BYTES. ANY CHANGED .tex
+# TABLE IN THE PAPER REPO OR CHANGED RESULT FILE HERE FAILS THE RUN, SO A
+# NUMBER THAT MOVED CANNOT HIDE BEHIND AN EXIT CODE OF 0 (Codex, 2026-11-03).
+$changedTex = git -C $paper status --porcelain --untracked-files=no -- "figures/*.tex"
+$changedRes = git -C $repo status --porcelain -- replication/results/
+if ($changedTex -or $changedRes) {
+    Write-Host "`nFAILED TO REPRODUCE: generated tables or result files differ from the committed versions (listed above)." -ForegroundColor Red
+    Write-Host "If the change is intended, review it and commit it; otherwise find what moved." -ForegroundColor Red
+    $checkExit = 1
+}
 
 exit $checkExit

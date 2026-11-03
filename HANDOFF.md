@@ -1,4 +1,4 @@
-# HANDOFF — state as of 2026-11-01
+# HANDOFF — state as of 2026-11-03
 
 
 Written for continuing this work on **either** of the two servers. Each holds a
@@ -87,6 +87,37 @@ Nothing else is needed from B for now.
 
 **Do not** touch `CODE/`, `replication/hash_inputs.py`,
 `replication/input_manifest.md`, or the draft for this job.
+
+## 2026-11-02 (machine A): middle-initial validation decomposed
+
+- **What was found.** Codex's 2026-11-01_180159 finding 2 was right, and the
+  problem went further. The two 1930-1940 link files carry different 1940
+  middle initials: Ancestry's in the old-names file, one from our
+  transcription in the new-names file. So the share validated scores each
+  version against its own initial, and the same link can validate differently
+  before and after. See `replication/README.md`, "What is not covered", item 3.
+- **The author's decision.** Keep the original measure (65 → 84%, +28%) and
+  disclose its decomposition. Section 5.1 (paper `4fa3649`) now says about half
+  of the 18 points (8-10) comes from the links, and the rest from the initial
+  being read differently. Among the one in five links with initials, added
+  links agree 82-85% vs 71% for dropped ones. The overall 1% is mostly
+  re-reading. The abstract and intro keep "28 percent" unqualified, also by the
+  author's decision; both reviewers object, and this is recorded as rebutted.
+- **No analysis code changed.** A fixed-initial version of
+  `create_figures_SSHA2025.do` (`8e8990d`) was reverted (`c4d8d66`) before any
+  rebuild ran. The decomposition lives in
+  `replication/diagnostics/validation_fixed_initials.do`, which now runs in
+  `run_machineA.do`'s DIAGNOSTICS step.
+- **Draft ownership.** Section 2 (Machine Learning Transcription) and the ML
+  appendix belong to a coauthor who is now editing them in Overleaf. **Do not
+  edit Section 2.** Pull before every draft edit. Rhode Island was only the
+  prototype state, so it should get no special treatment outside Section 2;
+  line 394's "developed on Rhode Island alone" was removed (`30fe12f`).
+  Questions left to the coauthor: what data trained the model (line 184), and
+  the GPU cost of the full run (line 375).
+- **Review before running.** The author wants Codex and Antigravity to review a
+  code change before the long run, not after.
+- **Claim check:** 54 match, 0 fail, 21 unchecked (ML pipeline).
 
 ## 2026-10-31 (machine A): one sample, draft corrected
 
