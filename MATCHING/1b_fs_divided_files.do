@@ -62,7 +62,24 @@ foreach f of local files {
 	/*sex VARIABLE; abeclean NEEDS ONE TO CHOOSE THE NICKNAME TABLE.          */
 	capture confirm variable sex
 	if _rc gen byte sex = 1
+	/*abeclean CLEANS EACH NAME FIELD SEPARATELY AND STOPS WITH r(2000) "no  */
+	/*observations" WHEN A FIELD HAS NO LETTERS IN ANY RECORD (THE PLACEBO,  */
+	/*OR A BIRTHPLACE WHERE FAMILYSEARCH LACKS ONE OF THE TWO NAMES).        */
+	/*CLEANING ONE FIELD ALONE WOULD TREAT A SURNAME AS A FIRST NAME, SO ONE */
+	/*PLACEHOLDER ROW WITH A NAME IN BOTH FIELDS IS ADDED FOR THE CALL AND   */
+	/*DROPPED RIGHT AFTER; abeclean WORKS RECORD BY RECORD, SO IT CANNOT     */
+	/*CHANGE ANY OTHER RECORD.                                               */
+	gen byte _placeholder = 0
+	local np1 = _N + 1
+	set obs `np1'
+	replace _placeholder = 1 in `np1'
+	replace fs_namefrst = "john" in `np1'
+	replace fs_namelast = "smith" in `np1'
+	replace sex = 1 in `np1'
 	abeclean fs_namefrst fs_namelast, sex(sex) initial(mi_fs) nicknames nonysiis
+	drop if _placeholder
+	drop _placeholder
+	assert _N==`n0'
 	gen byte fs_frst_used = fs_namefrst_cleaned!=""
 	gen byte fs_last_used = fs_namelast_cleaned!=""
 	replace f_name = fs_namefrst_cleaned if fs_frst_used
