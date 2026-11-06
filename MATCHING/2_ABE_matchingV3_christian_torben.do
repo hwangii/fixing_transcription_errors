@@ -16,8 +16,17 @@ clear all
 /*SET YEARS*/
 local year1=`1'
 local year2=`2'
-local name_type=`"`3'"' /*"_ans_cleaned", "_ans_nysiis", "_true_cleaned", "_true_nysiis"*/
+local name_type=`"`3'"' /*"_ans_cleaned", "_ans_nysiis", "_true_cleaned", "_true_nysiis", "_fs_cleaned"*/
 local location=`4'
+/*2026-11-06: OPTIONAL NAME TYPE FOR THE LATER CENSUS (DATASET B). EMPTY =   */
+/*THE SAME AS DATASET A, WHICH IS THE ORIGINAL BEHAVIOUR. E.G. FAMILYSEARCH  */
+/*NAMES IN 1930 ONLY: name_type "_fs_cleaned", name_type_B "_ans_cleaned".   */
+local name_type_B=`"`5'"'
+if `"`name_type_B'"'=="" local name_type_B `"`name_type'"'
+/*SUFFIX FOR OUTPUT NAMES: EMPTY WHEN BOTH YEARS USE THE SAME NAME TYPE, SO  */
+/*EXISTING DIRECTORIES AND FILES KEEP THEIR NAMES.                           */
+local B_tag ""
+if `"`name_type_B'"'!=`"`name_type'"' local B_tag `"`name_type_B'"'
 
 if `"`name_type'"'=="" {
 	di "ENTER NAME TYPE!!!"
@@ -27,13 +36,15 @@ if `"`name_type'"'=="" {
 /* Specify directory locations: */
 if `location'==1 { /*SERVER AT HOME*/
 
-	local original  "D:\Dropbox\enum_date\DATA\ORIGINAL\"
-	local intermediate "F:\enum_date\DATA\INTERMEDIATE\"
+	/*2026-11-06: PATHS FROM replication/config.do; D:\Dropbox NO LONGER EXISTS.*/
+	if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
+	local original  "$REP_SNU/enum_date/DATA/ORIGINAL/"
+	local intermediate "$REP_F/enum_date/DATA/INTERMEDIATE/"
 
-	global MatchingDoFiles   "D:\Dropbox\enum_date\CODE\abe_algorithm_code_july2020"  	    	/*location where all ABE/Ferrie matching algorithm files (and .ado files) are stored */
-	global datadirA			 `"F:\enum_date\DATA\INTERMEDIATE\divided_file`year1'`name_type'"'		  		/*location where the raw data for dataset A is held*/
-	
-	global datadirB			 `"F:\enum_date\DATA\INTERMEDIATE\divided_file`year2'`name_type'"'  			/*location where the raw data for dataset B is held*/
+	global MatchingDoFiles   "$REP_SNU/enum_date/CODE/abe_algorithm_code_july2020"  	    	/*location where all ABE/Ferrie matching algorithm files (and .ado files) are stored */
+	global datadirA			 `"$REP_F/enum_date/DATA/INTERMEDIATE/divided_file`year1'`name_type'"'		  		/*location where the raw data for dataset A is held*/
+
+	global datadirB			 `"$REP_F/enum_date/DATA/INTERMEDIATE/divided_file`year2'`name_type_B'"'  			/*location where the raw data for dataset B is held*/
 
 }
 else if `location'==2 { /*DESKTOP AT HOME*/
@@ -44,7 +55,7 @@ else if `location'==2 { /*DESKTOP AT HOME*/
 	global MatchingDoFiles   "C:\Users\ilmyo\Dropbox\enum_date\CODE\abe_algorithm_code_july2020"  	    	/*location where all ABE/Ferrie matching algorithm files (and .ado files) are stored */
 	global datadirA			 `"C:\Users\ilmyo\OneDrive\Desktop\enum_date\DATA\INTERMEDIATE\divided_file`year1'`name_type'"'		  		/*location where the raw data for dataset A is held*/
 	
-	global datadirB			 `"C:\Users\ilmyo\OneDrive\Desktop\enum_date\DATA\INTERMEDIATE\divided_file`year2'`name_type'"'  			/*location where the raw data for dataset B is held*/
+	global datadirB			 `"C:\Users\ilmyo\OneDrive\Desktop\enum_date\DATA\INTERMEDIATE\divided_file`year2'`name_type_B'"'  			/*location where the raw data for dataset B is held*/
 	
 	
 }
@@ -56,27 +67,27 @@ else if `location'==3 { /*DAD'S DESKTOP*/
 	global MatchingDoFiles   "D:\Dropbox\enum_date\CODE\abe_algorithm_code_july2020"  	    	/*location where all ABE/Ferrie matching algorithm files (and .ado files) are stored */
 	global datadirA			 `"D:\enum_date\DATA\INTERMEDIATE\divided_file`year1'`name_type'"'		  		/*location where the raw data for dataset A is held*/
 
-	global datadirB			 `"D:\enum_date\DATA\INTERMEDIATE\divided_file`year2'`name_type'"'  			/*location where the raw data for dataset B is held*/	
+	global datadirB			 `"D:\enum_date\DATA\INTERMEDIATE\divided_file`year2'`name_type_B'"'  			/*location where the raw data for dataset B is held*/	
 
 }
 
-use sex race bpl namefrst_ans_cleaned namelast_ans_cleaned using `"`original'matching_intgen`year1'.dta"',clear
-
-/*MAKE SURE THE QUALIFICATIONS BELOW MATCH THOSE IN 1_divide_and_clean_everyoneV4.do*/
-keep if sex==1
-drop if namefrst_ans_cleaned==""|namelast_ans_cleaned==""
-keep if bpl<900
-keep if race==1|race==2
-
-/*OBTAIN RACE-SPECIFIC */
-levelsof race,local(race_list)
-
-foreach r in `race_list' {
-	levelsof bpl if race==`r',local(race`r'_bpl_list)
+/*2026-11-06: THE BIRTHPLACE LIST COMES FROM DATASET A'S DIVIDED FILES. IT   */
+/*WAS READ FROM matching_intgen`year1'.dta (MEN, NAMES PRESENT, bpl<900,     */
+/*race 1-2), WHICH NO LONGER EXISTS UNDER THAT NAME (ONLY _old AND           */
+/*_women_added). 1_divide_and_clean WROTE ONE norace<bpl>.dta PER BIRTHPLACE */
+/*IN THAT SAME LIST, AND THE LOOP BELOW SKIPS ANY PAIR WITHOUT BOTH FILES,   */
+/*SO THE PAIRS MATCHED ARE THE SAME. ONLY THE race 3 (norace) LIST IS USED.  */
+local race3_bpl_list ""
+local Afiles : dir `"$datadirA"' files "norace*.dta"
+foreach f of local Afiles {
+	local b = subinstr(subinstr(`"`f'"',"norace","",1),".dta","",1)
+	local race3_bpl_list `race3_bpl_list' `b'
 }
-
-/*OBTAIN BPL LISTS*/
-levelsof bpl, local(race3_bpl_list)
+local race3_bpl_list : list sort race3_bpl_list
+if `"`race3_bpl_list'"'=="" {
+	display as error "no norace*.dta files in $datadirA"
+	exit 601
+}
 
 *******************************************************************************
 /* SECTION 1. Standardize and Clean Data
@@ -85,12 +96,12 @@ levelsof bpl, local(race3_bpl_list)
 /* SECTION 2. ABE/Ferrie matching algorithm
 *******************************************************************************/
 capture cd `"`intermediate'"'
-capture mkdir r`name_type'`year1'_`year2' /*r FOR race*/
+capture mkdir r`name_type'`B_tag'`year1'_`year2' /*r FOR race*/
 
-local dir_name=`"r`name_type'`year1'_`year2'"'
+local dir_name=`"r`name_type'`B_tag'`year1'_`year2'"'
 
 if `location'==1 {
-	global outdir 			 `"F:\enum_date\DATA\INTERMEDIATE\\`dir_name'"' 						/*location to store cleaned data*/
+	global outdir 			 `"$REP_F/enum_date/DATA/INTERMEDIATE/`dir_name'"' 						/*location to store cleaned data*/
 }
 else if `location'==2 {
 	global outdir 			 `"C:\Users\ilmyo\OneDrive\Desktop\enum_date\DATA\INTERMEDIATE\\`dir_name'"' 						/*location to store cleaned data*/
@@ -121,7 +132,7 @@ foreach r in /*`race_list'*/ 3 {
 		global A $datadirA\\`race'`b'.dta 				// cleaned & standardized data file A
 		global B $datadirB\\`race'`b'.dta 				// cleaned & standardized data file B
 		
-		global outputfile `"${outdir}\\`race'`b'`name_type'"'  // file name to save matched data 
+		global outputfile `"${outdir}\\`race'`b'`name_type'`B_tag'"'  // file name to save matched data
 		
 		/*CHECK IF FILE EXISTS FOR BOTH YEARS*/
 		capture confirm file "$A"
