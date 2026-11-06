@@ -9,6 +9,14 @@ local fsnames=`"`6'"' /*SUFFIX FOR THE LINK FILE NAMES; THE PAPER'S FILES USE "0
 /*FAMILYSEARCH RUN, 1930-1940, MEN, SAME RECORDS AS THE PAPER'S ABE LINKS:   */
 /*  do MATCHING/_matching_master_dofile.do "1930" 10 1 "" 0 0 "1930 1940"    */
 local fs_years=`"`7'"'
+/*1 = PLACEBO CHECK: THE SAME FAMILYSEARCH PATH WITH NO FAMILYSEARCH NAME    */
+/*SWAPPED IN. ITS LINK FILE, link<yr1>_<yr2>_fsplacebo<years>_cleaned_      */
+/*noraceblock<suffix>.dta, MUST EQUAL THE PAPER'S ANCESTRY LINKS            */
+/*(check_placebo.do). RUN IT BEFORE TRUSTING THE FAMILYSEARCH RESULTS:      */
+/*  do MATCHING/_matching_master_dofile.do "1930" 10 1 "" 0 0 "1930 1940" 1 */
+local fs_placebo=`"`8'"'
+if `"`fs_placebo'"'=="" local fs_placebo 0
+local fstype = cond(`fs_placebo'==1, "_fsplacebo_cleaned", "_fs_cleaned")
 
 
 if `location'==1 { /*SERVER AT HOME*/
@@ -68,26 +76,27 @@ if `"`fs_years'"'!="" {
 		display as error "the FamilySearch run is set up for machine A only (location 1)"
 		exit 198
 	}
-	/*EACH YEAR'S FAMILYSEARCH FILES ARE BUILT ONCE AND REUSED BY LATER RUNS */
-	/*(E.G. "1930", THEN "1940", THEN "1930 1940"). DELETE fs_names<yr>.dta */
-	/*AND divided_file<yr>_fs_cleaned TO REBUILD THEM.                      */
+	/*THE ABE COMMANDS MUST BE INSTALLED (MACHINE A: c:/ado/plus, THE SAME    */
+	/*FILES AS enum_date/CODE/abe_algorithm_code_july2020). STOP IF NOT, AND   */
+	/*LOG WHICH COPY IS USED.                                                   */
+	which abeclean
+	which abematch
+
+	/*THE FAMILYSEARCH NAME FILES (SLOW TO BUILD, FROM FIXED INPUTS) ARE BUILT */
+	/*ONCE AND REUSED; DELETE fs_names<yr>.dta TO REBUILD. THE DIVIDED FILES   */
+	/*ARE REBUILT ON EVERY RUN, SO A STALE OR PARTIAL FOLDER IS NEVER REUSED.  */
 	local fsdir "$REP_F/enum_date/DATA/INTERMEDIATE/"
 	foreach y of local fs_years {
-		capture confirm file `"`fsdir'fs_names`y'.dta"'
-		if _rc do `"`code'0b_create_fs_names.do"' `y'
-		else display "fs_names`y'.dta exists: reused"
-		/*REUSED ONLY IF IT HAS EXACTLY THE ANCESTRY FOLDER'S FILES, SO A   */
-		/*PARTLY BUILT FOLDER (AN INTERRUPTED RUN) IS REBUILT, NOT REUSED.  */
-		local built : dir `"`fsdir'divided_file`y'_fs_cleaned"' files "norace*.dta"
-		local want  : dir `"`fsdir'divided_file`y'_ans_cleaned"' files "norace*.dta"
-		local built : list sort built
-		local want  : list sort want
-		if `"`built'"'!=`"`want'"' do `"`code'1b_fs_divided_files.do"' `y'
-		else display "divided_file`y'_fs_cleaned complete: reused"
+		if `fs_placebo'==0 {
+			capture confirm file `"`fsdir'fs_names`y'.dta"'
+			if _rc do `"`code'0b_create_fs_names.do"' `y'
+			else display "fs_names`y'.dta exists: reused"
+		}
+		do `"`code'1b_fs_divided_files.do"' `y' `"`fstype'"'
 	}
 	foreach yr in `yr_list' {
-		do `"`code'2_ABE_matchingV3_master_christian_torben.do"' `yr' `interval' `location' `"`fs_years'"'
-		do `"`code'3_append_and_clean_all_links_christian_torbenV2.do"' `yr' `interval' `location' `reporting_error_only' `"`fsnames'"' `"`fs_years'"'
+		do `"`code'2_ABE_matchingV3_master_christian_torben.do"' `yr' `interval' `location' `"`fs_years'"' `"`fstype'"'
+		do `"`code'3_append_and_clean_all_links_christian_torbenV2.do"' `yr' `interval' `location' `reporting_error_only' `"`fsnames'"' `"`fs_years'"' `"`fstype'"'
 	}
 	exit
 }

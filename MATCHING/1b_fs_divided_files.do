@@ -14,14 +14,21 @@
 /*FamilySearch names are cleaned with the same abeclean options used for the */
 /*ML names in 1_divide_and_clean (nicknames, nonysiis).                      */
 /*                                                                           */
-/*ARGUMENT: the census year. NEEDS fs_names<yr>.dta (0b_create_fs_names.do). */
+/*ARGUMENTS: the census year; optionally the output name type, default      */
+/*"_fs_cleaned". "_fsplacebo_cleaned" IS THE PLACEBO: NO FAMILYSEARCH NAME   */
+/*IS SWAPPED IN, SO THE FILES ARE THE ANCESTRY FILES AND THE LINKS MUST      */
+/*REPRODUCE link1930_1940_ans_cleaned_noraceblock0.dta (check_placebo.do).   */
+/*NEEDS fs_names<yr>.dta (0b_create_fs_names.do) EXCEPT FOR THE PLACEBO.     */
 
 local yr `1'
+local fstype `"`2'"'
+if `"`fstype'"'=="" local fstype "_fs_cleaned"
+local placebo = `"`fstype'"'=="_fsplacebo_cleaned"
 if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
 local f_intermediate "$REP_F/enum_date/DATA/INTERMEDIATE/"
 
 local src `"`f_intermediate'divided_file`yr'_ans_cleaned"'
-local dst `"`f_intermediate'divided_file`yr'_fs_cleaned"'
+local dst `"`f_intermediate'divided_file`yr'`fstype'"'
 capture mkdir `"`dst'"'
 
 local files : dir `"`src'"' files "norace*.dta"
@@ -39,10 +46,17 @@ foreach f of local files {
 	isid id
 	local n0 = _N
 
-	rename id histid
-	merge 1:1 histid using `"`f_intermediate'fs_names`yr'.dta"', keep(1 3)
-	assert _N==`n0'
-	rename histid id
+	if `placebo' {
+		gen fs_namefrst = ""
+		gen fs_namelast = ""
+	}
+	else {
+		rename id histid
+		merge 1:1 histid using `"`f_intermediate'fs_names`yr'.dta"', keep(1 3)
+		assert _N==`n0'
+		drop _merge
+		rename histid id
+	}
 
 	/*THESE FILES ARE MEN ONLY (1_divide_and_clean KEEPS sex==1) AND CARRY NO */
 	/*sex VARIABLE; abeclean NEEDS ONE TO CHOOSE THE NICKNAME TABLE.          */

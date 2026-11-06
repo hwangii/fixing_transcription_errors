@@ -8,6 +8,9 @@ local fsnames=`"`5'"' /*A SUFFIX FOR THE OUTPUT FILE NAME ONLY; THE PAPER'S FILE
 /*2026-11-06: THE CENSUS YEARS WHOSE NAMES COME FROM FAMILYSEARCH, AS IN    */
 /*2_ABE_matchingV3_master_christian_torben.do. EMPTY = ORIGINAL BEHAVIOUR.  */
 local fs_years=`"`6'"'
+/*"_fs_cleaned", OR "_fsplacebo_cleaned" FOR THE PLACEBO (OUTPUT TAG _fsplacebo).*/
+local fstype=`"`7'"'
+if `"`fstype'"'=="" local fstype "_fs_cleaned"
 
 if `location'==1 { /*SERVER AT HOME*/
 
@@ -64,11 +67,11 @@ if `"`fs_years'"'!="" {
 		local yr2=`yr1'+`interval'
 		local typeA "_ans_cleaned"
 		local typeB "_ans_cleaned"
-		if strpos(`" `fs_years' "', " `yr1' ") local typeA "_fs_cleaned"
-		if strpos(`" `fs_years' "', " `yr2' ") local typeB "_fs_cleaned"
+		if strpos(`" `fs_years' "', " `yr1' ") local typeA "`fstype'"
+		if strpos(`" `fs_years' "', " `yr2' ") local typeB "`fstype'"
 		local B_tag ""
 		if "`typeB'"!="`typeA'" local B_tag "`typeB'"
-		local ver = "_fs" + subinstr(strtrim(stritrim(`"`fs_years'"')), " ", "_", .)
+		local ver = subinstr("`fstype'","_cleaned","",1) + subinstr(strtrim(stritrim(`"`fs_years'"')), " ", "_", .)
 
 		local rdir `"`f_intermediate'r`typeA'`B_tag'`yr1'_`yr2'"'
 		local files : dir `"`rdir'"' files "norace*.dta"
@@ -103,7 +106,7 @@ if `"`fs_years'"'!="" {
 				local y    = cond("`side'"=="A", `yr1', `yr2')
 				local type = cond("`side'"=="A", "`typeA'", "`typeB'")
 				rename id_`side' id
-				if "`type'"=="_fs_cleaned" {
+				if "`type'"=="`fstype'" {
 					merge m:1 id using `"`f_intermediate'divided_file`y'`type'/norace`b'.dta"', keepusing(mi fs_frst_used fs_last_used) keep(1 3)
 					gen byte fs_used`y' = fs_frst_used==1 | fs_last_used==1
 					drop fs_frst_used fs_last_used

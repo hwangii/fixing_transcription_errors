@@ -1,0 +1,289 @@
+I1106 01:46:03.111756       1 resolver.go:85] Model ID gemini-3.8-flash-high not in local config, defaulting to CCPA
+I1106 01:46:03.116119       1 resolver.go:111] Model resolved via default
+I1106 01:46:03.117753      82 server.go:2275] Starting language server process with pid 28348
+I1106 01:46:03.125460      82 server.go:2333] Language server version: 1.5.2
+I1106 01:46:03.125460      82 server.go:1077] Language server will attempt to listen on host localhost
+I1106 01:46:03.147415      82 server.go:1092] Language server listening on random port at 55377 for HTTPS (gRPC)
+I1106 01:46:03.148020      82 server.go:1100] Language server listening on random port at 55378 for HTTP
+I1106 01:46:03.249352      91 model_configs.go:195] Auth mode is unspecified, skipping fetchAvailableModels and returning empty response
+W1106 01:46:03.252014      60 cache.go:157] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+E1106 01:46:03.252553      60 errorreport.go:247] error getting token source: You are not logged into Antigravity.
+E1106 01:46:03.253082      91 errorreport.go:247] Failed to poll ListExperiments: error getting token source: You are not logged into Antigravity.
+W1106 01:46:03.258954      98 cache.go:157] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+W1106 01:46:03.259487      98 cache.go:157] Cache(userInfo): Singleflight refresh failed: failed to get load code assist response: error getting token source: You are not logged into Antigravity.
+I1106 01:46:03.264316      97 store_client.go:714] summary store: starting background reconciliation (trigger=startup)
+W1106 01:46:03.269043     130 cache.go:157] Cache(peopleInfo): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+E1106 01:46:03.269043     130 errorreport.go:247] error getting token source: You are not logged into Antigravity.
+W1106 01:46:03.272211      82 defaults.go:725] failed to get cs path: cs path /usr/bin/cs invalid
+I1106 01:46:03.272742      82 manager.go:119] Creating trajectory store manager with proto store and SQLite store
+I1106 01:46:03.281465     210 manager.go:98] Migration [MIGRATION_ID_SANITY_CHECK_PROJECT_URIS] is enabled
+I1106 01:46:03.282522     210 manager.go:107] Migration [MIGRATION_ID_SANITY_CHECK_PROJECT_URIS] already has status MIGRATION_STATUS_COMPLETED, skipping
+I1106 01:46:03.283033     210 manager.go:98] Migration [MIGRATION_ID_PLUGIN_ENABLEMENT] is enabled
+I1106 01:46:03.283033     210 manager.go:107] Migration [MIGRATION_ID_PLUGIN_ENABLEMENT] already has status MIGRATION_STATUS_COMPLETED, skipping
+I1106 01:46:03.283033     210 manager.go:98] Migration [MIGRATION_ID_BUILTIN_SIDECARS_TO_PLUGINS] is enabled
+I1106 01:46:03.283565     210 manager.go:107] Migration [MIGRATION_ID_BUILTIN_SIDECARS_TO_PLUGINS] already has status MIGRATION_STATUS_COMPLETED, skipping
+I1106 01:46:03.283565     210 manager.go:95] Migration [MIGRATION_ID_LIN_BUILTIN_TO_MARKETPLACE] is disabled, skipping entirely
+I1106 01:46:03.283565     210 manager.go:95] Migration [MIGRATION_ID_ADOPT_BWG_INSTALLS] is disabled, skipping entirely
+I1106 01:46:03.283565     210 manager.go:95] Migration [MIGRATION_ID_GDRIVE_BUILTIN_PLUGIN] is disabled, skipping entirely
+I1106 01:46:03.283565     210 manager.go:95] Migration [MIGRATION_ID_SPLIT_SCIENCE_PLUGIN] is disabled, skipping entirely
+I1106 01:46:03.285478      97 store_client.go:764] summary store: reconciliation complete, synced 129 records
+I1106 01:46:03.379638      82 server.go:3543] initialized server successfully in 262.9021ms
+I1106 01:46:03.379638      28 server.go:4201] Auth succeeded, refreshing features and managers
+W1106 01:46:03.379638      63 cache.go:157] Cache(loadCodeAssistResponse): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+W1106 01:46:03.379638      62 cache.go:157] Cache(peopleInfo): Singleflight refresh failed: error getting token source: You are not logged into Antigravity.
+E1106 01:46:03.379638      62 errorreport.go:247] error getting token source: You are not logged into Antigravity.
+E1106 01:46:03.379638      63 errorreport.go:247] error getting token source: You are not logged into Antigravity.
+W1106 01:46:03.379638      62 rpcs_plugin_auth.go:105] Not reloading plugin MCP servers: cannot get the signed-in user: error getting token source: You are not logged into Antigravity.
+E1106 01:46:03.379638      28 errorreport.go:247] Failed to poll ListExperiments: error getting token source: You are not logged into Antigravity.
+I1106 01:46:03.379638      28 server.go:4220] State refresh took 1ms
+I1106 01:46:03.379638      28 server.go:4233] [RemoteControl] Subscription callback triggered.
+I1106 01:46:03.379638      28 server.go:4236] [RemoteControl] RemoteControlEnabled value: false
+I1106 01:46:03.379638      28 server.go:5206] [RemoteControl] Session toggle is off, staying disconnected
+I1106 01:46:03.379638      28 server.go:4909] [RemoteControl] Resolved proxyServerURL: ""
+I1106 01:46:03.379638     234 manager.go:98] Migration [MIGRATION_ID_SANITY_CHECK_PROJECT_URIS] is enabled
+I1106 01:46:03.379638      28 profiler.go:231] Continuous pprof profiling is disabled.
+I1106 01:46:03.379638     234 manager.go:107] Migration [MIGRATION_ID_SANITY_CHECK_PROJECT_URIS] already has status MIGRATION_STATUS_COMPLETED, skipping
+I1106 01:46:03.379638     234 manager.go:98] Migration [MIGRATION_ID_PLUGIN_ENABLEMENT] is enabled
+I1106 01:46:03.379638     234 manager.go:107] Migration [MIGRATION_ID_PLUGIN_ENABLEMENT] already has status MIGRATION_STATUS_COMPLETED, skipping
+I1106 01:46:03.379638     234 manager.go:98] Migration [MIGRATION_ID_BUILTIN_SIDECARS_TO_PLUGINS] is enabled
+I1106 01:46:03.379638     231 reconcile_summaries.go:94] [Summaries] reconcile checked 129 conversations, restored 0, cached 129, skipped 0, dropped 0, cancelled false in 1ms (resident: 0 -> 0)
+I1106 01:46:03.379638     234 manager.go:107] Migration [MIGRATION_ID_BUILTIN_SIDECARS_TO_PLUGINS] already has status MIGRATION_STATUS_COMPLETED, skipping
+I1106 01:46:03.379638     234 manager.go:95] Migration [MIGRATION_ID_LIN_BUILTIN_TO_MARKETPLACE] is disabled, skipping entirely
+I1106 01:46:03.379638     234 manager.go:95] Migration [MIGRATION_ID_ADOPT_BWG_INSTALLS] is disabled, skipping entirely
+I1106 01:46:03.379638     234 manager.go:95] Migration [MIGRATION_ID_GDRIVE_BUILTIN_PLUGIN] is disabled, skipping entirely
+I1106 01:46:03.379638     234 manager.go:95] Migration [MIGRATION_ID_SPLIT_SCIENCE_PLUGIN] is disabled, skipping entirely
+I1106 01:46:03.408533       1 auto_updater.go:334] Spawned background update process with PID 24104
+I1106 01:46:03.409586       1 common.go:191] Launching CLI mode
+E1106 01:46:03.409586       1 launchsteps.go:95] Failed to resolve GeminiDir ".gemini": .gemini must be an absolute path: path is not absolute, falling back to default
+I1106 01:46:03.410110       1 common.go:212] CLI app data directory: C:\Users\munir_and_sam\.gemini\antigravity-cli
+I1106 01:46:03.410110       1 server.go:313] Creating CLI server backend: product=antigravity workspaceDirs=[D:\repos\fixing_transcription_errors] appDataDir=C:\Users\munir_and_sam\.gemini\antigravity-cli languageServer=true codeAssist=true
+I1106 01:46:03.410634       1 auth_provider.go:954] [AuthProvider] SetEnableBusinessLogin called with enable: true
+I1106 01:46:03.416939       1 server.go:2261] Backend project ID updated dynamically to: default-cli-project
+I1106 01:46:03.417465       1 analytics.go:249] CLI startup completed (took 320.6847ms, phases [main_entered=0ms ls_start=20ms ls_ready=285ms launch_cli=313ms backend_created=319ms project_resolved=320ms])
+I1106 01:46:03.417465       1 printmode.go:208] Print mode: starting (promptLength=245, model="gemini-3.8-flash-high", conversationID="")
+I1106 01:46:03.417465       1 manager.go:549] Initializing CLI store manager for workspace D:\repos\fixing_transcription_errors
+I1106 01:46:03.420176       1 cli_setting_manager.go:81] config.json not found or unreadable, using CLI settings only: open C:/Users/munir_and_sam/.gemini/config/config.json: The system cannot find the file specified.
+I1106 01:46:03.522754       1 cli_setting_manager.go:96] CLI settings initialized: permissions=&{Allow:[read_file(D:/repos/pandemic/**) read_file(F:/pandemic/log/**) read_file(C:/Users/munir_and_sam/AppData/Local/Temp/claude/**) read_file(D:/repos/qq_tradeoff/**) read_file(D:/repos/multigen_CM/CODE/**) read_file(C:/ado/plus/**) read_file(D:/repos/fixing_transcription_errors/**) read_file(D:/repos/6638fa0fd89fbec05130caeb/**) command(dir) command(ls) command(type) command(cat) command(head) command(tail) command(wc) command(grep) command(rg) command(findstr) command(Get-ChildItem) command(Get-Content) command(Select-String)] Deny:[command(del) command(erase) command(rm) command(rmdir) command(rd) command(move) command(mv) command(copy) command(cp) command(ren) command(rename) command(Remove-Item) command(Move-Item) command(Copy-Item) command(Rename-Item) command(Set-Content) command(Add-Content) command(Out-File) command(New-Item) command(git) command(python) command(py) command(StataMP-64) command(stata) command(powershell) command(pwsh) command(cmd)] Ask:[]}, toolPermission=always-proceed
+I1106 01:46:03.530752       1 hooks_manager.go:53] loaded 0 named hooks from 0 hooks.json file(s)
+I1106 01:46:03.530752       1 manager.go:723] CLI store manager initialized successfully
+I1106 01:46:03.537594     274 manager.go:1674] Reloading system slash commands and skills
+I1106 01:46:03.537594     274 manager.go:1630] Reloading system slash commands
+I1106 01:46:03.537594     274 manager.go:1639] Slash commands unchanged, skipping update
+I1106 01:46:03.540257       1 hooks_manager.go:53] loaded 0 named hooks from 0 hooks.json file(s)
+I1106 01:46:03.540257       1 printmode.go:889] Print mode: applying agent mode plan
+I1106 01:46:03.540787       1 manager.go:1723] SetCycleMode called: plan
+I1106 01:46:03.540787       1 printmode.go:409] Print mode: not authenticated, trying silent auth
+I1106 01:46:03.541836     289 keyring.go:64] keyringAuth: loaded token, expiry=2026-11-06 01:46:01.9571033 -0800 PST expired=true
+I1106 01:46:03.790220     289 browser.go:265] token refreshed, new expiry=2026-11-06 02:46:02.7902208 -0800 PST m=+3600.035908901
+I1106 01:46:03.798461       1 auth.go:157] ChainedAuth: authenticated via keyring (effective: keyring)
+I1106 01:46:03.798461       1 server_oauth.go:221] applyAuthResult: email=ilmyounghwang@gmail.com, authMethod=consumer, quotaProject=
+I1106 01:46:03.798461       1 server_oauth.go:226] OAuth: authenticated successfully as ilmyounghwang@gmail.com
+I1106 01:46:03.798461       1 server_oauth.go:235] b.codeAssistClient.AuthProvider (0xcd8ef06a870) is same as b.cliAuth (0xcd8ef06a870)
+W1106 01:46:03.798461     145 cache.go:189] Failed to refresh cache in background: admin controls not applicable
+W1106 01:46:03.798461     372 cache.go:189] Failed to refresh cache in background: admin controls not applicable
+I1106 01:46:04.250467     140 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0xc3b8f92e99ee960b
+I1106 01:46:04.472542     141 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels Trace: 0xafc944d7a26840e0
+I1106 01:46:04.508216       1 model_resolver.go:107] Resolving model gemini-3.8-flash-high
+I1106 01:46:04.508216       1 model_config_manager.go:363] Propagating selected model override to backend: label="Gemini 3.8 Flash (High)"
+I1106 01:46:04.508752     255 experiment_manager.go:66] Starting experiment refresh after login
+I1106 01:46:04.508752       1 printmode.go:411] Print mode: silent auth succeeded
+I1106 01:46:04.508752     254 quota_manager.go:45] doRefreshQuota: starting reload (force=true)
+I1106 01:46:04.604293     255 http_helpers.go:99] UseAICodeMendel routing switch changed: false -> true
+I1106 01:46:04.604293     255 remote_agent.go:188] Remote agent fastpush pin gate changed: false -> true
+I1106 01:46:04.605343     255 server.go:5206] [RemoteControl] Session toggle is off, staying disconnected
+I1106 01:46:04.605343     255 server.go:4909] [RemoteControl] Resolved proxyServerURL: ""
+I1106 01:46:04.605343     255 experiment_manager.go:70] Experiments refreshed after login
+I1106 01:46:04.605343     367 manager.go:1630] Reloading system slash commands
+I1106 01:46:04.820761     362 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0x173b03e1b8eda772
+I1106 01:46:05.081963     362 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0x76a5dd3fb20ca1e8
+I1106 01:46:05.115731     362 model_config_manager.go:363] Propagating selected model override to backend: label="Gemini 3.8 Flash (High)"
+I1106 01:46:05.115731     255 experiment_manager.go:66] Starting experiment refresh after login
+I1106 01:46:05.115731     254 quota_manager.go:45] doRefreshQuota: starting reload (force=true)
+I1106 01:46:05.117318     464 model_config_manager.go:363] Propagating selected model override to backend: label="Gemini 3.8 Flash (High)"
+I1106 01:46:05.159189       1 model_resolver.go:107] Resolving model gemini-3.8-flash-high
+I1106 01:46:05.159189       1 conversation_manager.go:686] Starting new conversation (agent=false)
+I1106 01:46:05.159189       1 server.go:1199] Creating new cascade trajectory (agentScript=false)
+I1106 01:46:05.159189       1 server.go:1225] Conversation using project ID: default-cli-project
+I1106 01:46:05.175360     255 server.go:5206] [RemoteControl] Session toggle is off, staying disconnected
+I1106 01:46:05.175887     255 server.go:4909] [RemoteControl] Resolved proxyServerURL: ""
+I1106 01:46:05.175887     255 experiment_manager.go:70] Experiments refreshed after login
+I1106 01:46:05.175887     255 experiment_manager.go:66] Starting experiment refresh after login
+I1106 01:46:05.175887     330 manager.go:1630] Reloading system slash commands
+I1106 01:46:05.177462     255 server.go:5206] [RemoteControl] Session toggle is off, staying disconnected
+I1106 01:46:05.177462     255 server.go:4909] [RemoteControl] Resolved proxyServerURL: ""
+I1106 01:46:05.177462     255 experiment_manager.go:70] Experiments refreshed after login
+I1106 01:46:05.177462     336 manager.go:1630] Reloading system slash commands
+I1106 01:46:05.206083       1 server.go:1242] Created conversation 9c98e5f3-0bdf-4a3b-b789-4684015c62ee (backend=BACKEND_TYPE_UNSPECIFIED)
+I1106 01:46:05.207707       1 server.go:3369] GetConversationDetail: found conversation 9c98e5f3-0bdf-4a3b-b789-4684015c62ee (active=true)
+I1106 01:46:05.209259       1 server.go:3369] GetConversationDetail: found conversation 9c98e5f3-0bdf-4a3b-b789-4684015c62ee (active=true)
+I1106 01:46:05.209259       1 conversation_manager.go:740] project: switching to conversation belonging to project ID: default-cli-project
+I1106 01:46:05.209793       1 server.go:2261] Backend project ID updated dynamically to: default-cli-project
+I1106 01:46:05.209793       1 cli_setting_manager.go:226] ApplyProjectPermissionGrants: no grants for project "CLI Project", cleared project permissions
+I1106 01:46:05.209793       1 conversation_manager.go:756] project: synced active project to "CLI Project" (id=default-cli-project) from conversation switch
+I1106 01:46:05.209793       1 conversation_manager.go:1068] Streaming conversation 9c98e5f3-0bdf-4a3b-b789-4684015c62ee
+I1106 01:46:05.209793     586 manager.go:1674] Reloading system slash commands and skills
+I1106 01:46:05.210313     586 manager.go:1630] Reloading system slash commands
+I1106 01:46:05.211365       1 server.go:3369] GetConversationDetail: found conversation 9c98e5f3-0bdf-4a3b-b789-4684015c62ee (active=true)
+I1106 01:46:05.213069       1 server.go:1260] Starting conversation update stream for 9c98e5f3-0bdf-4a3b-b789-4684015c62ee
+I1106 01:46:05.213069       1 manager.go:1784] Successfully registered JSON schema on the backend: {
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "dimensions_reviewed", "findings", "verified_clean", "review_limits"],
+  "properties": {
+    "summary": {
+      "type": "string",
+      "description": "Two to four sentences. The overall state of the reviewed work and the single most important thing to fix. No preamble."
+    },
+    "dimensions_reviewed": {
+      "type": "array",
+      "description": "Which scope dimensions were actually reviewed in this run.",
+      "items": {
+        "type": "string",
+        "enum": ["correctness", "claims-vs-code", "replication", "identification"]
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Defects and concerns, ordered most severe first. Empty if none. Do not pad with stylistic observations.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "dimension", "severity", "confidence", "title", "location", "what_the_code_does", "why_it_matters", "how_to_check", "suggested_fix"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable short slug, kebab-case, e.g. 'empty-string-agreement-inflation'."
+          },
+          "dimension": {
+            "type": "string",
+            "enum": ["correctness", "claims-vs-code", "replication", "identification"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["blocker", "major", "minor", "nit"],
+            "description": "blocker: a reported result is wrong. major: a referee would demand it. minor: real but survivable. nit: cosmetic."
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["verified", "likely", "speculative"],
+            "description": "verified: traced in the source. likely: strongly implied but depends on unseen data. speculative: a question, not an established defect."
+          },
+          "title": {
+            "type": "string",
+            "description": "One line, stating the defect itself, not its category."
+          },
+          "location": {
+            "type": "string",
+            "description": "path:line, or path:line-line. Several may be comma-separated. Required: a finding without a location is not a finding."
+          },
+          "what_the_code_does": {
+            "type": "string",
+            "description": "Precisely what the code computes, quoting the relevant expression. Contrast with what it was evidently intended to compute."
+          },
+          "why_it_matters": {
+            "type": "string",
+            "description": "The consequence for a number or claim in the paper. If there is no consequence, the severity is nit."
+          },
+          "how_to_check": {
+            "type": "string",
+            "description": "A concrete command, tabulation, or count the author can run to confirm or refute this in minutes."
+          },
+          "suggested_fix": {
+            "type": "string",
+            "description": "The change, specific enough to act on. Do not apply it yourself."
+          }
+        }
+      }
+    },
+    "verified_clean": {
+      "type": "array",
+      "description": "Things explicitly checked that were fine. This is what makes a short findings list trustworthy rather than lazy.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item", "evidence"],
+        "properties": {
+          "item": { "type": "string", "description": "What was checked." },
+          "evidence": { "type": "string", "description": "How it was confirmed, with path:line where applicable." }
+        }
+      }
+    },
+    "review_limits": {
+      "type": "array",
+      "description": "What this review could NOT establish: data not readable, pipeline not runnable, paper text unavailable, Stata semantics not verifiable by reading. Be explicit; silence here reads as false assurance.",
+      "items": { "type": "string" }
+    }
+  }
+}
+I1106 01:46:05.213607       1 session.go:201] Print mode: conversation=9c98e5f3-0bdf-4a3b-b789-4684015c62ee, sending message
+I1106 01:46:05.213607       1 manager.go:1630] Reloading system slash commands
+I1106 01:46:05.267162     254 quota_manager.go:45] doRefreshQuota: starting reload (force=true)
+I1106 01:46:05.276082     336 manager.go:1639] Slash commands unchanged, skipping update
+I1106 01:46:05.314560     586 manager.go:1639] Slash commands unchanged, skipping update
+I1106 01:46:05.316135       1 manager.go:1639] Slash commands unchanged, skipping update
+I1106 01:46:05.316135       1 printmode.go:932] Print mode: expanded slash command "plan" (system)
+I1106 01:46:05.316668       1 conversation_manager.go:875] Forwarding user message to conversation 9c98e5f3-0bdf-4a3b-b789-4684015c62ee (items=2, media=0)
+I1106 01:46:05.316668       1 server.go:1826] Sending user message to conversation 9c98e5f3-0bdf-4a3b-b789-4684015c62ee (items=2, media=0)
+I1106 01:46:05.318251     330 manager.go:1639] Slash commands unchanged, skipping update
+I1106 01:46:05.319825       1 latency_breakdown.go:168] SEND_USER_CASCADE_MESSAGE_LATENCY latency breakdown: map[active_user_state_latency_ms:0 blocking:false cascade_id:9c98e5f3-0bdf-4a3b-b789-4684015c62ee cascade_send_latency_ms:0 hydrate_slash_commands_latency_ms:0 load_trajectory_latency_ms:0 media_count:0 media_summaries_latency_ms:0 message_origin:AGENT_MESSAGE_ORIGIN_UNSPECIFIED resolve_agent_config_latency_ms:0 save_media_latency_ms:0 saved_media_count:0 status:OK total_latency_ms:1 trajectory_id:0eede7e3-0843-4b00-ba2a-ba5e03c280d0]
+I1106 01:46:05.387890     463 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0x6f2156d0fb363047
+I1106 01:46:05.452858     729 monitor_config_manager_external.go:53] externalMonitorConfigManager: initialized with embedded config (3 monitors)
+I1106 01:46:05.452858     729 monitoring.go:409] [Sonar] Resolved active tags: [jetski_mode_turbo policy_guardian sonar_skip_tags] (detected surface: "")
+I1106 01:46:05.452858     729 monitoring.go:409] [Sonar] Resolved active tags: [jetski_mode_turbo policy_guardian sonar_skip_tags] (detected surface: "")
+I1106 01:46:10.895728    1066 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xfa8fda092f6ac9ec ResponseID: 3qHtapv8KNCh1MkPgJPYyAE
+I1106 01:46:16.647958    1159 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x2899c2a422d4da9d ResponseID: 5KHtasLPBcax1MkPjeCIkAE
+I1106 01:46:21.705117    1190 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xef80fbe72973ddbf ResponseID: 66HtatW6M_aW1MkPytGmkA0
+I1106 01:46:23.621157    1251 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xee12bf0f56a61dcd ResponseID: 7qHtaqTINebS_PUPg6ChkA4
+I1106 01:46:27.835098    1306 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xca950df698d7ed4b ResponseID: 8KHtavG2N5Hj_uMP_IntIQ
+I1106 01:46:31.885441    1363 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xe08214d5dede8c0e ResponseID: 96HtasKkF8G01MkP2OfF-QI
+I1106 01:46:35.416828     975 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x8be56c21a7f33a74 ResponseID: -aHtaozPB8yw9MoP94SLkAw
+I1106 01:46:42.738236    1463 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x278a2e1d99d53d1d ResponseID: _6HtavC4EeOX1MkP7qi2qAQ
+I1106 01:46:47.907172    1514 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xaae1ed298c421712 ResponseID: A6LtauDGOtip1MkPkMyBqQc
+I1106 01:46:53.100363    1563 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x324ebb7b7213c02a ResponseID: CaLtapDuCcmg1MkP7fKm8AU
+I1106 01:46:59.548070    1629 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x6ff413d2f60b8bd2 ResponseID: DqLtasGKFuWh1MkP3dvGwAk
+I1106 01:47:02.504160    1655 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xf43db77b307065e9 ResponseID: FKLtau2_LMG01MkP2OfF-QI
+I1106 01:47:06.553416    1701 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x79d2870c6a2d270e ResponseID: F6LtasqqKY6w9MoPmvmQ-Ag
+I1106 01:47:13.218672    1752 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x8354c2379eff59ee ResponseID: G6LtaqTyLL3g_uMPnr_O0As
+I1106 01:47:18.030711    1802 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x92dca66217ca0316 ResponseID: JaLtavqeBYWQ_uMPnt2tyA8
+I1106 01:47:24.546469    1835 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x9c916b915a2ead7b ResponseID: J6LtaviLDKCk1MkPysa68AU
+I1106 01:47:32.647890    1907 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xc6d5128dcb433b70 ResponseID: MKLtasyBEJiQ_uMPu_ejgQ0
+I1106 01:47:34.708703    1964 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x5f664a4f645f4a8d ResponseID: NaLtaqHCM6Ck1MkPysa68AU
+I1106 01:47:38.895942    1999 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xabc971ac5e6c8ce9 ResponseID: OaLtav-7FcXS_PUP59OdSA
+I1106 01:47:44.646069    1985 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x701f3c1da0eae042 ResponseID: PaLtatiBPI6q1MkPvsmwMA
+I1106 01:47:49.107787    2105 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x937287c20cac9a59 ResponseID: Q6LtaoTMJMzc_uMPhNOTKQ
+I1106 01:47:51.151709    2156 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x1753cca8dc3cee00 ResponseID: RqLtatSjEoqc1MkPo8P5gAU
+I1106 01:48:00.939685    2189 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xcc3e00e9003c693a ResponseID: SaLtauOkGJKU1MkPmobHoQY
+I1106 01:48:04.314226    2235 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x38a0c759ecd448c0 ResponseID: UqLtarTiB4Sg1MkPkf6WUA
+I1106 01:48:11.752748    2286 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x3c3d9d648361edfe ResponseID: VqLtatnxJ8DV_uMPo7SuGA
+I1106 01:48:21.016917    2342 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xefd0b9c36d5cdcd4 ResponseID: XqLtaouvBp6d1MkP5d_DuAo
+I1106 01:48:29.254450    2366 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x48458f891e48c337 ResponseID: bKLtatxv5qHUyQ-Cxpgg
+I1106 01:48:34.140127    2446 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x83858914c538af1e ResponseID: cKLtapvYG-Wh1MkP3dvGwAk
+I1106 01:48:42.707325    2493 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x240033cc62e993ca ResponseID: c6Ltau2_Fauo1MkPgsCxqQE
+I1106 01:48:48.218115    2543 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xf6b94b239c9e4556 ResponseID: fKLtatM-6rHUyQ-94IqIAQ
+I1106 01:49:06.513952    2560 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x44d5a1f9f2b7b63e ResponseID: g6LtatWHKain1MkPtsOh-QI
+I1106 01:49:09.838880    2645 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xec4f362c4990dfa6 ResponseID: k6LtatGULJad1MkPzIPdwAc
+I1106 01:49:17.086782    2706 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xb8c703062f5136a8 ResponseID: l6Ltasa_BOah1MkPgsaYIA
+I1106 01:49:39.766458    2792 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xd6b85428b4ace6cd ResponseID: rKLtapD7HpKi1MkPnYWB8AU
+I1106 01:49:48.234061    2617 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xaddfa843a65762db ResponseID: uqLtaseRHsSz1MkP-b3pkAE
+I1106 01:49:57.061773    2891 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x9097524733cf6ec0 ResponseID: vqLtavvMKdOQ1MkPwf37-AU
+I1106 01:50:40.091926    3036 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x113af27c28f122eb ResponseID: 7KLtav2iNcyw9MoPwpSJwAY
+I1106 01:50:43.863429    3074 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xe299d33e49fd7e2c ResponseID: 8aLtasjUG9ek1MkP8dKaiA0
+I1106 01:50:51.050017    3109 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xc138b408ec594ad1 ResponseID: 9aLtapirB52a_uMPsKqw0Qw
+I1106 01:51:04.200730    3198 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x93cf61c8c07c633 ResponseID: BaPtau24BLbL_uMP9bD7iA0
+I1106 01:51:12.037272    3253 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xc515048dcbc5ddad ResponseID: CaPtar_BH-Cg1MkP-MPZ4QM
+I1106 01:52:03.426826    3341 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:fetchAvailableModels Trace: 0xaa9cc4d846a35d63
+I1106 01:52:03.567112    3342 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist Trace: 0x978b46e8c6eab798
+I1106 01:52:12.902919    3431 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x9cdbfd0dd9e36e35 ResponseID: RqPtasisII6w9MoPmvmQ-Ag
+I1106 01:52:33.243380    3483 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x9e59959883b90e3c ResponseID: UqPtaom2BZyt1MkPtsj--Ao
+I1106 01:53:09.919087    3588 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x7bdb9c174b91e40 ResponseID: f6PtarPFG5Ga9MoP2bnv0AM
+I1106 01:53:17.831243    3675 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0x273e0af2c40cac9c ResponseID: h6PtapPzDeqx1MkPveCKiAE
+I1106 01:54:28.680910    3806 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xa705780a31ed266e ResponseID: 06Ptao_bAtCb1MkP4LGI8AU
+I1106 01:54:42.394476    3889 http_helpers.go:403] URL: https://daily-cloudcode-pa.googleapis.com/v1internal:streamGenerateContent?alt=sse Trace: 0xdc894996fd608179 ResponseID: 1qPtapOFBJyt1MkPtsj--Ao
+I1106 01:54:42.570404       1 manager.go:961] CLI store manager shutting down
+I1106 01:54:42.574001       1 conversation_manager.go:1020] Stopping conversation stream
+I1106 01:54:42.574001     589 server.go:1323] Stream goroutine exited for 9c98e5f3-0bdf-4a3b-b789-4684015c62ee, sending completion signal
+E1106 01:54:42.636777    3892 telemetry.go:141] error recording trajectory segment analytics: Post "https://daily-cloudcode-pa.googleapis.com/v1internal:recordTrajectoryAnalytics": context canceled
+I1106 01:54:42.718191    2781 server.go:3918] Language server shutting down
+I1106 01:54:42.718191    2781 server.go:3940] Waiting for migrations to complete to prevent partial migration state...
+E1106 01:54:42.758938     194 file_watcher.go:194] skipping empty or temp file: 
+E1106 01:54:42.758938     194 file_watcher.go:194] skipping empty or temp file: 

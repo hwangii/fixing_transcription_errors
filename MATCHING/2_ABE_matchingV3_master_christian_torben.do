@@ -5,6 +5,10 @@ local location=`3'
 /*THEM (1b_fs_divided_files.do), E.G. "1930", "1940" OR "1930 1940". EMPTY =   */
 /*THE ORIGINAL BEHAVIOUR: ANCESTRY (_ans) AND ML (_true) NAMES IN BOTH YEARS.  */
 local fs_years=`"`4'"'
+/*THE FAMILYSEARCH NAME TYPE: "_fs_cleaned", OR "_fsplacebo_cleaned" FOR THE */
+/*PLACEBO (ANCESTRY NAMES THROUGH THE SAME PATH; SEE 1b_fs_divided_files.do).*/
+local fstype=`"`5'"'
+if `"`fstype'"'=="" local fstype "_fs_cleaned"
 
 if `location'==1 {
 	/*2026-11-06: THE CODE LIVES IN THIS REPO (MATCHING/); D:\Dropbox IS GONE.*/
@@ -36,8 +40,8 @@ foreach yr in `yr_list' {
 		/*ONE RUN: FAMILYSEARCH NAMES IN THE LISTED YEARS, ANCESTRY OTHERWISE.*/
 		local typeA "_ans_cleaned"
 		local typeB "_ans_cleaned"
-		if strpos(`" `fs_years' "', " `yr1' ") local typeA "_fs_cleaned"
-		if strpos(`" `fs_years' "', " `yr2' ") local typeB "_fs_cleaned"
+		if strpos(`" `fs_years' "', " `yr1' ") local typeA "`fstype'"
+		if strpos(`" `fs_years' "', " `yr2' ") local typeB "`fstype'"
 		if "`typeA'"=="_ans_cleaned" & "`typeB'"=="_ans_cleaned" {
 			display as error "fs_years (`fs_years') names neither `yr1' nor `yr2'"
 			exit 198
