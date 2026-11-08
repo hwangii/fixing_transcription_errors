@@ -1,0 +1,83 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "replication",
+      "how_to_check": "Run `rg -n \"fs_cells\" replication/` to confirm that the replication suite contains no reference to `fs_cells.do` or `fs_cells.tex`. Run `replication/run_machineA.do` and verify that `MATCHING/results/fs_cells.tex` is neither generated nor checked.",
+      "id": "cell-table-omitted-from-replication-pipeline",
+      "location": "MATCHING/fs_cells.do:209-247, replication/run_machineA.do:39-65, replication/run_machineA.do:80-93",
+      "severity": "major",
+      "suggested_fix": "Add `MATCHING/fs_cells.do` to `replication/run_machineA.do` (or create a dedicated matching workflow runner), add `link1930_1940_fs*.dta` and `divided_file*_ans_cleaned` to preflight inputs, and add `MATCHING/results/fs_cells.tex` to the output audit in `Run-MachineA.ps1`.",
+      "title": "Documented replication master does not preflight or execute the new cell table script",
+      "what_the_code_does": "`MATCHING/fs_cells.do` writes `$REP_REPO/MATCHING/results/fs_cells.tex`, but `replication/run_machineA.do` runs only scripts under `CODE/` (`do \"$REP_REPO/CODE/`s'.do\"`). Additionally, `run_machineA.do` preflight does not verify the three FamilySearch link files (`link1930_1940_fs*.dta`) or the divided-file directories (`divided_file`y'_ans_cleaned`), and `Run-MachineA.ps1` does not track outputs in `MATCHING/results/`.",
+      "why_it_matters": "A complete execution of `Run-MachineA.ps1` can succeed with code 0 while leaving `fs_cells.tex` missing or stale. A third-party replicator following `replication/README.md` cannot reproduce the referee-requested cell table from the documented master."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "replication",
+      "how_to_check": "In a fresh Stata session on a system without a `D:/repos` path, leave `REP_REPO` undefined and run `do MATCHING/fs_cells.do`. Stata will halt at line 26 attempting to open the non-existent `D:` drive path.",
+      "id": "hardcoded-config-path-breaks-machine-b-bootstrap",
+      "location": "MATCHING/fs_cells.do:26",
+      "severity": "minor",
+      "suggested_fix": "Bootstrap `config.do` using relative path `capture do \"replication/config.do\"` or test file existence across configured machine paths before falling back to the `D:/` default.",
+      "title": "Standalone execution fallback hardcodes Machine A drive D path to config.do",
+      "what_the_code_does": "Line 26 executes `if `\"$REP_REPO\"'==\"\" do \"D:/repos/fixing_transcription_errors/replication/config.do\"`.",
+      "why_it_matters": "On Machine B (`ARTS-ECON-SHSRV`), the repository clone is at `F:/github_repos/fixing_transcription_errors` as declared in `replication/config.do:31`. Launching `fs_cells.do` in a new Stata session where `$REP_REPO` is not preset will crash with file not found error r(601)."
+    }
+  ],
+  "review_limits": [
+    "No paper draft was supplied, so claims-vs-code review was limited to comments, LaTeX labels, and numeric target benchmarks in the source code.",
+    "The Stata pipeline was not executed because the review sandbox is read-only and pipeline execution modifies outputs; benchmark values and merge rates were verified by source tracing rather than direct execution.",
+    "The external full-count census files (such as the 43 GB labeled census file and 50 state merged_data files) live on external drives outside git and could not be fully loaded or manipulated in this session.",
+    "Identification review verified that all five linkage variants share a single common target master, but could not assess the paper draft's interpretation of selection into the discordant target sample or ditto-resolution mechanics."
+  ],
+  "summary": "`MATCHING/fs_cells.do` carefully constructs the referee-requested cell decomposition: it guards against empty-string agreement inflation, isolates incomplete model output, quarantines conflicting identifiers, and verifies that cell aggregates add back to the paper's target row before writing LaTeX output. The primary defect is replication integrity: the master replication script `replication/run_machineA.do` neither preflights nor invokes `fs_cells.do`, meaning the new table is omitted from automated replication runs. Integrating the script and its input dependencies into the documented replication workflow is the most important fix before submission.",
+  "verified_clean": [
+    {
+      "evidence": "`disc` requires all four human fields to be non-empty, `ml_ok` requires both model fields, and `assert inrange(cell,1,4) if disc` enforces partition coverage at MATCHING/fs_cells.do:73-81.",
+      "item": "Human-complete discordant records are partitioned without blank-to-blank agreement inflation."
+    },
+    {
+      "evidence": "The captured `describe` permits only Hawaii to be missing Ancestry/FamilySearch columns; any other state read failure immediately halts execution with exit code 601 at MATCHING/fs_cells.do:59-69.",
+      "item": "Unexpected state read failures halt execution rather than producing a partial classification."
+    },
+    {
+      "evidence": "Within-`histid` disagreements across rows in `merged_data.dta` are detected, reported, and assigned to cell 0 at MATCHING/fs_cells.do:89-97.",
+      "item": "Conflicting and duplicate identifiers are quarantined to unclassified cell 0."
+    },
+    {
+      "evidence": "Demographic filtering enforces `sex==1 & age>=10 & age<.` at MATCHING/fs_cells.do:119-121, preventing Stata positive-infinity missing value representation from qualifying.",
+      "item": "Target age restriction excludes numeric missing values."
+    },
+    {
+      "evidence": "`val_`c'' and `valanc_`c'' explicitly require both initials to be non-empty and `linked_`c'==1` at MATCHING/fs_cells.do:128-135, setting unlinked or blank-initial records to missing.",
+      "item": "Middle initial validation avoids empty-string matching."
+    },
+    {
+      "evidence": "The target cohort of 14,416,543 records is constructed once and each linkage file is merged onto this master at MATCHING/fs_cells.do:116-136.",
+      "item": "All five link variants are evaluated on the exact same target master sample."
+    },
+    {
+      "evidence": "Sample size, linkage rates, validation denominators, and validation shares for Ancestry and ML are compared against `p_n_target`, `p_lr_*`, `p_nv_*`, and `p_sv_*` to 9 decimal places at MATCHING/fs_cells.do:141-162, halting with exit 9 on discrepancy.",
+      "item": "Aggregate benchmarks are verified against paper target row before results are generated."
+    },
+    {
+      "evidence": "The script accumulates cell counts, weighted linkage totals, and validation denominators, verifying they sum back to the target row at MATCHING/fs_cells.do:168-207.",
+      "item": "Cell aggregates are explicitly verified to add back to the target row."
+    },
+    {
+      "evidence": "Row headers and labels use neutral source-agreement descriptions ('Model = Ancestry only', 'Model = FamilySearch only', 'Model = neither') rather than claiming accuracy or truth at MATCHING/fs_cells.do:218-224.",
+      "item": "Output terminology avoids treating commercial transcriptions as ground truth."
+    },
+    {
+      "evidence": "`\\begin{tabular}{llccccc}` declares 7 columns, matching the 2 label columns and 5 variant columns formatted in line 217 and data rows 235-241 at MATCHING/fs_cells.do:215-245.",
+      "item": "LaTeX tabular column specification matches the emitted data row structure."
+    }
+  ]
+}

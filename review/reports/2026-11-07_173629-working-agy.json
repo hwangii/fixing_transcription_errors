@@ -1,0 +1,94 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "correctness",
+      "how_to_check": "Temporarily rename one state file (e.g. 'al/merged_data.dta') or simulate an I/O failure, then execute 'MATCHING/fs_cells.do'. Observe that the script displays 'al: no human name columns, skipped', passes the Section 3 gate with 'REPLICATION PASSED', and writes 'MATCHING/results/fs_cells.tex' with Alabama records absorbed into cell 0.",
+      "id": "failed-state-silently-becomes-unclassified",
+      "location": "MATCHING/fs_cells.do:59-65, MATCHING/fs_cells.do:118-120, MATCHING/fs_cells.do:136-157",
+      "severity": "major",
+      "suggested_fix": "Replace the indiscriminate capture with an explicit exemption for Hawaii ('if \"`s'\" == \"hi\" continue'). Track the count of successfully loaded states and assert that exactly 49 states contributed, matching the completeness assertion in 'CODE/compute_model_agreement_on_discordant.do:159-166'. Additionally, assert that the count of target records with _merge==1 at line 118 matches only the known Hawaii and Alaska counts.",
+      "title": "Any unexpected state-file read failure silently drops records into unclassified cell 0",
+      "what_the_code_does": "The state loop wraps 'describe ... using ...' in capture (lines 59-65) to skip Hawaii, but executes 'continue' on any nonzero _rc without checking the state code or asserting the number of processed states. When target records are subsequently merged against 'cells' (lines 118-120), all records from any omitted state have _merge==1 and are assigned 'cell = 0' ('Not classified'). The verification gate in Section 3 (lines 136-157) tests only unconditional sample sizes and overall Ancestry/ML means without checking cell-level counts or unclassified totals, allowing a run with missing states to pass silently.",
+      "why_it_matters": "If any state file is missing, corrupted, or encounters an I/O failure, millions of records will silently migrate from substantive model-agreement cells (cells 1-4) into the residual unclassified cell (cell 0). The script will report 'REPLICATION PASSED' and generate LaTeX output containing distorted cell distributions and biased conditional linkage rates without throwing any error."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "replication",
+      "how_to_check": "Run 'rg -n \"fs_cells\" replication/' and confirm that no script in the replication package references 'fs_cells.do' or 'fs_cells.tex'.",
+      "id": "cell-table-absent-from-replication-master",
+      "location": "MATCHING/fs_cells.do:183-221, replication/run_machineA.do:39-65, replication/run_machineA.do:80-93",
+      "severity": "major",
+      "suggested_fix": "Add 'MATCHING/fs_cells.do' to the replication pipeline (e.g. as a designated stage in 'run_machineA.do' or via a dedicated matching runner), register its required input files in 'run_machineA.do' preflight, and ensure its output table is verified alongside other results.",
+      "title": "The new cell table is omitted from replication master runners and preflight checks",
+      "what_the_code_does": "'MATCHING/fs_cells.do' writes 'MATCHING/results/fs_cells.tex', but 'replication/run_machineA.do:80-93' builds its execution list exclusively from 'CODE/*.do' and never runs 'MATCHING/fs_cells.do'. Furthermore, the preflight check in 'run_machineA.do:39-65' does not verify the presence of the FamilySearch link files ('link1930_1940_fs*.dta') or divided file directories ('divided_file*_ans_cleaned') required by 'fs_cells.do', nor does 'Run-MachineA.ps1' monitor changes in 'MATCHING/results/'.",
+      "why_it_matters": "Executing the documented replication suite ('Run-MachineA.ps1') will not generate, update, or audit 'fs_cells.tex'. If upstream data or linkage routines change, a stale or missing cell table can be included in the paper without detection by the replication pipeline."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "Inspect Section 4 (lines 164-181). Search for any check or assertion summing 'n_k' or 'nv_k_c' across cells 'k'. None exists.",
+      "id": "unverified-cell-summation-claim",
+      "location": "MATCHING/fs_cells.do:19-21, MATCHING/fs_cells.do:136-157, MATCHING/fs_cells.do:164-181",
+      "severity": "minor",
+      "suggested_fix": "Add an explicit post-loop assertion in Section 4 verifying that scalar sum_n equals '`p_n_target'', sum(nv_k_ans) equals '`p_nv_ans'', and the weighted average of cell linkage rates reproduces '`p_lr_ans''.",
+      "title": "The script claims cell totals are verified against the paper's target row, but no by-cell aggregation check is performed",
+      "what_the_code_does": "Lines 19-21 state: 'Summed over cells the Ancestry and ML numbers must equal the paper's target row; the file stops if they do not.' However, Section 3 (lines 136-157) only verifies unconditional target dataset statistics before the by-cell loop. Section 4 computes cell scalars ('n_k', 'lr_k_c', 'nv_k_c', 'sv_k_c') and directly prints and writes them to LaTeX without any assertion checking that sum(n_k) == p_n_target, that sum(nv_k_c) == p_nv_c, or that the cell-weighted linkage and validation rates match the target row.",
+      "why_it_matters": "The script claims an internal consistency gate that does not exist. If cells fail to partition the target set or if records are misassigned across cells, the gate in Section 3 will still pass because it runs on the unpartitioned data, leaving by-cell discrepancies undetected."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "replication",
+      "how_to_check": "Open a clean Stata session without '$REP_REPO' defined, change directory to a different drive or clone path, and execute 'do MATCHING/fs_cells.do'. Stata will error when attempting to find 'D:/repos/fixing_transcription_errors/replication/config.do'.",
+      "id": "hardcoded-config-fallback-path",
+      "location": "MATCHING/fs_cells.do:26",
+      "severity": "minor",
+      "suggested_fix": "Use relative path loading when '$REP_REPO' is empty (e.g. 'capture do \"replication/config.do\"' or 'capture do \"../replication/config.do\"') or require the user/runner to define '$REP_REPO' prior to execution.",
+      "title": "Standalone configuration fallback hardcodes repository path to D:/repos/fixing_transcription_errors",
+      "what_the_code_does": "Line 26 executes 'if `\"$REP_REPO\"'==\"\" do \"D:/repos/fixing_transcription_errors/replication/config.do\"'. If '$REP_REPO' is unset in a standalone Stata session, it requires the repository to be located at that exact absolute path on drive D.",
+      "why_it_matters": "When run standalone on any system where the repository is cloned elsewhere (such as Machine B at 'F:/github_repos/fixing_transcription_errors' per 'replication/config.do:31', or an external auditor's environment), the script immediately crashes with a file-not-found error."
+    }
+  ],
+  "review_limits": [
+    "No paper draft was supplied; claims-vs-code review was limited to claims, docstrings, and labels embedded within the reviewed code, and paper text claims could not be verified.",
+    "External Stata datasets on Dropbox and F: drives were not accessible, and the Stata pipeline could not be executed at runtime; empirical sample counts and rate calculations could not be verified dynamically.",
+    "Diff-scoped review: only uncommitted changes in the working tree (specifically 'MATCHING/fs_cells.do') were audited; upstream data construction and linkage files were inspected only as needed to interpret the changed script."
+  ],
+  "summary": "The new cell-analysis script correctly implements the substantive four-cell partition on human-complete records and maintains valuable benchmark checks against the paper's target row. However, its state-loading loop swallows unexpected input failures via an indiscriminate capture describe, silently dumping missing jurisdictions into the unclassified residual cell while passing all aggregate gates. The script is also omitted entirely from the replication suite and preflight checks, meaning its output cannot be reproduced by the automated runner. Fixing the state-loading loop with explicit Hawaii handling and a strict completeness assertion is the most critical priority.",
+  "verified_clean": [
+    {
+      "evidence": "MATCHING/fs_cells.do:68-76 requires all four human name fields to be nonempty for 'disc', separates complete from incomplete model output via 'ml_ok', and enforces coverage with 'assert inrange(cell,1,4) if disc'.",
+      "item": "The substantive four-cell model-agreement taxonomy correctly partitions human-complete discordant records."
+    },
+    {
+      "evidence": "MATCHING/fs_cells.do:114-116 uses 'keep if sex==1 & age>=10 & age<.', preventing Stata's positive-infinity missing value representation from erroneously qualifying.",
+      "item": "Numeric missing values are safely excluded from the sample age restriction."
+    },
+    {
+      "evidence": "MATCHING/fs_cells.do:126,129 generates 'val_`c'' and 'valanc_`c'' conditionally on 'mi1930!=\"\" & mi1940!=\"\"' (or 'mianc1930!=\"\" & mianc1940!=\"\"') and 'linked_`c'==1', returning missing rather than true when initials are blank.",
+      "item": "Linkage and middle-initial validation metrics avoid blank-to-blank false positive agreement."
+    },
+    {
+      "evidence": "MATCHING/fs_cells.do:193-198 and lines 3-14 consistently use neutral labels ('Model = Ancestry only', 'Model = FamilySearch only', 'Model = neither', 'No model output') rather than claiming truth or correctness.",
+      "item": "Labels and comments describe agreement with comparison sources rather than claiming ground-truth accuracy."
+    },
+    {
+      "evidence": "MATCHING/fs_cells.do:111-131 defines the target sample once and sequentially merges each link version ('ans', 'true', 'fs12', 'fs30', 'fs40') onto that same master, preventing sample drift across specifications.",
+      "item": "All five linkage combinations are evaluated against an identical common target master dataset."
+    },
+    {
+      "evidence": "MATCHING/fs_cells.do:85-90 sorts by 'histid (cell)', flags discrepancies with '_conf = cell[1]!=cell[_N]', counts and reports conflicting IDs, and assigns them to residual cell 0.",
+      "item": "Conflicting cell assignments across duplicate record occurrences are detected and quarantined."
+    },
+    {
+      "evidence": "MATCHING/fs_cells.do:128-130,174-176,206-207 merges Ancestry middle initials across all link versions, isolating link composition changes from middle-initial transcription discrepancies.",
+      "item": "Ancestry-initial validation provides an econometric control holding middle initials fixed across link versions."
+    }
+  ]
+}
