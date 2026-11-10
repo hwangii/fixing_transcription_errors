@@ -97,7 +97,12 @@ As of `3ca56d2`, Section 4.3 quotes no truth-based number. If you add FamilySear
   - Both raised the same two findings, "tables not yet rerun" and "docs stale". Both are dispositioned Fixed.
   - Neither found a defect in the code.
 - Everything after that (`8348e8b..ef51a7f`, with the draft) was reviewed by both on 2026-11-10, in `review/reports/2026-11-10_030029-*`. Both confirmed the draft numbers match the regenerated tables and the truth path is consistent across `paths.do`, preflight and manifest. Both raised the same three findings:
-  1. **The truth set is selected, but the draft calls it "independent"** (lines 104-108, 573). Open, for the author. The wording predates this rerun. The truth set is FamilySearch-profile links found in both censuses and having complete vital dates. Whether census names were used to build those crosswalks is unknown. If you can establish how `unique_ID_to_census_crosswalk1930/1940.dta` were built, record it.
+  1. **The truth set is selected, but the draft called it "independent".** Addressed in the draft (paper `a545456`, at the author's instruction):
+     - "independent" is dropped where it described the truth set (lines 70, 104, 108, 519);
+     - one sentence on selection is added in the intro;
+     - two sentences are added in Section 4.2. They say the bias would, if anything, favour links built on the existing transcriptions. That is reasoning, not a checked result.
+
+     Still unknown: whether census names were used when FamilySearch profiles were attached to census records. If you can establish how `unique_ID_to_census_crosswalk1930/1940.dta` were built, record it. Revise the Section 4.2 sentences if it changes the picture.
   2. **`check_claims.py` passes with 37 unregistered numbers, all in Section 4.3.** Handed to you; see task 4 below.
   3. **`LINKAGE/DOCUMENTATION.md` results section was stale.** Fixed on B.
 
