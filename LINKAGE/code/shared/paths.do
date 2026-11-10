@@ -85,7 +85,12 @@ global D_APPENDED   "$DATA/transcriptions/appended"
 global D_LINKS      "$DATA/links/derived"
 global D_LINKS_RAW  "$DATA/links/raw_hlink"
 
-global D_TRUTH      "$DATA/truth"
+* 2026-11-09: the truth file is now machine A's copy, in its own folder. The
+* copy in data/truth/ (Deaglan's, 36,143,407 pairs) is damaged: it lost two
+* contiguous blocks of 546,932 pairs and has one truncated histid1940. It stays
+* in place, unmodified, as the record of what the pre-November tables used.
+* See LINKAGE/notes/truth_file_provenance.md.
+global D_TRUTH      "$DATA/truth_from_machineA"
 global D_MORT       "$DATA/mortality"
 
 * ---- output ----

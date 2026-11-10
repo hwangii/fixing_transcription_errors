@@ -70,6 +70,24 @@ NOTE = ("17 rows, all frozen inputs: the data files `run_machineB.do` preflights
         "`LINKAGE/` and versioned by git, not hashed here.")
 
 
+# Inputs that were replaced. Not read by any run; kept here so the hash of what
+# the earlier tables used stays on record. Written verbatim after the table.
+SUPERSEDED = [
+    "",
+    "## Superseded",
+    "",
+    "Not read by `run_machineB.do`. Kept on disk, unmodified, as the record of what the tables before 2026-11-09 used.",
+    "",
+    "| File | Bytes | Modified | SHA-256 | Status |",
+    "|---|---|---|---|---|",
+    "| `$REP_LINK/data/truth/mlp_training1930_1940.dta` | 2,602,336,840 | 2026-08-18 | "
+    "`6b585c82463c880cf14e6c3cd4130ec68d4c64f37185b2568fdf8ac6d491b6ac` | "
+    "superseded, damaged copy: 36,143,407 pairs, missing two contiguous blocks of machine A's file "
+    "(546,932 pairs) and one `histid1940` truncated; replaced 2026-11-09 by "
+    "`data/truth_from_machineA/` (see `LINKAGE/notes/truth_file_provenance.md`) |",
+]
+
+
 def read_manifest():
     rows = {}
     for line in MANIFEST.read_text(encoding="utf-8").splitlines():
@@ -125,7 +143,7 @@ def main():
         "| File | Bytes | Modified | SHA-256 |",
         "|---|---|---|---|",
     ]
-    MANIFEST.write_text("\n".join(header + rows) + "\n", encoding="utf-8")
+    MANIFEST.write_text("\n".join(header + rows + SUPERSEDED) + "\n", encoding="utf-8")
     print(f"wrote {MANIFEST}")
 
 

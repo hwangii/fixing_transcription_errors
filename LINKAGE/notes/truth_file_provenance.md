@@ -5,7 +5,29 @@ Read-only: no truth file was modified, moved or re-saved.
 Every Stata check was run in Stata/MP 15.1 batch mode on B's file at `F:\Deaglan\Census_Transcriptions\data\truth\mlp_training1930_1940.dta`.
 Tags: **[data]** = confirmed by data or logs on this machine; **[inferred]** = reasoning, not proven.
 
-## Bottom line
+## Resolved 2026-11-08 (machine A), applied 2026-11-09 (machine B)
+
+Machine A settled the open question (`review/handoff_truth_rerun_machineB.md`). **[data]**
+- Machine A's file is correctly built: rebuilding it from its four inputs with `CODE/create_linked_sample_for_MLP_training.do` reproduces it exactly, the same 36,690,338 pairs in the same row order.
+- Deaglan's file is a strict subset of A's, apart from the one truncated pair: 36,143,406 pairs in both, 546,932 in A only, and 1 in B only (the truncated `histid1940`, complete in A). None of the 546,932 people missing from B appears in B with a different partner.
+- The missing pairs are two contiguous blocks of A's row order: rows 23,927,763–24,215,791 (288,029) and 24,859,830–25,118,732 (258,903).
+
+So B's file is a **damaged copy**, not a different extraction or a deliberate filter.
+- The likeliest account is that the two blocks were overwritten with copies of other rows, giving the 546,928 duplicates Deaglan's code dropped, probably when the file reached B around 2026-03-20. **[inferred]**
+
+**When the id was truncated: not settled.** This corrects my 2026-11-08 statement that the 18 Aug re-save *caused* it.
+- Machine A's evidence: the truncated pair is A's row 24,859,830, the first row of the second missing block, which suggests the same event as the block loss.
+- Against that: the 17 Aug log (before the re-save) kept 19,473,337 truth pairs among 1940 men aged 8+, and every later log keeps 19,473,336. That is the count the truncation removes, so the id may still have been intact on 17 Aug.
+- Both are inferences; the pre-August file no longer exists, so neither can be proven.
+
+**Since 2026-11-09 the tables use machine A's file.** It sits at `F:\Deaglan\Census_Transcriptions\data\truth_from_machineA\` with sha256 `5507c60c…`, checked on arrival. In Stata it has 36,690,338 obs, `isid` on both ids, and every id is 36 characters.
+- The code points there through `D_TRUTH` in `LINKAGE/code/shared/paths.do`.
+- Deaglan's file stays in `data/truth/`, unmodified (hash re-checked 2026-11-09), as the record of what the earlier tables used.
+- The doc corrections proposed below have been applied to `LINKAGE/DOCUMENTATION.md` and `replication/README.md`.
+
+Everything below is the 2026-11-08 investigation as written. Items 1, 4 and 5 of its bottom line are superseded by this section.
+
+## Bottom line (2026-11-08)
 
 1. The paper's truth set is B's file as it stands today: 36,143,407 one-to-one pairs. **[data]**
 2. B's file is **not** an extraction from the IPUMS MLP crosswalk. Everything points to Sam's FamilySearch-profile build, the same lineage as A's file. **[data + inferred, see 3]**

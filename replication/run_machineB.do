@@ -60,7 +60,9 @@ local inputs `"`inputs' "`D'/links/derived/matches_after.dta""'
 local inputs `"`inputs' "`D'/links/derived/matches_before.dta""'
 /*Both census-to-census linkages*/
 local inputs `"`inputs' "`D'/names/flags/ipums_fs_names_for_Deaglan1940.dta""'
-local inputs `"`inputs' "`D'/truth/mlp_training1930_1940.dta""'
+/*2026-11-09: machine A's complete truth file; data/truth/ holds the damaged */
+/*copy (LINKAGE/notes/truth_file_provenance.md). Must match $D_TRUTH.       */
+local inputs `"`inputs' "`D'/truth_from_machineA/mlp_training1930_1940.dta""'
 /*Mortality (not in the draft; rebuilt because 00_run_all_tables.do runs it)*/
 local inputs `"`inputs' "`D'/mortality/temp.dta""'
 foreach spec in oldnames oldnames_conservative newnames newnames_conservative {

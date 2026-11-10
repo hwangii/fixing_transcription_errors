@@ -64,17 +64,21 @@ everything this project made.
 | `derived/JW_matches_x2_unique_{new,old}.dta` | 1.0 GB each | Jaro-Winkler links. 13,478,232 / 12,670,605 pairs. Keys `Ahistid` / `Bhistid`. |
 | `derived/link1930_1940_{true,ans}_cleaned_noraceblock0.dta` | 2.9 / 2.6 GB | ABE links. 18,198,099 / 16,946,362 pairs. Keys `id_A` / `id_B`, with `fiveyr_band`. Producing code was missing; reconstructed as `code/01_abe_jw/linkage/run_abe_match.do` and verified to reproduce these files exactly on Massachusetts — see Known gaps. |
 
-### `data/truth/`
+### `data/truth/` and `data/truth_from_machineA/`
 
 | File | Size | Origin |
 |---|---|---|
-| `mlp_training1930_1940.dta` | 2.6 GB | Ground-truth 1930→1940 links, used to classify every proposed pair as correct, contradicted, or unverifiable. Every one of the five tables depends on it. |
-| `mlp_census_crosswalk_v2_0.stata.zip` | 16.0 GB | The **MLP census crosswalk v2.0** — one `.dta` of 62.3 GB uncompressed. Almost certainly the source `mlp_training1930_1940.dta` was extracted from. Kept compressed: nothing reads it directly. |
+| `truth_from_machineA/mlp_training1930_1940.dta` | 2.6 GB | **The ground truth the tables use** (since 2026-11-09): 36,690,338 one-to-one 1930→1940 links between FamilySearch profiles, used to classify every proposed pair as verified, contradicted or unverifiable. The four census-to-census tables depend on it; the mortality table does not. Built by Sam Hwang with `CODE/create_linked_sample_for_MLP_training.do` (in this repo) from the FamilySearch-profile crosswalks `unique_ID_to_census_crosswalk1930/1940.dta`, `all_profiles.dta` and `anon_id_vital_dates.dta`, keeping profiles with valid birth and death dates. Copied from machine A by Dropbox; sha256 `5507c60c…` (`replication/input_manifest_machineB.md`). |
+| `truth/mlp_training1930_1940.dta` | 2.6 GB | **Superseded, damaged copy**, kept unmodified as the record of what the tables before 2026-11-09 used. 36,143,407 pairs: it lacks two contiguous row blocks of the file above (546,932 pairs) and has one `histid1940` truncated by a character. See `LINKAGE/notes/truth_file_provenance.md`. |
+| `truth/mlp_census_crosswalk_v2_0.stata.zip` | 16.0 GB | The **IPUMS MLP census crosswalk v2.0**, one `.dta` of 66.9 GB uncompressed (175,649,924 people, `histid_1850`…`histid_1950` plus `hik`). **Not** the source of the truth file, whatever earlier versions of this document said. Nothing reads it. |
 
-> **The extraction step is not in this package.** No script here derives
-> `mlp_training1930_1940.dta` from the crosswalk, so the 1930→1940 subsetting
-> is undocumented. The derived file is present and every table uses it, so
-> nothing is blocked, but the provenance chain has a gap at this link.
+> **Provenance.** The truth file is Sam's FamilySearch-profile linked sample,
+> not an extraction from the MLP crosswalk: its build script is in this repo
+> and reproduces machine A's copy exactly (same 36,690,338 pairs, same row
+> order). Deaglan's copy was damaged. The likeliest account (inferred, not
+> provable now) is that the two blocks were overwritten with copies of other
+> rows when the file was copied to this machine around 2026-03-20; his code's
+> `duplicates drop` then silently removed those 546,928 duplicate rows.
 
 ### `abe_jw/data/` — the ABE/JW working tree
 
@@ -113,14 +117,14 @@ hours a re-match would cost.
 - `data/names/flags/ipums_fs_names_for_Deaglan1940.dta`
 - `data/links/derived/JW_matches_x2_unique_{new,old}.dta`
 - `data/links/derived/link1930_1940_{true,ans}_cleaned_noraceblock0.dta`
-- `data/truth/mlp_training1930_1940.dta`
+- `data/truth_from_machineA/mlp_training1930_1940.dta`
 
 **Table 2 — HLINK** (`code/02_hlink/linkage_analysis_newlinks.do`)
 - `data/transcriptions/appended/divided_file1930_ans_cleaned_women_added.dta`
 - `data/transcriptions/appended/divided_file1940_true_cleaned_women_added.dta`
 - `data/names/flags/ipums_fs_names_for_Deaglan1940.dta`
 - `data/links/derived/matches_{before,after}.dta`
-- `data/truth/mlp_training1930_1940.dta`
+- `data/truth_from_machineA/mlp_training1930_1940.dta`
 
 **Table 3 — Mortality** (`code/03_mortality/05_make_linkage_table.do`)
 - `data/mortality/working/censoc_bunmd_matched_{old,new}names{,_conservative}.dta`
@@ -252,12 +256,17 @@ version (preserved in `_archive/output_previous/`) **exactly, in every cell**, d
 script having been repointed from dead `D:` and `E:` paths onto the reorganized
 tree. That makes it a complete regression test of the path repairs.
 
-One caution for anyone repeating this check: the ground-truth file
-`mlp_training1930_1940.dta` carries an mtime of 2026-08-18, four months *after*
-that table was written, which suggests the truth set changed. It did not — the
-timestamp records the file being **moved** during reorganization, not edited. An
-mtime cannot distinguish a move from a content change; the reproduction of the
-truth-dependent columns is what actually establishes the content is unchanged.
+One caution for anyone repeating this check: the ground-truth file then in use,
+`data/truth/mlp_training1930_1940.dta`, carries an mtime of 2026-08-18, four
+months *after* that table was written. An earlier version of this document said
+the timestamp recorded a move, not an edit. That was wrong: Stata's internal
+save stamp is also 18 Aug 2026 12:32, so the file was re-saved, after its 546,928
+duplicate rows had been dropped. The reproduction still holds, because the
+scripts dropped those duplicates at run time before and after, so the distinct
+pairs scored were the same apart from one (the truncated id; too small to move a
+printed cell). The file was nevertheless damaged (it lacks 546,932
+pairs), and the tables have used machine A's complete copy since 2026-11-09;
+see `LINKAGE/notes/truth_file_provenance.md`.
 
 ---
 

@@ -104,7 +104,7 @@ save `true_by1940'
 * Person-level true links, 1930 side (histid1930 -> true_histid1940), from the
 * FULL truth file: a 1930 person whose true 1940 match lies outside the
 * denominator is still known to be linked to someone else. The truth file is
-* one-to-one on both sides (36,143,407 pairs; checked 2026-10-19).
+* one-to-one on both sides (36,690,338 pairs, machine A's file; checked 2026-11-09).
 * Fix 2026-10-19: a pair is Directly Contradicted if EITHER of its people is
 * truly linked to someone else. Before, only the 1940 side was checked, so a
 * wrong link whose 1940 person is outside the truth set was Unverifiable.
