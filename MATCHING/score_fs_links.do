@@ -12,7 +12,8 @@
 /*    keeps every record)                                                     */
 /*  - middle initials: 1930 from the Ancestry divided files, 1940 from the ML */
 /*    divided files, the same for every column, as in the paper               */
-/*  - truth: the MLP genealogical links; Verified / Unverifiable / Directly   */
+/*  - truth: the FamilySearch-profile sample (mlp_training1930_1940.dta);    */
+/*    Verified / Unverifiable / Directly                                      */
 /*    Contradicted two-sided as fixed on 2026-10-19; recall                   */
 /*  - restricted sample: 1940 records where Ancestry and FamilySearch         */
 /*    disagree (congruent==0)                                                 */
@@ -43,43 +44,45 @@ local combos ans true fs12 fs30 fs40
 
 /*THE PAPER'S NUMBERS (linkage_tables/linkage_table_abe_jw.tex AND _restricted,*/
 /*ABE COLUMNS: Old = ans, New = true; PANEL B ADDED/REMOVED = true vs ans).    */
-local p_full_ans_ver 6188445
-local p_full_ans_unv 5982941
-local p_full_ans_con 344018
-local p_full_true_ver 6690920
-local p_full_true_unv 6482670
-local p_full_true_con 313846
-local p_full_add_ver 1064715
-local p_full_add_unv 1216975
-local p_full_add_con 80670
-local p_full_rem_ver 563429
-local p_full_rem_unv 717953
-local p_full_rem_con 108946
-local p_restr_ans_ver 515555
-local p_restr_ans_unv 703536
-local p_restr_ans_con 65148
-local p_restr_true_ver 1300253
-local p_restr_true_unv 1432546
-local p_restr_true_con 71863
-local p_restr_add_ver 930996
-local p_restr_add_unv 984046
-local p_restr_add_con 49946
-local p_restr_rem_ver 147928
-local p_restr_rem_unv 255723
-local p_restr_rem_con 40914
+/*TRUTH-BASED VALUES UPDATED 2026-11-10: THE PAPER NOW SCORES AGAINST MACHINE  */
+/*A'S COMPLETE TRUTH FILE (paper 3ca56d2; LINKAGE/notes/truth_file_provenance.md).*/
+local p_full_ans_ver 6283801
+local p_full_ans_unv 5883324
+local p_full_ans_con 348279
+local p_full_true_ver 6794104
+local p_full_true_unv 6375502
+local p_full_true_con 317830
+local p_full_add_ver 1081009
+local p_full_add_unv 1199711
+local p_full_add_con 81640
+local p_full_rem_ver 571902
+local p_full_rem_unv 708243
+local p_full_rem_con 110183
+local p_restr_ans_ver 523399
+local p_restr_ans_unv 694933
+local p_restr_ans_con 65907
+local p_restr_true_ver 1320314
+local p_restr_true_unv 1411579
+local p_restr_true_con 72769
+local p_restr_add_ver 945322
+local p_restr_add_unv 969084
+local p_restr_add_con 50582
+local p_restr_rem_ver 150060
+local p_restr_rem_unv 253120
+local p_restr_rem_con 41385
 /*PERCENTAGES, AS PRINTED (TWO DECIMALS): MATCH RATE, MI MATCH RATE, RECALL.*/
 local p_full_ans_rate 21.73
 local p_full_true_rate 23.42
 local p_full_ans_mi 86.27
 local p_full_true_mi 87.00
-local p_full_ans_recall 31.78
-local p_full_true_recall 34.36
+local p_full_ans_recall 31.79
+local p_full_true_recall 34.37
 local p_restr_ans_rate 8.56
 local p_restr_true_rate 18.69
 local p_restr_ans_mi 76.81
 local p_restr_true_mi 83.51
-local p_restr_ans_recall 11.12
-local p_restr_true_recall 28.06
+local p_restr_ans_recall 11.13
+local p_restr_true_recall 28.07
 local p_denom_full  57589273
 local p_denom_restr 15003537
 
@@ -154,7 +157,7 @@ save `true_by1940'
 use `true_links', clear
 keep histid1930 histid1940
 duplicates drop histid1930 histid1940, force
-display "truth pairs after dropping duplicates: " _N " (machine B, 2026-10-19: 36,143,407)"
+display "truth pairs after dropping duplicates: " _N " (paper, since 2026-11-10: 36,690,338)"
 isid histid1930
 rename histid1940 true_histid1940
 tempfile true_by1930
@@ -371,7 +374,7 @@ file open f using "`outtex'", write replace
 file write f "% Written by MATCHING/score_fs_links.do; do not edit by hand." _n
 file write f "% ABE exact-name links, conservative (+-2 year) band. FS = FamilySearch names where FamilySearch has them, Ancestry otherwise (field by field)." _n
 file write f "% Net added/removed follow the paper's Panel B (1930 person newly linked / no longer linked); partner changes are the separate rows." _n
-file write f "% Verified/Unverifiable/Contradicted are against the MLP genealogical links, as in the paper." _n
+file write f "% Verified/Unverifiable/Contradicted are against the FamilySearch-profile linked sample, as in the paper." _n
 file write f "\begin{tabular}{lccccc}" _n
 file write f "\toprule" _n
 file write f " & Ancestry & ML & FS 1930 \& 1940 & FS 1930 & FS 1940 \\" _n

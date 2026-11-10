@@ -533,6 +533,143 @@ script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
 machine = "B"
 
 
+# ============================================ SECTION 4.3: SECOND HUMAN TRANSCRIPTION (FamilySearch names)
+# Tables: figures/fs_versions_allstates.tex, fs_cells_sizes_allstates.tex, fs_cells_allstates.tex (Sec 4.3).
+# cell() counts the second label column as column 1, so: 2 Ancestry, 3 Ours, 4 FS 1930 & 1940, 5 FS 1930, 6 FS 1940.
+# In fs_cells the rows repeat once per cell, so nth = cell number ("links with both initials": two per cell).
+
+[[claim]]
+id = "fs-versions-target"
+text = '''names link 20.1 percent of records, against 8.9 percent for Ancestry's and 19.4 percent for ours, and 83.4 percent of their links are validated, against 65.4 and 83.6 percent'''
+values = [
+  'cell("figures/fs_versions_allstates.tex", "Linkage rate", 6)',
+  'cell("figures/fs_versions_allstates.tex", "Linkage rate", 2)',
+  'cell("figures/fs_versions_allstates.tex", "Linkage rate", 3)',
+  'cell("figures/fs_versions_allstates.tex", "Share validated (", 6)',
+  'cell("figures/fs_versions_allstates.tex", "Share validated (", 2)',
+  'cell("figures/fs_versions_allstates.tex", "Share validated (", 3)',
+]
+status = "table"
+script = "MATCHING/fs_avg_performance.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-versions-both"
+text = 'raises the target-set linkage rate further, to 22.3 percent'
+values = ['cell("figures/fs_versions_allstates.tex", "Linkage rate", 4)']
+status = "table"
+script = "MATCHING/fs_avg_performance.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-versions-anc-initials"
+text = '''the share validated is 75.7 percent for our links and 74.8 percent for FamilySearch's 1940 links, against 65.4 percent for Ancestry's'''
+values = [
+  'cell("figures/fs_versions_allstates.tex", "Share validated, Ancestry initials", 3)',
+  'cell("figures/fs_versions_allstates.tex", "Share validated, Ancestry initials", 6)',
+  "",
+  'cell("figures/fs_versions_allstates.tex", "Share validated, Ancestry initials", 2)',
+]
+status = "table"
+script = "MATCHING/fs_avg_performance.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-versions-note-n"
+text = 'the target set is the 14,416,543 men aged 10 and above whose Ancestry and FamilySearch transcriptions of the 1940 name disagree, and all records are the 51,036,859 men aged 10 and above'
+values = ["nRecordsTarget", "", "", "nRecordsAll", ""]
+status = "scripted"
+script = "CODE/create_figures_SSHA2025.do"
+machine = "A"
+
+[[claim]]
+id = "fs-cell1-size"
+text = 'the 14.3 percent of the target set where our model'
+values = ['cell("figures/fs_cells_sizes_allstates.tex", "1. Ours matches Ancestry", 2)']
+status = "table"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-cell1"
+text = '''There, Ancestry's names and ours link 21.6 and 21.4 percent of records, with 82.8 and 83.0 percent of links validated, while FamilySearch's 1940 names link only 13.0 percent, with 67.8 percent validated'''
+values = [
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 2, 1)',
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 3, 1)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 2, 1)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 3, 1)',
+  "",
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 6, 1)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 6, 1)',
+]
+status = "table"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-cell1-anc-initials"
+text = '''at 83.0 percent for our links against 77.5 percent for FamilySearch's'''
+values = [
+  'cell("figures/fs_cells_allstates.tex", "Share validated, Ancestry initials", 3, 1)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated, Ancestry initials", 6, 1)',
+]
+status = "table"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-cell2"
+text = '''the two give nearly identical results: 25.9 and 25.7 percent linked, with 87.5 and 87.6 percent validated, against 6.7 and 53.0 percent for Ancestry's names'''
+values = [
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 3, 2)',
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 6, 2)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 3, 2)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 6, 2)',
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 2, 2)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 2, 2)',
+]
+status = "table"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-cell3"
+text = '''Here our names raise the linkage rate only from 6.7 to 8.9 percent and the share validated from 59.8 to 63.9 percent, while FamilySearch's 1940 names link 14.1 percent with 76.1 percent validated'''
+values = [
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 2, 3)',
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 3, 3)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 2, 3)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 3, 3)',
+  "",
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 6, 3)',
+  'cell("figures/fs_cells_allstates.tex", "Share validated (", 6, 3)',
+]
+status = "table"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-cell4"
+text = 'at 8.4 against 6.9 percent'
+values = [
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 3, 4)',
+  'cell("figures/fs_cells_allstates.tex", "Linkage rate", 2, 4)',
+]
+status = "table"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
+[[claim]]
+id = "fs-cell4-note"
+text = 'rests on only 9,531 links with both initials in our own transcription, against 26,489 when'
+values = [
+  'cell("figures/fs_cells_allstates.tex", "links with both initials", 3, 7)',
+  'cell("figures/fs_cells_allstates.tex", "links with both initials", 3, 8)',
+]
+status = "table"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py -> figures/"
+machine = "A"
+
 # ===================================================== SECTION: LINKING TO MORTALITY RECORDS
 
 [[claim]]
@@ -828,6 +965,25 @@ file = "figures/rhode_island_providence_6_128_298_38.png"
 label = "fig:error_examples"
 script = "none (census image crop)"
 machine = "?"
+
+
+[[exhibit]]
+file = "figures/fs_versions_allstates.tex"
+label = "tab:fs_versions"
+script = "MATCHING/fs_avg_performance.do -> MATCHING/fs_draft_tables.py"
+machine = "A"
+
+[[exhibit]]
+file = "figures/fs_cells_sizes_allstates.tex"
+label = "tab:fs_cells_sizes"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py"
+machine = "A"
+
+[[exhibit]]
+file = "figures/fs_cells_allstates.tex"
+label = "tab:fs_cells"
+script = "MATCHING/fs_cells.do -> MATCHING/fs_draft_tables.py"
+machine = "A"
 
 
 # ========================================================================== IGNORED

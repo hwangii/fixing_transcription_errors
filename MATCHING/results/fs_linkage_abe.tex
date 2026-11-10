@@ -1,0 +1,47 @@
+% Written by MATCHING/score_fs_links.do; do not edit by hand.
+% ABE exact-name links, conservative (+-2 year) band. FS = FamilySearch names where FamilySearch has them, Ancestry otherwise (field by field).
+% Net added/removed follow the paper's Panel B (1930 person newly linked / no longer linked); partner changes are the separate rows.
+% Verified/Unverifiable/Contradicted are against the FamilySearch-profile linked sample, as in the paper.
+\begin{tabular}{lccccc}
+\toprule
+ & Ancestry & ML & FS 1930 \& 1940 & FS 1930 & FS 1940 \\
+\midrule
+\multicolumn{6}{l}{\textit{Men aged 8+ in the 1940 census}} \\
+Links with an FS name in 1930 (\%) & 0.00 & 0.00 & 99.73 & 99.73 & 0.00 \\
+Links with an FS name in 1940 (\%) & 0.00 & 0.00 & 94.14 & 0.00 & 94.02 \\
+Match Rate (\%) & 21.73 & 23.42 & 26.33 & 23.14 & 24.19 \\
+MI Match Rate (\%) & 86.27 & 87.00 & 86.89 & 86.50 & 86.76 \\
+Verified Correct & 6,283,801 & 6,794,104 & 7,954,808 & 6,839,850 & 7,151,347 \\
+Unverifiable & 5,883,324 & 6,375,502 & 6,925,299 & 6,175,473 & 6,464,781 \\
+Directly Contradicted & 348,279 & 317,830 & 282,349 & 310,176 & 311,841 \\
+Recall (\%) & 31.79 & 34.37 & 40.24 & 34.60 & 36.18 \\
+Net added vs.\ Ancestry: Verified & -- & 1,081,009 & 2,220,871 & 876,448 & 1,235,215 \\
+Net added vs.\ Ancestry: Unverifiable & -- & 1,199,711 & 2,035,461 & 820,113 & 1,218,878 \\
+Net added vs.\ Ancestry: Contradicted & -- & 81,640 & 107,766 & 59,378 & 76,495 \\
+Net removed vs.\ Ancestry: Verified & -- & 571,902 & 556,076 & 323,672 & 369,688 \\
+Net removed vs.\ Ancestry: Unverifiable & -- & 708,243 & 994,984 & 528,654 & 637,953 \\
+Net removed vs.\ Ancestry: Contradicted & -- & 110,183 & 165,986 & 93,518 & 110,382 \\
+Partner changed vs.\ Ancestry & -- & 21,633 & 30,404 & 16,454 & 18,609 \\
+\quad new partner Verified & -- & 4,512 & 9,240 & 5,044 & 4,290 \\
+\quad Ancestry partner Verified & -- & 3,316 & 3,028 & 1,771 & 2,271 \\
+\midrule
+\multicolumn{6}{l}{\textit{1940 records where Ancestry and FamilySearch disagree}} \\
+Links with an FS name in 1930 (\%) & 0.00 & 0.00 & 99.72 & 99.67 & 0.00 \\
+Links with an FS name in 1940 (\%) & 0.00 & 0.00 & 100.00 & 0.00 & 100.00 \\
+Match Rate (\%) & 8.56 & 18.69 & 21.46 & 8.70 & 19.31 \\
+MI Match Rate (\%) & 76.81 & 83.51 & 83.13 & 77.35 & 82.86 \\
+Verified Correct & 523,399 & 1,320,314 & 1,650,247 & 547,907 & 1,448,667 \\
+Unverifiable & 694,933 & 1,411,579 & 1,500,651 & 700,102 & 1,374,206 \\
+Directly Contradicted & 65,907 & 72,769 & 68,182 & 56,625 & 74,378 \\
+Recall (\%) & 11.13 & 28.07 & 35.08 & 11.65 & 30.80 \\
+Net added vs.\ Ancestry: Verified & -- & 945,322 & 1,391,849 & 81,800 & 1,203,292 \\
+Net added vs.\ Ancestry: Unverifiable & -- & 969,084 & 1,284,206 & 113,690 & 1,160,964 \\
+Net added vs.\ Ancestry: Contradicted & -- & 50,582 & 57,265 & 14,148 & 60,307 \\
+Net removed vs.\ Ancestry: Verified & -- & 150,060 & 267,215 & 57,324 & 280,055 \\
+Net removed vs.\ Ancestry: Unverifiable & -- & 253,120 & 479,087 & 108,522 & 482,228 \\
+Net removed vs.\ Ancestry: Contradicted & -- & 41,385 & 52,177 & 23,397 & 49,268 \\
+Partner changed vs.\ Ancestry & -- & 8,609 & 15,712 & 931 & 18,415 \\
+\quad new partner Verified & -- & 2,359 & 4,072 & 180 & 4,252 \\
+\quad Ancestry partner Verified & -- & 706 & 1,858 & 148 & 2,221 \\
+\bottomrule
+\end{tabular}
