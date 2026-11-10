@@ -95,7 +95,7 @@ machine = "A"
 
 [[claim]]
 id = "intro-validation"
-text = 'rises from 515,555 to 1,300,253 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 5.07 to 2.56 percent on that sample under exact names and from 0.76 to 0.72 percent under the machine-learning linker'
+text = 'rises from 523,399 to 1,320,314 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 5.13 to 2.59 percent on that sample under exact names and from 0.77 to 0.73 percent under the machine-learning linker'
 values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 3)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 4)',
@@ -461,7 +461,7 @@ issue = "These are discordant-sample values (full-sample MI rates are 86-87); th
 
 [[claim]]
 id = "deaglan-verified"
-text = 'from 515,555 to 1,300,253 on discordant records under exact names, and recall rises with it, from 11.1 to 28.1 percent, from 20.6 to 32.5 percent under Jaro-Winkler, and from 69.5 to 77.4 percent under HLINK'
+text = 'from 523,399 to 1,320,314 on discordant records under exact names, and recall rises with it, from 11.1 to 28.1 percent, from 20.6 to 32.5 percent under Jaro-Winkler, and from 69.5 to 77.4 percent under HLINK'
 values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 4)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 4)',
@@ -474,7 +474,7 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-contradicted-counts"
-text = 'in the full sample it falls under Jaro-Winkler and exact names, from 308,848 to 275,442 under Jaro-Winkler, but rises under HLINK, from 501,010 to 503,357, and on the discordant sample under exact names, from 65,148 to 71,863, and under HLINK, from 116,233 to 125,607'
+text = 'in the full sample it falls under Jaro-Winkler and exact names, from 312,746 to 278,940 under Jaro-Winkler, but rises under HLINK, from 507,261 to 509,706, and on the discordant sample under exact names, from 65,907 to 72,769, and under HLINK, from 117,637 to 127,195'
 values = [
   'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 2)',
   'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 2)',
@@ -487,7 +487,7 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-contradicted-shares"
-text = 'from 2.44 to 2.04 percent under Jaro-Winkler and from 2.75 to 2.33 percent under exact names in the full sample, from 4.07 to 2.25 and from 5.07 to 2.56 percent on the discordant sample, and from 0.75 to 0.74 and from 0.76 to 0.72 percent under HLINK'
+text = 'from 2.47 to 2.07 percent under Jaro-Winkler and from 2.78 to 2.36 percent under exact names in the full sample, from 4.12 to 2.27 and from 5.13 to 2.59 percent on the discordant sample, and from 0.76 to 0.74 and from 0.77 to 0.73 percent under HLINK'
 values = [
   'contra("figures/deaglan_abe_jw.tex", 1)', 'contra("figures/deaglan_abe_jw.tex", 2)',
   'contra("figures/deaglan_abe_jw.tex", 3)', 'contra("figures/deaglan_abe_jw.tex", 4)',
