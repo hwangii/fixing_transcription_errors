@@ -1,4 +1,4 @@
-# Review request: new Section 4.4, "Comparison with a Second Human Transcription"
+# Review request: new Section 4.3, "Comparison with a Second Human Transcription"
 
 I want you to review a new subsection that was added to my paper draft. Please read critically. I am not asking you to polish the wording; I am asking whether the claims are supported, correctly worded, and not over-sold. Everything you need is in this message: the background, how the numbers were produced, the three tables, and the LaTeX of the subsection.
 
@@ -146,7 +146,7 @@ Share validated, Ancestry initials (\%) &  & 72.8 & 74.5 & 75.2 & 72.4 & 74.9 \\
 \end{tabular}
 ```
 
-## The new subsection, verbatim LaTeX (one sentence per line; table environments included)
+## The new subsection (4.3), verbatim LaTeX (one sentence per line; table environments included)
 
 ```latex
 \subsection{Comparison with a Second Human Transcription} \label{sec:fs_names}
