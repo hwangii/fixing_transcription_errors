@@ -146,8 +146,8 @@ of three buckets:
 | Term | Meaning |
 |---|---|
 | **Verified correct** | The pair matches a ground-truth link. |
-| **Directly contradicted** | The 1940 record *is* in the truth set, but linked to a different 1930 person. An outright error. |
-| **Unverifiable** | The 1940 record does not appear in the truth set. Neither confirmed nor refuted — the truth set does not cover everyone. |
+| **Directly contradicted** | Either person is in the truth set with a different partner: the 1940 record is truth-linked to another 1930 person, or (1940 record absent) the 1930 record is truth-linked to another 1940 person. An outright error. Two-sided since 2026-10-19; before that only the 1940 side was checked. |
+| **Unverifiable** | Neither the 1940 nor the 1930 record appears in the truth set. Neither confirmed nor refuted — the truth set does not cover everyone. |
 | **Match rate** | Linked pairs ÷ eligible population. |
 | **Recall** | verified ÷ (verified + ground-truth pairs never proposed). |
 | **MI match rate** | Among links with a middle initial observed on both sides, the share that agree. Middle initials are **not** used for matching, so this is an out-of-sample quality check. |
@@ -203,55 +203,66 @@ Measured runtime, StataMP-64 15.1, ~3 cores, 12.6 GB peak:
 | 3/3 Mortality | minutes |
 | **total** | **4 h 07 m** |
 
+### Current results (rerun 2026-11-09)
+
+The figures below are from the 2026-11-09 run on machine A's complete truth
+file (`replication/run_machineB.log`; tables in the paper repo's
+`linkage_tables/`). They supersede the figures this section carried before,
+which predated the BUNMD birth-year filter, the two-sided contradiction check
+(2026-10-19) and the truth-file switch. The tables are the authority; if they
+disagree with this section, the section is stale.
+
 ### Mortality (`linkage_table_mortality_bunmd.tex`)
 
 | | Old names | New names | Change |
 |---|---|---|---|
-| Exact matches | 5,754,061 | 6,165,698 | +7.15% |
-| Exact linkage rate | 27.55% | 29.52% | +1.97 pp |
-| Conservative matches | 4,286,765 | 4,621,152 | +7.80% |
-| Conservative linkage rate | 20.52% | 22.13% | +1.60 pp |
-| MI agreement (exact) | 82.54% | 84.70% | +2.16 pp |
-| MI agreement (conservative) | 87.12% | 88.87% | +1.74 pp |
+| Exact matches | 5,658,793 | 6,059,234 | +7.08% |
+| Exact linkage rate | 27.09% | 29.01% | +1.92 pp |
+| Conservative matches | 4,223,961 | 4,551,083 | +7.74% |
+| Conservative linkage rate | 20.22% | 21.79% | +1.57 pp |
+| MI agreement (exact) | 83.14% | 85.33% | +2.19 pp |
+| MI agreement (conservative) | 87.60% | 89.36% | +1.75 pp |
 
-The new transcription links **more** records, and the extra links are **more**
-accurate, not less — middle-initial agreement rises even as volume grows.
+Denominator 20,886,324 BUNMD men born in or before 1940. The new transcription
+links **more** records, and the extra links are **more** accurate, not less —
+middle-initial agreement rises even as volume grows.
 
 ### HLINK (`linkage_table_hlink.tex`)
 
 | | Old | New |
 |---|---|---|
-| Match rate | 58.08% | 59.55% |
+| Match rate | 58.06% | 59.52% |
 | Recall | 78.48% | 79.88% |
 | MI match rate | 86.11% | 86.34% |
-| Verified correct | 28,357,041 | 28,863,711 |
-| Directly contradicted | 293,078 | 296,657 |
+| Verified correct | 28,786,787 | 29,301,006 |
+| Directly contradicted | 507,261 | 509,706 |
 
 Denominator 115,030,746 (1940 population aged 8+, men and women). Pair changes:
-4,090,989 added, 2,400,121 removed, 309,900 changed, 64,097,518 unchanged. Of
-links added, 27.7% verify correct against 1.6% contradicted; of links removed,
-26.4% were correct against 2.4% contradicted — a favourable trade.
+4,089,300 added, 2,399,411 removed, 306,435 changed, 64,075,928 unchanged. Of
+links added, 28.2% verify correct against 2.5% contradicted; of links removed,
+26.8% were correct against 3.7% contradicted — a favourable trade.
 
-Restricted sample (`congruent == 0`, 35,550,163 people): 49.70% → 56.55%, a much
+Restricted sample (`congruent == 0`, 30,754,309 people): 49.68% → 56.53%, a much
 larger gain, as expected where the two transcriptions disagree.
 
 ### ABE / Jaro-Winkler (`linkage_table_abe_jw.tex`)
-
-See `output/tables/`.
 
 | | JW old | JW new | ABE old | ABE new |
 |---|---|---|---|---|
 | Match rate | 22.00% | 23.40% | 21.73% | 23.42% |
 | MI match rate | 86.25% | 87.00% | 86.27% | 87.00% |
-| Verified correct | 6,222,698 | 6,627,332 | 6,188,445 | 6,690,920 |
-| Directly contradicted | 190,805 | 171,174 | 210,054 | 194,387 |
-| Recall | 31.95% | 34.03% | 31.78% | 34.36% |
+| Verified correct | 6,318,838 | 6,729,814 | 6,283,801 | 6,794,104 |
+| Directly contradicted | 312,746 | 278,940 | 348,279 | 317,830 |
+| Recall | 31.97% | 34.04% | 31.79% | 34.37% |
 
-Both methods improve under the new transcription, and — as with the other two
-linkages — the added links are disproportionately good: of links added, 42.3% (JW)
-and 45.1% (ABE) verify correct against roughly 2% contradicted.
+Denominator 57,589,273 men aged 8+ in 1940 (restricted: 15,003,537). Both
+methods improve under the new transcription, and — as with the other two
+linkages — the added links are disproportionately good: of links added, 43.0%
+(JW) and 45.8% (ABE) verify correct against 3.9% and 3.5% contradicted; of links
+removed, 9.1% and 7.9% were contradicted.
 
-**Verified against the previous run.** This table reproduces the 2026-04-02
+**Verified against the previous run (2026-09-06 check, before the truth-file
+switch; the truth-based rows above have since changed).** This table reproduced the 2026-04-02
 version (preserved in `_archive/output_previous/`) **exactly, in every cell**, despite the
 script having been repointed from dead `D:` and `E:` paths onto the reorganized
 tree. That makes it a complete regression test of the path repairs.

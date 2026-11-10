@@ -96,10 +96,11 @@ As of `3ca56d2`, Section 4.3 quotes no truth-based number. If you add FamilySear
 - The code switch (`paths.do`, `run_machineB.do`, comments, `hash_inputs_machineB.py`) was reviewed by Codex and Antigravity **before** the rerun, in `review/reports/2026-11-09_171344-*`.
   - Both raised the same two findings, "tables not yet rerun" and "docs stale". Both are dispositioned Fixed.
   - Neither found a defect in the code.
-- **Not yet reviewed:** everything committed after that review. That covers:
-  - the documentation and provenance edits;
-  - the regenerated tables;
-  - the four draft lines;
-  - the `claims.toml` text.
+- Everything after that (`8348e8b..ef51a7f`, with the draft) was reviewed by both on 2026-11-10, in `review/reports/2026-11-10_030029-*`. Both confirmed the draft numbers match the regenerated tables and the truth path is consistent across `paths.do`, preflight and manifest. Both raised the same three findings:
+  1. **The truth set is selected, but the draft calls it "independent"** (lines 104-108, 573). Open, for the author. The wording predates this rerun. The truth set is FamilySearch-profile links found in both censuses and having complete vital dates. Whether census names were used to build those crosswalks is unknown. If you can establish how `unique_ID_to_census_crosswalk1930/1940.dta` were built, record it.
+  2. **`check_claims.py` passes with 37 unregistered numbers, all in Section 4.3.** Handed to you; see task 4 below.
+  3. **`LINKAGE/DOCUMENTATION.md` results section was stale.** Fixed on B.
 
-  A review of `8348e8b..11d1355`, with the draft passed via `-PaperPath`, is recommended. If machine B has run it, it is in `review/reports/` with dispositions.
+### 4. Register Section 4.3 in `claims.toml` (yours)
+
+`check_claims.py` lists 37 result-like numbers in Section 4.3 (draft lines ~658-695, e.g. 20.1%, 22.3%) that no claim covers. It also lists 3 unregistered exhibits: `fs_versions_allstates`, `fs_cells_sizes_allstates` and `fs_cells_allstates`. The gate still exits 0, because unregistered numbers are reported, not failed. These numbers come from your data, so register them and their exhibits on A. Whether unregistered numbers should fail the gate is the author's decision.
