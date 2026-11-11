@@ -206,8 +206,9 @@ Measured runtime, StataMP-64 15.1, ~3 cores, 12.6 GB peak:
 ### Current results (rerun 2026-11-09)
 
 The figures below are from the 2026-11-09 run on machine A's complete truth
-file (`replication/run_machineB.log`; tables in the paper repo's
-`linkage_tables/`). They supersede the figures this section carried before,
+file (tables in the paper repo's `linkage_tables/`; the denominators and the
+HLINK changed/unchanged pair counts, which no table prints, were transcribed
+on 2026-11-10 from that run's Stata log, since overwritten). They supersede the figures this section carried before,
 which predated the BUNMD birth-year filter, the two-sided contradiction check
 (2026-10-19) and the truth-file switch. The tables are the authority; if they
 disagree with this section, the section is stale.

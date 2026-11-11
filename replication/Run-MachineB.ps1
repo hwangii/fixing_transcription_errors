@@ -49,7 +49,9 @@ Set-Content -Path $wrapper -Encoding ASCII -Value @(
 & (Join-Path $PSScriptRoot "Run-Stata.ps1") -DoFile $wrapper -TimeoutMinutes 480
 $stataExit = $LASTEXITCODE
 $log = Join-Path $env:TEMP "run_machineB_entry.log"
-$keep = Join-Path $PSScriptRoot "run_machineB.log"
+# A preflight-only run keeps its own log: on 2026-11-11 one overwrote the only
+# log of the 2026-11-09 full run (the log is untracked, so nothing else had it).
+$keep = Join-Path $PSScriptRoot $(if ($PreflightOnly) { "run_machineB_preflight.log" } else { "run_machineB.log" })
 if (Test-Path $log) { Move-Item $log $keep -Force; Write-Host "Stata log: $keep" }
 Remove-Item $wrapper -ErrorAction SilentlyContinue
 if ($stataExit -ne 0) { Write-Host "Stata run failed; extraction and claim check not run." -ForegroundColor Red; exit $stataExit }
