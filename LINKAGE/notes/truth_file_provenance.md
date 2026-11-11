@@ -25,6 +25,33 @@ So B's file is a **damaged copy**, not a different extraction or a deliberate fi
 - Deaglan's file stays in `data/truth/`, unmodified (hash re-checked 2026-11-09), as the record of what the earlier tables used.
 - The doc corrections proposed below have been applied to `LINKAGE/DOCUMENTATION.md` and `replication/README.md`.
 
+## Were census names used to make the truth links? (machine A, 2026-11-11)
+
+Asked by `review/handoff_replication_update_machineA.md`, about the Sec 4.2 sentence (paper `a545456`) that "to the extent the attachments relied on the existing transcriptions, the comparison would tend to favor links built on them rather than on ours".
+
+**The files cannot settle it.** **[data]**
+- Each truth pair is two census records attached to the same FamilySearch profile: `CODE/create_linked_sample_for_MLP_training.do` joins `unique_ID_to_census_crosswalk1930/1940.dta` on `unique_ID`.
+- `describe` in Stata 15.1: the crosswalks hold only `serial<yr>`, `histid<yr>` and `unique_ID` (74,293,946 rows for 1930, 69,600,758 for 1940; saved 22 Jan 2026). There are no notes, and the only characteristics are `reshape` leftovers. Nothing records how a user found the record they attached.
+- The attachments are FamilySearch users' attachments, scraped Jun–Sep 2025 (`qq_tradeoff/documents/handoff_profile_links_vs_machine.md`).
+
+**The histid↔ark bridge does not use names.** **[data]**
+`F:\sshrc_idg_mortality\DATA\ORIGINAL\familysearch_census1940\final1940.dta` (129,386,409 rows) holds `image_ark_id person_ark_id serial pernum histid`. That maps records by image, household and person number. So names could enter only through the users' attachments, not through the bridge.
+
+**Which transcription users would have seen.** **[inferred]**
+- Users attach census records on FamilySearch, where they find them through FamilySearch's search and record hints. Both run on FamilySearch's own index of the census.
+- In the paper, "the existing transcriptions" means Ancestry's, as distributed by IPUMS.
+- So any name-based circularity would run through **FamilySearch's** names, not Ancestry's.
+- Consistent with this, though not proof: Census Tree links sourced from FamilySearch hints find 31.9% of the 1930–1940 profile links (`qq_tradeoff/documents/results_profile_links_vs_machine.md`, table 1).
+
+**Consequence for the sentence: possibly the wrong direction.** **[inferred]**
+- Sec 4.3 finds our names coincide with FamilySearch's in about half the target set.
+- If attachments followed FamilySearch's index, records whose FamilySearch name is unreadable or wrong would be under-represented in the truth set. That would tend to favour links built on FamilySearch-like names, which in that half of the target set include ours, rather than links built on Ancestry's.
+- The sentence's caveat about selection still holds. Its claim about which side the bias favours does not follow from the evidence here. Raised with Sam, 2026-11-11.
+
+**A test that machine A can run (not run).**
+- Compare truth-set coverage across the Sec 4.3 cells: records where our name matches Ancestry's versus records where it matches FamilySearch's.
+- If attachments depend on FamilySearch's reading, coverage should be lower where FamilySearch's reading is the less useful one (cell 1).
+
 Everything below is the 2026-11-08 investigation as written. Items 1, 4 and 5 of its bottom line are superseded by this section.
 
 ## Bottom line (2026-11-08)
