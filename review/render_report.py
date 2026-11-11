@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Render a Codex verdict JSON into a readable markdown report.
+"""Render a reviewer's verdict JSON into a readable markdown report.
 
-Usage: python render_report.py <verdict.json> <out.md>
+Usage: python render_report.py <verdict.json> <out.md> [reviewer]
+
+reviewer names the heading ("Codex", "Antigravity"); it defaults to Codex.
 
 The markdown carries a Disposition column that is deliberately blank. Claude (or
 you) fills it in with Fixed / Rebutted / Accepted risk. A finding with no
@@ -21,11 +23,12 @@ CONF_NOTE = {
 
 
 def main():
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4):
         print(__doc__, file=sys.stderr)
         return 2
 
     src, dst = sys.argv[1], sys.argv[2]
+    reviewer = sys.argv[3] if len(sys.argv) == 4 else "Codex"
     with open(src, "r", encoding="utf-8") as fh:
         raw = fh.read()
 
@@ -55,7 +58,7 @@ def main():
         tally = "no findings"
 
     o = []
-    o.append("# Codex review")
+    o.append(f"# {reviewer} review")
     o.append("")
     o.append(f"*Rendered {datetime.now():%Y-%m-%d %H:%M}. Source: `{src}`*")
     o.append("")

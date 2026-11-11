@@ -276,7 +276,7 @@ $promptFile = Join-Path $Reports "$baseName-prompt.md"
 
 function Render-Report([string]$json, [string]$md, [string]$tag) {
     if (-not (Test-Path $renderer)) { Write-Host "  Raw JSON: $json" -ForegroundColor Green; return }
-    & python $renderer $json $md
+    & python $renderer $json $md $tag
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  $tag report: review/reports/$(Split-Path -Leaf $md)" -ForegroundColor Green
     } else {
@@ -395,11 +395,16 @@ function Invoke-AgyReview {
         $args += @("--add-dir", (Split-Path -Parent (Resolve-Path $PaperPath).Path))
     }
 
+    # agy writes UTF-8. PowerShell decodes a native command's stdout with
+    # [Console]::OutputEncoding (cp437 here), which turned an en dash into
+    # three junk characters in every report until 2026-11-11. Decode as UTF-8
+    # for this call.
     $prevEAP = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    $prevEnc = [Console]::OutputEncoding; [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
     $rc = 0; $out = ""
     try { $out = (& $agy @args 2>&1 | Out-String -Width 1000000); $rc = $LASTEXITCODE }
     catch { Write-Warning "agy invocation failed: $($_.Exception.Message)"; $rc = 1 }
-    finally { $ErrorActionPreference = $prevEAP }
+    finally { $ErrorActionPreference = $prevEAP; [Console]::OutputEncoding = $prevEnc }
     [IO.File]::WriteAllText($rawOut, $out, [Text.UTF8Encoding]::new($false))
 
     # The verdict is the `structured_output` object of agy's JSON envelope. The
