@@ -1,12 +1,14 @@
-"""Write a SHA-256 manifest of machine A's 103 frozen data inputs, plus the analysis file.
+"""Write a SHA-256 manifest of machine A's frozen data inputs, plus the analysis file.
 
-    python replication/hash_inputs.py            # all inputs (about 150 GB; tens of minutes)
+    python replication/hash_inputs.py            # all inputs (about 200 GB; about 20 minutes)
     python replication/hash_inputs.py --check    # recompute and compare with the manifest
 
 The input list is the one run_machineA.do preflights, rebuilt from the same
 sources: the state names in config.do ($REP_A_STATES) and the model-output
 state codes in run_machineA.do. If either file changes shape, this script
-stops rather than hashing a different list.
+stops rather than hashing a different list. Since 2026-11-10 it also covers
+the Sec 4.3 inputs: the three FamilySearch-name link files and the Ancestry
+divided files (divided_file<yr>_ans_cleaned/norace*.dta).
 
 The analysis file (temp.dta) is hashed last and labelled as such: a full run
 writes it, and only a -SkipRebuild run reads it. Code inputs such as
@@ -60,6 +62,15 @@ def input_list():
     ]
     files += [f"{f_ft}/INTERMEDIATE/merged_{s}1940.dta" for s in states]
     files += [f"{model}/{c}/merged_data.dta" for c in codes]
+    # Sec 4.3 (MATCHING/fs_avg_performance.do, fs_cells.do).
+    files += [f"{snu_ed}/INTERMEDIATE/link1930_1940_{v}_cleaned_noraceblock0.dta"
+              for v in ("fs1930_1940", "fs1930", "fs1940")]
+    for y in (1930, 1940):
+        d = Path(f"{f_ed}/INTERMEDIATE/divided_file{y}_ans_cleaned")
+        div = sorted(p.as_posix() for p in d.glob("norace*.dta"))
+        if not div:
+            sys.exit(f"no norace*.dta under {d}")
+        files += div
     # Written by create_figures_SSHA2025.do; hashed so a -SkipRebuild run can
     # be tied to the analysis file it used.
     files.append(f"{snu_ed}/INTERMEDIATE/temp.dta")
@@ -68,7 +79,7 @@ def input_list():
     return files
 
 
-NOTE = '103 rows are frozen inputs. The last, `temp.dta`, is the analysis file: a full run writes it (`create_figures_SSHA2025.do`) and a `-SkipRebuild` run reads it, so its hash identifies the analysis file as of this manifest, not a full-run input. Code inputs (e.g. `CODE/label_socio_demo.do`) are versioned by git, not hashed here.'
+NOTE = 'Every row but the last is a frozen input: the 103 read since 2026-11-03, plus, since 2026-11-10, the three FamilySearch-name link files and the Ancestry divided files read by the Sec 4.3 scripts. The last, `temp.dta`, is the analysis file: a full run writes it (`create_figures_SSHA2025.do`) and a `-SkipRebuild` run reads it, so its hash identifies the analysis file as of this manifest, not a full-run input. Code inputs (e.g. `CODE/label_socio_demo.do`) are versioned by git, not hashed here.'
 
 
 def sha256(path):
@@ -119,7 +130,12 @@ def main():
         print(f"\n{len(files) - len(changed)} unchanged, {len(changed)} changed or new")
         for c in changed:
             print("  CHANGED:", c)
-        sys.exit(1 if changed else 0)
+        # A divided-file shard deleted from disk drops out of the glob, so it is
+        # not "missing" above; it shows up only as a manifest row with no file.
+        gone = sorted(set(old) - {short(f) for f in files})
+        for g in gone:
+            print("  GONE (in the manifest, not on disk):", g)
+        sys.exit(1 if changed or gone else 0)
 
     header = [
         "# Input manifest (machine A)",

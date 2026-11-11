@@ -47,6 +47,18 @@ foreach s of global REP_A_STATES {
 foreach s in al ar az ca co ct dc de fl ga ia id il in ks ky la ma md me mi mn mo ms mt nc nd ne nh nj nm nv ny oh ok or pa ri sc sd tn tx ut va vt wa wi wv wy {
 	local inputs `"`inputs' "`model'/`s'/merged_data.dta""'
 }
+/*SEC 4.3 (MATCHING/fs_avg_performance.do, fs_cells.do): THE FAMILYSEARCH-    */
+/*NAME LINK FILES AND THE ANCESTRY DIVIDED FILES THEIR INITIALS COME FROM.    */
+foreach v in fs1930_1940 fs1930 fs1940 {
+	local inputs `"`inputs' "`snu_ed'/INTERMEDIATE/link1930_1940_`v'_cleaned_noraceblock0.dta""'
+}
+foreach y in 1930 1940 {
+	local dfiles : dir `"`f_ed'/INTERMEDIATE/divided_file`y'_ans_cleaned"' files "norace*.dta"
+	if `"`dfiles'"' == "" local inputs `"`inputs' "`f_ed'/INTERMEDIATE/divided_file`y'_ans_cleaned/norace*.dta""'
+	foreach f of local dfiles {
+		local inputs `"`inputs' "`f_ed'/INTERMEDIATE/divided_file`y'_ans_cleaned/`f'""'
+	}
+}
 if $REP_SKIP_REBUILD == 1 {
 	local inputs `"`inputs' "`snu_ed'/INTERMEDIATE/temp.dta""'
 }
@@ -105,8 +117,23 @@ foreach s in validation_by_link_status validation_fixed_initials {
 	display as text "DONE `s' in " %6.1f (`t1'-`t0')/60000 " min"
 }
 
+/*========================= SEC 4.3: FAMILYSEARCH NAMES ======================*/
+/*TABLES 9-11. EACH STOPS UNLESS ITS ANCESTRY AND OURS COLUMNS REPRODUCE      */
+/*TABLE 4. THEY WRITE MATCHING/results/fs_avg_performance.tex AND fs_cells.tex;*/
+/*Run-MachineA.ps1 THEN RUNS MATCHING/fs_draft_tables.py, WHICH TURNS THEM    */
+/*INTO THE DRAFT'S figures/fs_*_allstates.tex. ABOUT 1 HOUR 45 MINUTES.       */
+foreach s in fs_avg_performance fs_cells {
+	local ++t
+	display as text _n "{hline 78}" _n "RUNNING MATCHING/`s'.do" _n "{hline 78}"
+	local t0 = clock("`c(current_date)' `c(current_time)'", "DMYhms")
+	do "$REP_REPO/MATCHING/`s'.do"
+	local t1 = clock("`c(current_date)' `c(current_time)'", "DMYhms")
+	display as text "DONE `s' in " %6.1f (`t1'-`t0')/60000 " min"
+}
+
 display as text _n "{hline 78}"
 display as text "run_machineA.do finished: `t' scripts. Next:"
+display as text "  python MATCHING/fs_draft_tables.py $REP_PAPER"
 display as text "  python replication/check_claims.py"
 display as text "  git -C $REP_PAPER diff --stat figures/"
 display as text "{hline 78}"
