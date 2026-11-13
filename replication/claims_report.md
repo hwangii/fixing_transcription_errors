@@ -22,21 +22,21 @@ Result files read: compare_sample_counts.tex, compute_county_correlates.tex, com
 | **UNCHECKED** | `gpu-benchmark` | 378 | ? | 299,880: unchecked<br>0.22: unchecked<br>1940: unchecked<br>1,600: unchecked | No benchmark code or log. 1940 Rhode Island had roughly 713,000 persons, so 299,880 as 'the complete Rhode Island sample' needs a definition. |
 | **UNCHECKED** | `gpu-extrapolation` | 379 | ? | 730,000: unchecked |  |
 | **UNCHECKED** | `n-males-ten` | 400 | A | 55,347,491: ok<br>10: unchecked<br>1940: unchecked |  |
-| **UNCHECKED** | `deaglan-denom-abe` | 602 | B | 57,589,273: ok<br>8: unchecked |  |
-| **UNCHECKED** | `deaglan-denom-abe-disc` | 617 | B | 15,003,537: ok<br>8: unchecked |  |
-| **UNCHECKED** | `deaglan-denom-hlink` | 634 | B | 115,030,746: ok<br>8: unchecked |  |
-| **UNCHECKED** | `deaglan-denom-hlink-disc` | 649 | B | 30,754,309: ok<br>8: unchecked |  |
-| **UNCHECKED** | `fs-versions-anc-initials` | 664 | A | 75.7: ok<br>74.8: ok<br>1940: unchecked<br>65.4: ok |  |
-| **UNCHECKED** | `fs-versions-note-n` | 677 | A | 14,416,543: ok<br>10: unchecked<br>1940: unchecked<br>51,036,859: ok<br>10: unchecked |  |
-| **UNCHECKED** | `fs-cell1` | 687 | A | 21.6: ok<br>21.4: ok<br>82.8: ok<br>83.0: ok<br>1940: unchecked<br>13.0: ok<br>67.8: ok |  |
-| **UNCHECKED** | `fs-cell3` | 694 | A | 6.7: ok<br>8.9: ok<br>59.8: ok<br>63.9: ok<br>1940: unchecked<br>14.1: ok<br>76.1: ok |  |
-| **UNCHECKED** | `mortality-denominator` | 736 | B | 20,886,324: ok<br>1940: unchecked |  |
-| **UNCHECKED** | `mortality-note-denominator` | 753 | B | 20,886,324: ok<br>1940: unchecked |  |
-| **UNCHECKED** | `county-percentiles` | 828 | A | 5: unchecked<br>95: unchecked<br>18: ok<br>43: ok |  |
-| **UNCHECKED** | `appendix-labels` | 1021 | ? | 392,085: unchecked |  |
-| **UNCHECKED** | `training-names-appendix` | 1022 | ? | 29,641: unchecked |  |
-| **UNCHECKED** | `appendix-last-labels` | 1027 | ? | 121,465: unchecked<br>28,032: unchecked |  |
-| **UNCHECKED** | `appendix-accuracy` | 1034 | ? | 97.38: unchecked<br>98.61: unchecked<br>94.54: unchecked<br>98.29: unchecked |  |
+| **UNCHECKED** | `deaglan-denom-abe` | 604 | B | 57,589,273: ok<br>8: unchecked |  |
+| **UNCHECKED** | `deaglan-denom-abe-disc` | 619 | B | 15,003,537: ok<br>8: unchecked |  |
+| **UNCHECKED** | `deaglan-denom-hlink` | 636 | B | 115,030,746: ok<br>8: unchecked |  |
+| **UNCHECKED** | `deaglan-denom-hlink-disc` | 651 | B | 30,754,309: ok<br>8: unchecked |  |
+| **UNCHECKED** | `fs-versions-anc-initials` | 666 | A | 75.7: ok<br>74.8: ok<br>1940: unchecked<br>65.4: ok |  |
+| **UNCHECKED** | `fs-versions-note-n` | 679 | A | 14,416,543: ok<br>10: unchecked<br>1940: unchecked<br>51,036,859: ok<br>10: unchecked |  |
+| **UNCHECKED** | `fs-cell1` | 689 | A | 21.6: ok<br>21.4: ok<br>82.8: ok<br>83.0: ok<br>1940: unchecked<br>13.0: ok<br>67.8: ok |  |
+| **UNCHECKED** | `fs-cell3` | 696 | A | 6.7: ok<br>8.9: ok<br>59.8: ok<br>63.9: ok<br>1940: unchecked<br>14.1: ok<br>76.1: ok |  |
+| **UNCHECKED** | `mortality-denominator` | 738 | B | 20,886,324: ok<br>1940: unchecked |  |
+| **UNCHECKED** | `mortality-note-denominator` | 755 | B | 20,886,324: ok<br>1940: unchecked |  |
+| **UNCHECKED** | `county-percentiles` | 830 | A | 5: unchecked<br>95: unchecked<br>18: ok<br>43: ok |  |
+| **UNCHECKED** | `appendix-labels` | 1023 | ? | 392,085: unchecked |  |
+| **UNCHECKED** | `training-names-appendix` | 1024 | ? | 29,641: unchecked |  |
+| **UNCHECKED** | `appendix-last-labels` | 1029 | ? | 121,465: unchecked<br>28,032: unchecked |  |
+| **UNCHECKED** | `appendix-accuracy` | 1036 | ? | 97.38: unchecked<br>98.61: unchecked<br>94.54: unchecked<br>98.29: unchecked |  |
 | **MATCH** | `abstract-disagree` | 67 | A | 28: ok |  |
 | **MATCH** | `abstract-disagree-groups` | 67 | A | assert: holds  [cell("figures/incongruent_allstates.tex", "Foreign-born", 2) > cell("figures/incongruent_allstates.tex", "Foreign-born", 1) and disagreeForeignborn > disagreeNativeborn and disagreeNonenglish > disagreeEnglish] |  |
 | **MATCH** | `abstract-link-gain` | 68 | A | 119: ok<br>28: ok |  |
@@ -73,33 +73,33 @@ Result files read: compare_sample_counts.tex, compute_county_correlates.tex, com
 | **MATCH** | `deaglan-jw-disc` | 567 | B | 14.9: ok<br>22.1: ok |  |
 | **MATCH** | `deaglan-hlink-disc` | 568 | B | 49.7: ok<br>56.5: ok |  |
 | **MATCH** | `deaglan-mi` | 571 | B | 76.8: ok<br>83.5: ok<br>79.7: ok<br>83.8: ok<br>82.7: ok<br>83.4: ok | These are discordant-sample values (full-sample MI rates are 86-87); the sentence does not say which sample. |
-| **MATCH** | `deaglan-verified` | 579 | B | 523,399: ok<br>1,320,314: ok<br>11.1: ok<br>28.1: ok<br>20.6: ok<br>32.5: ok<br>69.5: ok<br>77.4: ok |  |
-| **MATCH** | `deaglan-contradicted-counts` | 580 | B | 312,746: ok<br>278,940: ok<br>507,261: ok<br>509,706: ok<br>65,907: ok<br>72,769: ok<br>117,637: ok<br>127,195: ok |  |
-| **MATCH** | `deaglan-contradicted-shares` | 582 | B | 2.47: ok<br>2.07: ok<br>2.78: ok<br>2.36: ok<br>4.12: ok<br>2.27: ok<br>5.13: ok<br>2.59: ok<br>0.76: ok<br>0.74: ok<br>0.77: ok<br>0.73: ok |  |
-| **MATCH** | `fs-versions-target` | 661 | A | 20.1: ok<br>8.9: ok<br>19.4: ok<br>83.4: ok<br>65.4: ok<br>83.6: ok |  |
-| **MATCH** | `fs-versions-both` | 663 | A | 22.3: ok |  |
-| **MATCH** | `fs-cell1-size` | 686 | A | 14.3: ok |  |
-| **MATCH** | `fs-cell1-anc-initials` | 688 | A | 83.0: ok<br>77.5: ok |  |
-| **MATCH** | `fs-cell2` | 690 | A | 25.9: ok<br>25.7: ok<br>87.5: ok<br>87.6: ok<br>6.7: ok<br>53.0: ok |  |
-| **MATCH** | `fs-cell4` | 696 | A | 8.4: ok<br>6.9: ok |  |
-| **MATCH** | `fs-cell4-note` | 725 | A | 9,531: ok<br>26,489: ok |  |
-| **MATCH** | `mortality-exact` | 737 | B | 5,658,793: ok<br>6,059,234: ok<br>7.08: ok<br>27.09: ok<br>29.01: ok |  |
-| **MATCH** | `mortality-conservative` | 738 | B | 20.22: ok<br>21.79: ok |  |
-| **MATCH** | `mortality-initials` | 739 | B | 83.14: ok<br>85.33: ok<br>87.60: ok<br>89.36: ok |  |
-| **MATCH** | `socio-all-improved` | 811 | A | assert: holds  [socioGroupsNotImproved == 0 and socioGroupsMissing == 0] | The figure note's list of grouping variables omits non-English mother tongue, which the figure includes and line 712 quotes. |
-| **MATCH** | `race-baseline` | 818 | A | 11.0: ok<br>24.1: ok |  |
-| **MATCH** | `race-gain` | 819 | A | 6.4: ok<br>7.9: ok |  |
-| **MATCH** | `subgroups` | 821 | A | 16.6: ok<br>18.0: ok<br>8.1: ok<br>11.9: ok<br>12.7: ok<br>7.0: ok<br>19.9: ok<br>21.5: ok<br>7.8: ok |  |
-| **MATCH** | `inmates` | 822 | A | 15.0: ok<br>7.3: ok |  |
-| **MATCH** | `no-group-fell` | 822 | A | assert: holds  [socioGroupsNotImproved == 0 and socioGroupsMissing == 0] |  |
-| **MATCH** | `county-correlates-south` | 829 | A | 29.5: ok<br>28.2: ok<br>assert: holds  [countyIncongAboveSouth > countyIncongBelowSouth and countyIncongAboveYoung > countyIncongBelowYoung and countyIncongAboveNoed > countyIncongBelowNoed] |  |
-| **MATCH** | `county-correlates-young-noed` | 829 | A | 30.4: ok<br>27.3: ok<br>29.9: ok<br>27.8: ok |  |
-| **MATCH** | `legibility-headline` | 836 | A | 20: ok<br>1.6: ok |  |
-| **MATCH** | `legibility-detail` | 856 | A | 46.2: ok<br>14.0: ok<br>16.9: ok<br>27.7: ok |  |
-| **MATCH** | `legibility-gain` | 857 | A | 16.9: ok<br>20.3: ok<br>20: ok<br>27.7: ok<br>28.1: ok |  |
-| **MATCH** | `conclusion-similar-gains` | 865 | A | assert: holds  [abs(linkGainNonenglish - linkGainAll) < 1 and abs(linkGainForeignborn - linkGainAll) < 1 and abs(linkGainNoschool - linkGainAll) < 1] |  |
-| **MATCH** | `conclusion-hardest-to-read` | 866 | A | assert: holds  [legGainLowest > legGainSecond and legGainLowest > legGainThird and legGainLowest > legGainHighest] |  |
-| **MATCH** | `conclusion-coverage` | 880 | A | assert: holds  [linkGainAll > 0 and socioGroupsNotImproved == 0] |  |
+| **MATCH** | `deaglan-verified` | 581 | B | 523,399: ok<br>1,320,314: ok<br>11.1: ok<br>28.1: ok<br>20.6: ok<br>32.5: ok<br>69.5: ok<br>77.4: ok |  |
+| **MATCH** | `deaglan-contradicted-counts` | 582 | B | 312,746: ok<br>278,940: ok<br>507,261: ok<br>509,706: ok<br>65,907: ok<br>72,769: ok<br>117,637: ok<br>127,195: ok |  |
+| **MATCH** | `deaglan-contradicted-shares` | 584 | B | 2.47: ok<br>2.07: ok<br>2.78: ok<br>2.36: ok<br>4.12: ok<br>2.27: ok<br>5.13: ok<br>2.59: ok<br>0.76: ok<br>0.74: ok<br>0.77: ok<br>0.73: ok |  |
+| **MATCH** | `fs-versions-target` | 663 | A | 20.1: ok<br>8.9: ok<br>19.4: ok<br>83.4: ok<br>65.4: ok<br>83.6: ok |  |
+| **MATCH** | `fs-versions-both` | 665 | A | 22.3: ok |  |
+| **MATCH** | `fs-cell1-size` | 688 | A | 14.3: ok |  |
+| **MATCH** | `fs-cell1-anc-initials` | 690 | A | 83.0: ok<br>77.5: ok |  |
+| **MATCH** | `fs-cell2` | 692 | A | 25.9: ok<br>25.7: ok<br>87.5: ok<br>87.6: ok<br>6.7: ok<br>53.0: ok |  |
+| **MATCH** | `fs-cell4` | 698 | A | 8.4: ok<br>6.9: ok |  |
+| **MATCH** | `fs-cell4-note` | 727 | A | 9,531: ok<br>26,489: ok |  |
+| **MATCH** | `mortality-exact` | 739 | B | 5,658,793: ok<br>6,059,234: ok<br>7.08: ok<br>27.09: ok<br>29.01: ok |  |
+| **MATCH** | `mortality-conservative` | 740 | B | 20.22: ok<br>21.79: ok |  |
+| **MATCH** | `mortality-initials` | 741 | B | 83.14: ok<br>85.33: ok<br>87.60: ok<br>89.36: ok |  |
+| **MATCH** | `socio-all-improved` | 813 | A | assert: holds  [socioGroupsNotImproved == 0 and socioGroupsMissing == 0] | The figure note's list of grouping variables omits non-English mother tongue, which the figure includes and line 712 quotes. |
+| **MATCH** | `race-baseline` | 820 | A | 11.0: ok<br>24.1: ok |  |
+| **MATCH** | `race-gain` | 821 | A | 6.4: ok<br>7.9: ok |  |
+| **MATCH** | `subgroups` | 823 | A | 16.6: ok<br>18.0: ok<br>8.1: ok<br>11.9: ok<br>12.7: ok<br>7.0: ok<br>19.9: ok<br>21.5: ok<br>7.8: ok |  |
+| **MATCH** | `inmates` | 824 | A | 15.0: ok<br>7.3: ok |  |
+| **MATCH** | `no-group-fell` | 824 | A | assert: holds  [socioGroupsNotImproved == 0 and socioGroupsMissing == 0] |  |
+| **MATCH** | `county-correlates-south` | 831 | A | 29.5: ok<br>28.2: ok<br>assert: holds  [countyIncongAboveSouth > countyIncongBelowSouth and countyIncongAboveYoung > countyIncongBelowYoung and countyIncongAboveNoed > countyIncongBelowNoed] |  |
+| **MATCH** | `county-correlates-young-noed` | 831 | A | 30.4: ok<br>27.3: ok<br>29.9: ok<br>27.8: ok |  |
+| **MATCH** | `legibility-headline` | 838 | A | 20: ok<br>1.6: ok |  |
+| **MATCH** | `legibility-detail` | 858 | A | 46.2: ok<br>14.0: ok<br>16.9: ok<br>27.7: ok |  |
+| **MATCH** | `legibility-gain` | 859 | A | 16.9: ok<br>20.3: ok<br>20: ok<br>27.7: ok<br>28.1: ok |  |
+| **MATCH** | `conclusion-similar-gains` | 867 | A | assert: holds  [abs(linkGainNonenglish - linkGainAll) < 1 and abs(linkGainForeignborn - linkGainAll) < 1 and abs(linkGainNoschool - linkGainAll) < 1] |  |
+| **MATCH** | `conclusion-hardest-to-read` | 868 | A | assert: holds  [legGainLowest > legGainSecond and legGainLowest > legGainThird and legGainLowest > legGainHighest] |  |
+| **MATCH** | `conclusion-coverage` | 882 | A | assert: holds  [linkGainAll > 0 and socioGroupsNotImproved == 0] |  |
 
 ## Exhibits
 
@@ -108,20 +108,20 @@ Result files read: compare_sample_counts.tex, compute_county_correlates.tex, com
 | `figures/balance_allstates.tex` | tab:sample_characteristics | yes | 459 | A | header: generated | munir_figures_for_nber.do still contains balancetable writers for this file; running it after make_balance_exhibits.do overwrites the table with the old version. |
 | `figures/incongruent_allstates.tex` | tab:cong_vs_incong | yes | 480 | A | header: generated | Same overwrite risk as balance_allstates.tex. |
 | `figures/avg_performance_allstates.tex` | tab:avg_performance | yes | 538 | A | NO GENERATED-BY HEADER |  |
-| `figures/all_states_hetero_combinedV2.pdf` | fig:hetero_legibility | yes | 845 | A |  |  |
-| `figures/all_states_socio_demo_combinedV2.pdf` | fig:hetero_socio | yes | 805 | A |  |  |
-| `figures/deaglan_abe_jw.tex` | tab:deaglan_abe_jw | yes | 598,613 | B | header: extracted from Deaglan's package | The extraction step from deaglan_results/current/ into figures/ has no script. |
-| `figures/deaglan_abe_jw_restricted.tex` | tab:deaglan_abe_jw_restricted | yes | 613 | B | header: extracted from Deaglan's package |  |
-| `figures/deaglan_hlink.tex` | tab:deaglan_hlink | yes | 630,645 | B | header: extracted from Deaglan's package |  |
-| `figures/deaglan_hlink_restricted.tex` | tab:deaglan_hlink_restricted | yes | 645 | B | header: extracted from Deaglan's package |  |
-| `figures/deaglan_mortality_bunmd.tex` | tab:deaglan_mortality | yes | 749 | B | header: extracted from Deaglan's package |  |
+| `figures/all_states_hetero_combinedV2.pdf` | fig:hetero_legibility | yes | 847 | A |  |  |
+| `figures/all_states_socio_demo_combinedV2.pdf` | fig:hetero_socio | yes | 807 | A |  |  |
+| `figures/deaglan_abe_jw.tex` | tab:deaglan_abe_jw | yes | 600,615 | B | header: extracted from Deaglan's package | The extraction step from deaglan_results/current/ into figures/ has no script. |
+| `figures/deaglan_abe_jw_restricted.tex` | tab:deaglan_abe_jw_restricted | yes | 615 | B | header: extracted from Deaglan's package |  |
+| `figures/deaglan_hlink.tex` | tab:deaglan_hlink | yes | 632,647 | B | header: extracted from Deaglan's package |  |
+| `figures/deaglan_hlink_restricted.tex` | tab:deaglan_hlink_restricted | yes | 647 | B | header: extracted from Deaglan's package |  |
+| `figures/deaglan_mortality_bunmd.tex` | tab:deaglan_mortality | yes | 751 | B | header: extracted from Deaglan's package |  |
 | `figures/rhode_island_4_252_61.png` | fig:schedule | yes | 160 | ? |  | The choice of ED 4-252 as closest to mean legibility survives only as commented-out Rhode Island code. |
 | `figures/ernest_bassette_RI_kent_2_52_701_16.png` | fig:error_examples | yes | 347 | ? |  |  |
 | `figures/rhode_island_providence_4_60_692_34.png` | fig:error_examples | yes | 359 | ? |  |  |
 | `figures/rhode_island_providence_6_128_298_38.png` | fig:error_examples | yes | 364 | ? |  |  |
-| `figures/fs_versions_allstates.tex` | tab:fs_versions | yes | 673 | A | header: generated |  |
-| `figures/fs_cells_sizes_allstates.tex` | tab:fs_cells_sizes | yes | 706 | A | header: generated |  |
-| `figures/fs_cells_allstates.tex` | tab:fs_cells | yes | 721 | A | header: generated |  |
+| `figures/fs_versions_allstates.tex` | tab:fs_versions | yes | 675 | A | header: generated |  |
+| `figures/fs_cells_sizes_allstates.tex` | tab:fs_cells_sizes | yes | 708 | A | header: generated |  |
+| `figures/fs_cells_allstates.tex` | tab:fs_cells | yes | 723 | A | header: generated |  |
 
 ## Result-like numbers no claim covers (0)
 

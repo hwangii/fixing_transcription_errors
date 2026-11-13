@@ -47,6 +47,7 @@ Asked by `review/handoff_replication_update_machineA.md`, about the Sec 4.2 sent
 - Sec 4.3 finds our names coincide with FamilySearch's in about half the target set.
 - If attachments followed FamilySearch's index, records whose FamilySearch name is unreadable or wrong would be under-represented in the truth set. That would tend to favour links built on FamilySearch-like names, which in that half of the target set include ours, rather than links built on Ancestry's.
 - The sentence's caveat about selection still holds. Its claim about which side the bias favours does not follow from the evidence here. Raised with Sam, 2026-11-11.
+- **Resolved 2026-11-13 (Sam agreed):** the sentence now says any dependence runs through FamilySearch's transcription. Because our names agree with FamilySearch's far more often than with Ancestry's on discordant records (Sec 2: 52% vs 14%), it would tend to favour links built on **ours** over Ancestry's. So the validation may flatter our links, and the draft now says so. The coverage test below is still not run.
 
 **A test that machine A can run (not run).**
 - Compare truth-set coverage across the Sec 4.3 cells: records where our name matches Ancestry's versus records where it matches FamilySearch's.
