@@ -106,17 +106,43 @@ program define refsplit
 	keep _id `fvar' `lvar'
 	sort _id
 	compress
-	save `"`saveto'"'
+	char _dta[pn_normver] "$PN_NORMVER"
+	save `"`saveto'"', replace
 end
 
 local pn `"`out'/profile_names.dta"'
-tempfile r_full r_fpref r_fp1
-refsplit `"`pn'"' fullname    ref_first      ref_last      `"`r_full'"'
-refsplit `"`pn'"' father_pref _faf_pref      ref_last_pref `"`r_fpref'"'
-refsplit `"`pn'"' father_p1   _faf_p1        ref_last_p1   `"`r_fp1'"'
+/*VERSION OF pnorm/xsplit/refsplit: CHANGE IT WHENEVER THEY CHANGE, AND THE   */
+/*SAVED SPLIT NAMES ARE REBUILT.                                              */
+global PN_NORMVER "2026-11-14a"
+/*2026-11-14: THE SPLIT NAMES ARE SAVED NEXT TO profile_names.dta AND REUSED, */
+/*SINCE extrname TAKES HOURS. DELETE refs_*.dta WHENEVER profile_names.dta OR */
+/*THE NORMALISATION ABOVE CHANGES. A SAVED FILE IS USED ONLY IF IT IS NEWER   */
+/*THAN profile_names.dta AND HAS ONE ROW PER RECORD (CHECKED AT THE MERGE).   */
+local r_full  `"`out'/refs_fullname.dta"'
+local r_fpref `"`out'/refs_father_pref.dta"'
+local r_fp1   `"`out'/refs_father_p1.dta"'
+/*THE SAVE DATE OF A FILE: c(filedate) AFTER LOADING ITS FIRST ROW ONLY.*/
+quietly use in 1 using `"`pn'"', clear
+local pn_date `"`c(filedate)'"'
+foreach spec in "fullname ref_first ref_last r_full" "father_pref _faf_pref ref_last_pref r_fpref" "father_p1 _faf_p1 ref_last_p1 r_fp1" {
+	tokenize `"`spec'"'
+	local reuse 0
+	capture confirm file `"``4''"'
+	if !_rc {
+		quietly use in 1 using `"``4''"', clear
+		/*BOTH DATES ARE "dd Mon yyyy hh:mm": COMPARE AS CLOCK VALUES.*/
+		local t_ref = clock(`"`c(filedate)'"', "DMYhm")
+		local ref_ver : char _dta[pn_normver]
+		local t_pn  = clock(`"`pn_date'"', "DMYhm")
+		/*AN UNREADABLE DATE LABEL MEANS REBUILD, NEVER REUSE.*/
+		if `t_ref'<. & `t_pn'<. & `t_ref'>`t_pn' & `"`ref_ver'"'=="$PN_NORMVER" local reuse 1
+	}
+	if `reuse' display "`1': reusing saved split names ``4''"
+	else refsplit `"`pn'"' `1' `2' `3' `"``4''"'
+}
 
 /*MAIN DATASET: ONLY THE COLUMNS SCORED.*/
-use sex marst namefrst fs_namefrst namefrst_ml namelast fs_namelast namelast_ml_ditto cell gender birthdate n_fathers using `"`pn'"', clear
+use sex marst namefrst fs_namefrst namefrst_ml namelast fs_namelast namelast_ml_ditto cell gender birthdate deathdate n_fathers using `"`pn'"', clear
 display "records: " _N
 foreach c in n_census n_xwalk n_xmh n_xmu n_linked n_noipums n_noinfo {
 	local v : char _dta[`c']
@@ -124,7 +150,14 @@ foreach c in n_census n_xwalk n_xmh n_xmu n_linked n_noipums n_noinfo {
 }
 gen long _id = _n
 gen byte has_birth = birthdate!=""
-drop birthdate
+/*DEATH MONTH (2026-11-14): NO CENSUS RECORDS ONE, SO A PROFILE WITH A DEATH   */
+/*MONTH WAS BUILT FROM SOURCES BEYOND THE CENSUS, AND ITS NAME IS LESS LIKELY  */
+/*TO BE A COPY OF THE ATTACHED CENSUS INDEX. deathdate IS FAMILYSEARCH'S       */
+/*NORMALIZED TEXT ("28 January 1965", "April 1984", "about 18 October 1957", */
+/*"1970", "from 1940 to 1950"); A MONTH NAME OR ITS ABBREVIATION AS A WHOLE   */
+/*WORD COUNTS. (95% OF NON-EMPTY DATES; THE REST ARE YEARS OR YEAR RANGES.)   */
+gen byte has_dmonth = ustrregexm(lower(deathdate), "\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december)\b")
+drop birthdate deathdate
 foreach r in full fpref fp1 {
 	merge 1:1 _id using `"`r_`r''"', assert(match) nogen
 }
@@ -246,6 +279,15 @@ scoreblock "All women: first name" wom first
 /*ROBUSTNESS: WOMEN'S FATHER*/
 scoreblock "Robustness: never-married women, father with parent_no==1" nmw full_last_p1
 scoreblock "Robustness: never-married women with exactly one father" nmw1 full_last_pref
+
+/*PROFILES WITH A DEATH MONTH (2026-11-14): BUILT FROM SOURCES BEYOND THE    */
+/*CENSUS, SO LESS LIKELY TO COPY THE ATTACHED FAMILYSEARCH INDEX NAME.       */
+scoreblock "Death month on profile: men, first name and surname" men full_last "has_dmonth"
+scoreblock "Death month on profile: men, first name" men first "has_dmonth"
+scoreblock "Death month on profile: men, surname" men last_last "has_dmonth"
+scoreblock "Death month on profile: never-married women, first name and surname (father's surname)" nmw full_last_pref "has_dmonth"
+scoreblock "Death month on profile: all women, first name" wom first "has_dmonth"
+scoreblock "No death month on profile: men, first name and surname" men full_last "!has_dmonth"
 
 /*ROBUSTNESS: PROFILE HAS A BIRTH DATE (AT LEAST ONE NON-CENSUS FACT)*/
 scoreblock "Robustness: men, profile has a birth date" men full_last "has_birth"
