@@ -1,0 +1,59 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "replication",
+      "how_to_check": "Examine replication/diagnostics/ri_replication.do: lines 30-31 contain the only assert statements in the file; lines 57-76 only format and display the values without evaluating relative or absolute differences.",
+      "id": "ri-reproduction-check-has-no-pass-criterion",
+      "location": "replication/diagnostics/ri_replication.do:36-79",
+      "severity": "minor",
+      "suggested_fix": "Add explicit tolerance checks (e.g., asserting that current linkage and validation rates fall within acceptable percentage bounds of the historical rates) or calculate differences and output a clear PASS/FAIL summary for each row.",
+      "title": "The reproduction diagnostic never decides whether the Rhode Island results were reproduced",
+      "what_the_code_does": "The script hardcodes rounded historical August statistics in local macros and displays them side-by-side with current recomputed statistics using formatted display statements. While lines 30-31 assert that exactly one state was matched and observations exist, the script contains no assertions, calculated discrepancies, or tolerance checks comparing the current statistics to the historical benchmarks.",
+      "why_it_matters": "The script poses the question 'DOES THE CURRENT CODE REPRODUCE THE RHODE ISLAND RESULTS?' in its header, but can exit with code 0 even if current figures deviate substantially from the historical benchmark. It functions as an eyeball comparison rather than an automated, repeatable replication test."
+    }
+  ],
+  "review_limits": [
+    "No paper draft was supplied, so claims in the paper draft could not be compared against code directly; claims-vs-code review was limited to the uncommitted diagnostic script and notes.",
+    "External census and link datasets reside outside the repository on local/network storage and were not directly loaded or manipulated.",
+    "The Stata pipeline was not executed during this review run; all runtime behavior, macro expansion, and summary statistics were evaluated by static source code analysis.",
+    "Review scope was restricted to the uncommitted changes in the working tree (replication/diagnostics/ri_replication.do and review/revision-notes-2026-11-13.md), not a full repository audit."
+  ],
+  "summary": "The uncommitted Rhode Island diagnostic correctly filters the state sample and faithfully mirrors the all-state linkage and validation rate definitions from create_figures_SSHA2025.do. Its primary limitation is that it prints the historical August draft values alongside current calculations without defining tolerance bounds or evaluating pass/fail criteria. No data mutation or econometric correctness defects were found in the uncommitted files.",
+  "verified_clean": [
+    {
+      "evidence": "replication/diagnostics/ri_replication.do:25-31 applies `strpos(lower(state_folder_name), \"rhode\") > 0`, inspects unique values with `levelsof`, and asserts `: word count `st'' == 1 and `_N > 0`.",
+      "item": "The Rhode Island filter cannot silently select zero or multiple state labels."
+    },
+    {
+      "evidence": "replication/diagnostics/ri_replication.do:34 uses `gen target = !(namefrst==fs_namefrst & namelast==fs_namelast)`, which exactly matches CODE/create_figures_SSHA2025.do:117.",
+      "item": "The diagnostic uses the same target definition as the current all-state table."
+    },
+    {
+      "evidence": "CODE/clean_FS_and_combineV5_nber.do:225 requires `namelast!=\"\" & namefrst!=\"\" & namefrst_fs!=\"\" & namelast_fs!=\"\" & age!=. & age_fs!=.` before creating the labeled dataset read into temp.dta.",
+      "item": "Blank-name equality cannot inflate the target comparison under the upstream data builder."
+    },
+    {
+      "evidence": "replication/diagnostics/ri_replication.do:60-75 uses total count `r(N)` for linkage rates and separate non-missing counts `r(N)` from `summarize validated_before` and `summarize validated_after`, mirroring CODE/create_figures_SSHA2025.do:158-166,203-209.",
+      "item": "Linkage and validation denominators mirror the current table implementation."
+    },
+    {
+      "evidence": "replication/diagnostics/ri_replication.do:16-81 opens a dedicated log file and only executes read-only queries (`use`, `count`, `sum`, `display`) with no `save`, `replace` of datasets, or exports.",
+      "item": "The new diagnostic does not mutate analysis datasets or workspace state."
+    },
+    {
+      "evidence": "review/revision-notes-2026-11-13.md:7-18 explicitly marks tentative numbers for verification and correctly identifies an unsupported training data claim for excision.",
+      "item": "The revision notes distinguish unverified claims from definite corrections."
+    },
+    {
+      "evidence": "replication/diagnostics/ri_replication.do:25-79 restricts its analysis to descriptive comparison of linkage and validation means.",
+      "item": "The uncommitted code introduces no causal specification or new link selection mechanism."
+    }
+  ]
+}
