@@ -1,0 +1,59 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "correctness",
+      "how_to_check": "Run `do MATCHING/check_placebo.do ML` in Stata and observe that the script proceeds to test `link1930_1940_ans_cleaned_noraceblock0.dta` rather than aborting with an invalid argument error.",
+      "id": "invalid-placebo-mode-silently-selects-baseline",
+      "location": "MATCHING/check_placebo.do:22-28",
+      "severity": "minor",
+      "suggested_fix": "Normalize case and explicitly validate the `mode` parameter before setting filenames: `local mode = lower(strtrim(\\\"`1'\\\"))` followed by `if !inlist(\\\"`mode'\\\", \\\"\\\", \\\"ml\\\") { display as error \\\"check_placebo: invalid mode '`1''. Expected empty or 'ml'.\\\" \\n exit 198 }`.",
+      "title": "Unrecognized or non-lowercase mode argument silently tests the Ancestry baseline instead of failing",
+      "what_the_code_does": "The script sets the default filenames to the Ancestry baseline at lines 23-24 (`link1930_1940_ans_cleaned_noraceblock0.dta` and `link1930_1940_fsplacebo1930_1940_cleaned_noraceblock0.dta`), and only switches them to the ML files at lines 25-27 under `if \\\"`mode'\\\"==\\\"ml\\\"`. Any non-empty argument other than exact lower-case `ml`—such as `ML`, `m1`, or `placebo_ml`—silently leaves the filenames pointing to the Ancestry baseline.",
+      "why_it_matters": "A user who attempts to test the FamilySearch-1930 plus ML-1940 placebo path with an invalid or capitalized mode argument (e.g. `do MATCHING/check_placebo.do ML`) will see the script report `PLACEBO PASSED: identical to link1930_1940_ans_cleaned_noraceblock0.dta`. This provides false assurance that the ML placebo test passed when it was never actually executed."
+    }
+  ],
+  "review_limits": [
+    "No paper draft was supplied with the review request; claims-vs-code could not be assessed against manuscript text, and the untracked draft reading notes in review/revision-notes-2026-11-13.md are not an executable paper draft.",
+    "The multi-gigabyte census and linkage data files on external storage (D:\\... and F:\\...) are gitignored and not present in the sandbox, so Stata scripts could not be executed at runtime.",
+    "Review was diff-scoped to uncommitted working tree changes (MATCHING/check_placebo.do and untracked review/revision-notes-2026-11-13.md); unchanged files in CODE/ and LINKAGE/ were not audited in full.",
+    "Stata syntax and macro expansion were evaluated by static source code reading rather than dynamic execution in a live Stata environment."
+  ],
+  "summary": "The uncommitted addition of the ML-path placebo comparison in MATCHING/check_placebo.do correctly specifies the expected mixed-vintage link file and rigorously verifies pair-level and attribute-level equivalence against the paper's ML links. The primary defect is that any unrecognized or non-lowercase mode argument silently falls back to running the Ancestry placebo comparison instead of failing, which can give false assurance of ML equivalence if invoked with a typo. Explicit validation of the mode argument should be added before deploying the check.",
+  "verified_clean": [
+    {
+      "evidence": "MATCHING/check_placebo.do:15,25-28 pairs `link1930_1940_true_cleaned_noraceblock0.dta` with `link1930_1940_fsplacebo1930_ml1940_cleaned_noraceblock0.dta`; the latter matches the dynamic naming logic in `MATCHING/3_append_and_clean_all_links_christian_torbenV2.do:80-82,141` when `fs_years` is 1930, `fstype` is `_fsplacebo_cleaned`, and `ml_years` is 1940.",
+      "item": "Documented ML matching command produces the exact filenames expected by check_placebo.do."
+    },
+    {
+      "evidence": "MATCHING/check_placebo.do:33,42 runs `isid id_A id_B` on both the baseline paper links and the placebo links, preventing silent many-to-many merge errors.",
+      "item": "Link pair uniqueness is verified before merging."
+    },
+    {
+      "evidence": "MATCHING/check_placebo.do:47-51 counts `_merge!=3` and sets `bad=1`, which triggers `exit 9` at line 59 if link pairs differ between the two files.",
+      "item": "Discrepancies in link composition cause the check to halt with an error."
+    },
+    {
+      "evidence": "MATCHING/check_placebo.do:52-56 iterates over `fiveyr_band`, `f_name_A`, `l_name_A`, `f_name_B`, `l_name_B`, `mi1930`, and `mi1940`, requiring zero discrepancies between `v` and `v_paper` among matched records.",
+      "item": "All relevant matching attributes are checked for exact equality."
+    },
+    {
+      "evidence": "MATCHING/check_placebo.do:53 tests `v != v_paper` for exact identity across two versions of the same file rather than computing cross-source agreement rates, so matching blank strings (`\"\" != \"\"` = 0) and missing values (`. != .` = 0) correctly evaluate to parity.",
+      "item": "Empty string and numeric missing values do not spuriously inflate match parity."
+    },
+    {
+      "evidence": "MATCHING/check_placebo.do:37-38 uses a Stata `tempfile` and modifies no permanent datasets or repository files.",
+      "item": "Execution is strictly read-only."
+    },
+    {
+      "evidence": "review/revision-notes-2026-11-13.md:1-19 contains qualitative notes on the draft manuscript rather than executable code or data pipeline modifications.",
+      "item": "Untracked revision notes introduce no code or empirical inconsistencies."
+    }
+  ]
+}
