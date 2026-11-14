@@ -56,17 +56,11 @@ program define pnorm
 	}
 end
 
-use `"`out'/profile_names.dta"', clear
-display "records: " _N
-
-/*PROFILE GENDER MUST AGREE WITH CENSUS SEX.*/
-gen byte pmale = lower(gender)=="male"
-gen byte pfem  = lower(gender)=="female"
-local n_all = _N
-count if (sex==1 & pfem) | (sex==2 & pmale)
-local n_gender = r(N)
-display "dropped: profile gender contradicts census sex: " r(N)
-drop if (sex==1 & pfem) | (sex==2 & pmale)
+/*MEMORY: profile_names.dta is ~88 GB in memory because fullname and the two */
+/*father names are stored ~330 bytes wide. So each name column is read on its */
+/*own, split on its distinct values, and returned as short parts keyed by row */
+/*number (_id = _n of the saved file, which is sorted by unique_ID and read   */
+/*back in the same order); the main dataset reads only the columns it scores. */
 
 /*extrname IS SLOW, SO IT RUNS ON DISTINCT VALUES AND IS MERGED BACK (THE   */
 /*PATTERN OF qq_tradeoff/data_construction_v9_stage3_names_dedup.do).        */
@@ -92,15 +86,59 @@ program define xsplit
 	merge m:1 `src' using `parts', keep(1 3) nogen
 end
 
-/*REFERENCE NAMES*/
-pnorm fullname _pf
-xsplit _pf ref_first ref_last
-drop _pf
-foreach f in pref p1 {
-	pnorm father_`f' _fa
-	xsplit _fa _faf ref_last_`f'
-	drop _fa _faf
+/*refsplit FILE COLUMN FIRSTVAR LASTVAR SAVETO: one name column -> parts by _id*/
+capture program drop refsplit
+program define refsplit
+	args file v fvar lvar saveto
+	tempfile map
+	use `v' using `"`file'"', clear
+	drop if `v'==""
+	duplicates drop
+	display "`v': " _N " distinct non-empty values"
+	pnorm `v' _p
+	xsplit _p `fvar' `lvar'
+	keep `v' `fvar' `lvar'
+	save `map'
+	use `v' using `"`file'"', clear
+	gen long _id = _n
+	/*EMPTY NAMES ARE MASTER-ONLY; EVERY NON-EMPTY NAME IS IN THE MAP.*/
+	merge m:1 `v' using `map', keep(1 3) assert(1 3) nogen
+	keep _id `fvar' `lvar'
+	sort _id
+	compress
+	save `"`saveto'"'
+end
+
+local pn `"`out'/profile_names.dta"'
+tempfile r_full r_fpref r_fp1
+refsplit `"`pn'"' fullname    ref_first      ref_last      `"`r_full'"'
+refsplit `"`pn'"' father_pref _faf_pref      ref_last_pref `"`r_fpref'"'
+refsplit `"`pn'"' father_p1   _faf_p1        ref_last_p1   `"`r_fp1'"'
+
+/*MAIN DATASET: ONLY THE COLUMNS SCORED.*/
+use sex marst namefrst fs_namefrst namefrst_ml namelast fs_namelast namelast_ml_ditto cell gender birthdate n_fathers using `"`pn'"', clear
+display "records: " _N
+foreach c in n_census n_xwalk n_xmh n_xmu n_linked n_noipums n_noinfo {
+	local v : char _dta[`c']
+	assert `"`v'"'!=""
 }
+gen long _id = _n
+gen byte has_birth = birthdate!=""
+drop birthdate
+foreach r in full fpref fp1 {
+	merge 1:1 _id using `"`r_`r''"', assert(match) nogen
+}
+drop _id _faf_pref _faf_p1
+
+/*PROFILE GENDER MUST AGREE WITH CENSUS SEX.*/
+gen byte pmale = lower(gender)=="male"
+gen byte pfem  = lower(gender)=="female"
+local n_all = _N
+count if (sex==1 & pfem) | (sex==2 & pmale)
+local n_gender = r(N)
+display "dropped: profile gender contradicts census sex: " r(N)
+drop if (sex==1 & pfem) | (sex==2 & pmale)
+
 
 /*CENSUS NAMES: THE FIELDS ARE ALREADY SEPARATE. FIRST WORD OF THE FIRST-   */
 /*NAME FIELD; THE WHOLE SURNAME FIELD WITH SPACES REMOVED.                   */
@@ -210,7 +248,7 @@ scoreblock "Robustness: never-married women, father with parent_no==1" nmw full_
 scoreblock "Robustness: never-married women with exactly one father" nmw1 full_last_pref
 
 /*ROBUSTNESS: PROFILE HAS A BIRTH DATE (AT LEAST ONE NON-CENSUS FACT)*/
-scoreblock "Robustness: men, profile has a birth date" men full_last `"birthdate!="""'
+scoreblock "Robustness: men, profile has a birth date" men full_last "has_birth"
 
 /*ROBUSTNESS: THE APPENDIX'S RULE (3) -- AT LEAST ONE SOURCE MATCHES.        */
 /*IT SELECTS ON THE OUTCOME, SO IT IS SHOWN BESIDE THE MAIN RESULT ONLY.     */
