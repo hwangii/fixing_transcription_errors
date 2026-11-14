@@ -34,6 +34,14 @@ local f_fs12 "`links'/link1930_1940_fs1930_1940_cleaned_noraceblock0.dta"
 local f_fs30 "`links'/link1930_1940_fs1930_cleaned_noraceblock0.dta"
 local f_fs40 "`links'/link1930_1940_fs1940_cleaned_noraceblock0.dta"
 local combos ans true fs12 fs30 fs40
+/*2026-11-14, FOR THE SLIDES ONLY: do MATCHING/fs_avg_performance.do slides  */
+/*ADDS FAMILYSEARCH NAMES IN 1930 WITH OURS IN 1940 (fs30ml), LINKED BY      */
+/*_matching_master_dofile.do "1930" 10 1 "" 0 0 "1930" 0 "1940", AND WRITES  */
+/*MATCHING/results/fs_avg_performance_slides.tex INSTEAD, SO THE DRAFT'S     */
+/*TABLE (fs_draft_tables.py READS fs_avg_performance.tex) IS UNTOUCHED.      */
+local mode `"`1'"'
+local f_fs30ml "`links'/link1930_1940_fs1930_ml1940_cleaned_noraceblock0.dta"
+if "`mode'"=="slides" local combos `combos' fs30ml
 
 /*THE PAPER'S VALUES (raw= IN replication/results/create_figures_SSHA2025.tex).*/
 local p_n_target 14416543
@@ -84,6 +92,7 @@ foreach c of local combos {
 	if "`c'"=="fs12" local fsv "fs_used1930 fs_used1940"
 	if "`c'"=="fs30" local fsv "fs_used1930"
 	if "`c'"=="fs40" local fsv "fs_used1940"
+	if "`c'"=="fs30ml" local fsv "fs_used1930"
 	merge 1:1 id_B using `"`f_`c''"', keepusing(id_A mi1930 mi1940 fiveyr_band `fsv') keep(1 3)
 	gen byte linked_`c' = _merge==3 & fiveyr_band==1
 	gen byte val_`c' = mi1930==mi1940 if mi1930!="" & mi1940!="" & linked_`c'==1
@@ -154,14 +163,22 @@ display "REPLICATION PASSED: Ancestry and ML columns equal the paper's main tabl
 
 capture mkdir "$REP_REPO/MATCHING/results"
 local outtex "$REP_REPO/MATCHING/results/fs_avg_performance.tex"
+if "`mode'"=="slides" local outtex "$REP_REPO/MATCHING/results/fs_avg_performance_slides.tex"
 file open f using "`outtex'", write replace
 file write f "% Written by MATCHING/fs_avg_performance.do; do not edit by hand." _n
 file write f "% Sample and definitions as in tab:avg_performance. FS = FamilySearch names where FamilySearch has them, Ancestry otherwise (field by field)." _n
 file write f "% Own initials: Ancestry column from matching_intgen; ML column 1930 Ancestry, 1940 ML; FS columns from each side's divided file (FS where the FS first name is used)." _n
 file write f "% Ancestry initials: every column scored with the Ancestry initials from the men-only Ancestry divided files." _n
-file write f "\begin{tabular}{llccccc}" _n
-file write f "\toprule" _n
-file write f " & & Ancestry & ML & FS 1930 \& 1940 & FS 1930 & FS 1940 \\" _n
+if "`mode'"=="slides" {
+	file write f "\begin{tabular}{llcccccc}" _n
+	file write f "\toprule" _n
+	file write f " & & Ancestry & ML & FS 1930 \& 1940 & FS 1930 & FS 1940 & FS 1930, ML 1940 \\" _n
+}
+else {
+	file write f "\begin{tabular}{llccccc}" _n
+	file write f "\toprule" _n
+	file write f " & & Ancestry & ML & FS 1930 \& 1940 & FS 1930 & FS 1940 \\" _n
+}
 file write f "\midrule" _n
 foreach row in n lr sv nv sva nva fs1930 fs1940 {
 	if "`row'"=="n"   local lab "Records"

@@ -11,6 +11,10 @@ local fs_years=`"`6'"'
 /*"_fs_cleaned", OR "_fsplacebo_cleaned" FOR THE PLACEBO (OUTPUT TAG _fsplacebo).*/
 local fstype=`"`7'"'
 if `"`fstype'"'=="" local fstype "_fs_cleaned"
+/*2026-11-14: YEARS NOT IN fs_years WHOSE NAMES ARE OURS (ML, "_true_cleaned"),*/
+/*AS IN 2_ABE_matchingV3_master_christian_torben.do. EMPTY = ANCESTRY. THE     */
+/*OUTPUT TAG GAINS _ml<years>, e.g. link1930_1940_fs1930_ml1940_cleaned_...   */
+local ml_years=`"`8'"'
 
 if `location'==1 { /*SERVER AT HOME*/
 
@@ -67,11 +71,14 @@ if `"`fs_years'"'!="" {
 		local yr2=`yr1'+`interval'
 		local typeA "_ans_cleaned"
 		local typeB "_ans_cleaned"
+		if strpos(`" `ml_years' "', " `yr1' ") local typeA "_true_cleaned"
+		if strpos(`" `ml_years' "', " `yr2' ") local typeB "_true_cleaned"
 		if strpos(`" `fs_years' "', " `yr1' ") local typeA "`fstype'"
 		if strpos(`" `fs_years' "', " `yr2' ") local typeB "`fstype'"
 		local B_tag ""
 		if "`typeB'"!="`typeA'" local B_tag "`typeB'"
 		local ver = subinstr("`fstype'","_cleaned","",1) + subinstr(strtrim(stritrim(`"`fs_years'"')), " ", "_", .)
+		if strtrim(`"`ml_years'"')!="" local ver = "`ver'_ml" + subinstr(strtrim(stritrim(`"`ml_years'"')), " ", "_", .)
 
 		local rdir `"`f_intermediate'r`typeA'`B_tag'`yr1'_`yr2'"'
 		local files : dir `"`rdir'"' files "norace*.dta"
@@ -110,6 +117,12 @@ if `"`fs_years'"'!="" {
 					merge m:1 id using `"`f_intermediate'divided_file`y'`type'/norace`b'.dta"', keepusing(mi fs_frst_used fs_last_used) keep(1 3)
 					gen byte fs_used`y' = fs_frst_used==1 | fs_last_used==1
 					drop fs_frst_used fs_last_used
+				}
+				else if "`type'"=="_true_cleaned" {
+					/*OURS: THE ML MIDDLE INITIAL, AS THE PAPER'S ML LINK FILE  */
+					/*TAKES IT (ORIGINAL BRANCH BELOW: mi_true_cleaned).        */
+					merge m:1 id using `"`f_intermediate'divided_file`y'`type'/norace`b'.dta"', keepusing(mi_true_cleaned) keep(1 3)
+					rename mi_true_cleaned mi
 				}
 				else {
 					merge m:1 id using `"`f_intermediate'divided_file`y'`type'/norace`b'.dta"', keepusing(mi) keep(1 3)

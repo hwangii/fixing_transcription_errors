@@ -9,6 +9,10 @@ local fs_years=`"`4'"'
 /*PLACEBO (ANCESTRY NAMES THROUGH THE SAME PATH; SEE 1b_fs_divided_files.do).*/
 local fstype=`"`5'"'
 if `"`fstype'"'=="" local fstype "_fs_cleaned"
+/*2026-11-14: THE CENSUS YEARS NOT IN fs_years WHOSE NAMES ARE OURS (ML,      */
+/*"_true_cleaned") RATHER THAN ANCESTRY'S, E.G. "1940" FOR FAMILYSEARCH NAMES */
+/*IN 1930 AND OURS IN 1940. EMPTY = ANCESTRY, AS BEFORE.                      */
+local ml_years=`"`6'"'
 
 if `location'==1 {
 	/*2026-11-06: THE CODE LIVES IN THIS REPO (MATCHING/); D:\Dropbox IS GONE.*/
@@ -37,12 +41,15 @@ foreach yr in `yr_list' {
 	}
 	else {
 
-		/*ONE RUN: FAMILYSEARCH NAMES IN THE LISTED YEARS, ANCESTRY OTHERWISE.*/
+		/*ONE RUN: FAMILYSEARCH NAMES IN THE LISTED YEARS, ANCESTRY OTHERWISE */
+		/*(OURS IN THE ml_years).                                            */
 		local typeA "_ans_cleaned"
 		local typeB "_ans_cleaned"
+		if strpos(`" `ml_years' "', " `yr1' ") local typeA "_true_cleaned"
+		if strpos(`" `ml_years' "', " `yr2' ") local typeB "_true_cleaned"
 		if strpos(`" `fs_years' "', " `yr1' ") local typeA "`fstype'"
 		if strpos(`" `fs_years' "', " `yr2' ") local typeB "`fstype'"
-		if "`typeA'"=="_ans_cleaned" & "`typeB'"=="_ans_cleaned" {
+		if "`typeA'"!="`fstype'" & "`typeB'"!="`fstype'" {
 			display as error "fs_years (`fs_years') names neither `yr1' nor `yr2'"
 			exit 198
 		}

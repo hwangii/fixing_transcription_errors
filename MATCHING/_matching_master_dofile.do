@@ -17,6 +17,11 @@ local fs_years=`"`7'"'
 local fs_placebo=`"`8'"'
 if `"`fs_placebo'"'=="" local fs_placebo 0
 local fstype = cond(`fs_placebo'==1, "_fsplacebo_cleaned", "_fs_cleaned")
+/*2026-11-14: YEARS NOT IN fs_years WHOSE NAMES ARE OURS (ML) RATHER THAN    */
+/*ANCESTRY'S. FAMILYSEARCH NAMES IN 1930, OURS IN 1940 (FOR THE SLIDES):     */
+/*  do MATCHING/_matching_master_dofile.do "1930" 10 1 "" 0 0 "1930" 0 "1940" */
+/*WRITES link1930_1940_fs1930_ml1940_cleaned_noraceblock0.dta.               */
+local ml_years=`"`9'"'
 
 
 if `location'==1 { /*SERVER AT HOME*/
@@ -94,9 +99,46 @@ if `"`fs_years'"'!="" {
 		}
 		do `"`code'1b_fs_divided_files.do"' `y' `"`fstype'"'
 	}
+	/*WITH OURS IN SOME YEARS, THE RESULT IS COMPARED WITH THE PAPER'S ML LINKS,*/
+	/*WHICH READ divided_file<yr>_true_cleaned IN EVERY YEAR. THE FAMILYSEARCH */
+	/*FILES ARE BUILT FROM divided_file<yr>_ans_cleaned, SO FOR EACH            */
+	/*FAMILYSEARCH YEAR THE TWO MUST HOLD THE SAME RECORDS AND NAMES; OTHERWISE */
+	/*THE COMPARISON WOULD MIX IN THAT DIFFERENCE. STOP IF THEY DO NOT.        */
+	if strtrim(`"`ml_years'"')!="" {
+		foreach y of local fs_years {
+			local fl : dir `"`fsdir'divided_file`y'_ans_cleaned"' files "norace*.dta"
+			local fl2 : dir `"`fsdir'divided_file`y'_true_cleaned"' files "norace*.dta"
+			local fl : list sort fl
+			local fl2 : list sort fl2
+			if !`: list fl === fl2' {
+				display as error "`y': _ans_cleaned and _true_cleaned hold different birthplace files"
+				exit 459
+			}
+			local ndiff 0
+			tempfile ansf
+			foreach f of local fl {
+				/*SORTED BY id, SO ROW ORDER CANNOT CAUSE A FALSE DIFFERENCE.*/
+				use id f_name l_name age using `"`fsdir'divided_file`y'_ans_cleaned/`f'"', clear
+				sort id
+				save `ansf', replace
+				use id f_name l_name age using `"`fsdir'divided_file`y'_true_cleaned/`f'"', clear
+				sort id
+				capture cf id f_name l_name age using `ansf'
+				if _rc {
+					display as error "`y' `f': _true_cleaned differs from _ans_cleaned"
+					local ++ndiff
+				}
+			}
+			if `ndiff' {
+				display as error "`y': `ndiff' birthplace files differ; the comparison with the ML links would not be clean"
+				exit 459
+			}
+			display "`y': _true_cleaned and _ans_cleaned identical in id f_name l_name age (all birthplace files)"
+		}
+	}
 	foreach yr in `yr_list' {
-		do `"`code'2_ABE_matchingV3_master_christian_torben.do"' `yr' `interval' `location' `"`fs_years'"' `"`fstype'"'
-		do `"`code'3_append_and_clean_all_links_christian_torbenV2.do"' `yr' `interval' `location' `reporting_error_only' `"`fsnames'"' `"`fs_years'"' `"`fstype'"'
+		do `"`code'2_ABE_matchingV3_master_christian_torben.do"' `yr' `interval' `location' `"`fs_years'"' `"`fstype'"' `"`ml_years'"'
+		do `"`code'3_append_and_clean_all_links_christian_torbenV2.do"' `yr' `interval' `location' `reporting_error_only' `"`fsnames'"' `"`fs_years'"' `"`fstype'"' `"`ml_years'"'
 	}
 	exit
 }
