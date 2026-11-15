@@ -48,18 +48,21 @@ local inputs `"`inputs' "$LCODE/02_hlink/linkage_analysis_newlinks.do""'
 local inputs `"`inputs' "$LCODE/03_mortality/05_make_linkage_table.do""'
 /*Table 5-6: ABE / Jaro-Winkler*/
 local inputs `"`inputs' "`D'/names/cleaned/clean_names_1930_old.dta""'
-local inputs `"`inputs' "`D'/names/cleaned/clean_names_1940_new.dta""'
 local inputs `"`inputs' "`D'/links/derived/JW_matches_x2_unique_new.dta""'
 local inputs `"`inputs' "`D'/links/derived/JW_matches_x2_unique_old.dta""'
 local inputs `"`inputs' "`D'/links/derived/link1930_1940_true_cleaned_noraceblock0.dta""'
 local inputs `"`inputs' "`D'/links/derived/link1930_1940_ans_cleaned_noraceblock0.dta""'
 /*Tables 7-8: HLINK*/
 local inputs `"`inputs' "`D'/transcriptions/appended/divided_file1930_ans_cleaned_women_added.dta""'
-local inputs `"`inputs' "`D'/transcriptions/appended/divided_file1940_true_cleaned_women_added.dta""'
 local inputs `"`inputs' "`D'/links/derived/matches_after.dta""'
 local inputs `"`inputs' "`D'/links/derived/matches_before.dta""'
-/*Both census-to-census linkages*/
-local inputs `"`inputs' "`D'/names/flags/ipums_fs_names_for_Deaglan1940.dta""'
+/*Both census-to-census linkages. 2026-11-15: the 1940 sample, target flag  */
+/*and 1940 middle initials (men 10+ with both transcriptions, as in the      */
+/*main table), built on machine A by LINKAGE/code/prep/                     */
+/*build_linkage_sample1940.do and copied here by Dropbox. It replaces        */
+/*clean_names_1940_new.dta, divided_file1940_true_cleaned_women_added.dta    */
+/*and ipums_fs_names_for_Deaglan1940.dta, which no table script reads now.   */
+local inputs `"`inputs' "`D'/names/flags/linkage_sample1940.dta""'
 /*2026-11-09: machine A's complete truth file; data/truth/ holds the damaged */
 /*copy (LINKAGE/notes/truth_file_provenance.md). Must match $D_TRUTH.       */
 local inputs `"`inputs' "`D'/truth_from_machineA/mlp_training1930_1940.dta""'

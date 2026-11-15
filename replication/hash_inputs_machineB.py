@@ -1,4 +1,4 @@
-"""Write a SHA-256 manifest of machine B's 17 frozen data inputs.
+"""Write a SHA-256 manifest of machine B's 15 frozen data inputs.
 
     python replication/hash_inputs_machineB.py            # all inputs (tens of GB; minutes)
     python replication/hash_inputs_machineB.py --check    # recompute and compare with the manifest
@@ -6,7 +6,8 @@
 Machine B's counterpart to hash_inputs.py (machine A's, not edited here). The
 input list is parsed from the preflight in run_machineB.do -- the data files
 under `D' = $REP_LINK/data -- so the two cannot drift apart; the script stops
-if it does not find exactly 17. The five code files that preflight also
+if it does not find exactly 15 (17 before 2026-11-15, when three 1940
+inputs were replaced by linkage_sample1940.dta, built on machine A). The five code files that preflight also
 checks are in LINKAGE/ and versioned by git, so they are not hashed.
 
 mortality/temp.dta is a frozen input here, not a generated file: only
@@ -31,7 +32,7 @@ from hash_inputs import sha256  # noqa: E402  (machine A's helper, reused unchan
 
 REPO = HERE.parent
 MANIFEST = REPO / "replication" / "input_manifest_machineB.md"
-EXPECTED = 17
+EXPECTED = 15
 
 
 def rep_link():
@@ -63,7 +64,7 @@ def input_list():
     return ["data/" + r for r in rels]
 
 
-NOTE = ("17 rows, all frozen inputs: the data files `run_machineB.do` preflights. "
+NOTE = ("15 rows, all frozen inputs: the data files `run_machineB.do` preflights. "
         "`data/mortality/temp.dta` (the BUNMD denominator) is written upstream by "
         "`LINKAGE/code/03_mortality/04_post_match.do`, which `run_machineB.do` does not run; "
         "the run only reads it. The five code files the preflight also checks are in "

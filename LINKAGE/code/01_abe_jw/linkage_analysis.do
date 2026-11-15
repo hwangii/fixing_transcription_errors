@@ -2,12 +2,31 @@
 * linkage_analysis.do
 * Purpose:
 *   1. Linkage rates for JW and ABE methods, old vs new
-*      transcription. Denominator = all men in 1940 census.
+*      transcription. Denominator = 1940 men aged 10+ with both an
+*      Ancestry and a FamilySearch transcription (2026-11-15; was
+*      all men aged 8+).
 *   2. Pair-level comparison of each matched file to true links.
 *      For new vs old transcription: what pairs were added/removed,
 *      and were they true or false matches?
 *   3. Repeat analyses (1) and (2) restricting to 1940 records
 *      where Ancestry and FamilySearch transcriptions disagree.
+*
+* 2026-11-15: SAME SAMPLE AND DEFINITIONS AS THE PAPER'S MAIN TABLE
+* (tab:avg_performance, CODE/create_figures_SSHA2025.do), so that the
+* paper and the slides report one linkage rate for one set of links:
+*   - denominator: 1940 men aged 10+ with both transcriptions, from
+*     linkage_sample1940.dta (LINKAGE/code/prep/build_linkage_sample1940.do,
+*     built on machine A and copied to $D_FLAGS); was men aged 8+;
+*   - target: Ancestry and FamilySearch disagree on the first or last
+*     name (the file's target flag); was congruent == 0 from
+*     ipums_fs_names_for_Deaglan1940.dta;
+*   - numerator and every count: only links whose 1940 person is in the
+*     denominator, in both samples (the full sample used to keep every
+*     link);
+*   - middle initials: each version its own in 1940, Ancestry's for Old
+*     and ours for New (was ours for both); 1930 is Ancestry's in both.
+* The ABE columns must then reproduce the main table's linkage rate and
+* share validated; the file stops if they do not.
 * ============================================================
 
 clear all
@@ -26,8 +45,7 @@ repnum open using "$REP_RESULTS/linkage_abe_jw.tex", script(LINKAGE/code/01_abe_
 
 * ---- File paths (all derived from paths.do) ----
 local names1930   "$D_NAMES/clean_names_1930_old.dta"
-local names1940   "$D_NAMES/clean_names_1940_new.dta"
-local congruent_f "$D_FLAGS/ipums_fs_names_for_Deaglan1940.dta"
+local sample_f    "$D_FLAGS/linkage_sample1940.dta"
 
 local jw_new  "$D_LINKS/JW_matches_x2_unique_new.dta"
 local jw_old  "$D_LINKS/JW_matches_x2_unique_old.dta"
@@ -40,29 +58,26 @@ local true_links "$D_TRUTH/mlp_training1930_1940.dta"
 * PART 0: TEMPFILES
 * ============================================================
 
-* 1940 clean names (full) — restricted to boys age 8+
-use `names1940', clear
-keep if age >= 8 & !missing(age)
+* 1940 sample (full): men aged 10+ with both transcriptions, with each
+* version's 1940 middle initial (mi_anc = Ancestry, mi_ml = ours)
+use histid target mi_anc mi_ml using `sample_f', clear
+isid histid
 scalar N_men_1940_full = _N
 repnum linkDenomAbe = N_men_1940_full, format(%15.0fc)
-keep histid mi
 tempfile cn1940_full
 save `cn1940_full'
 
-* 1940 restricted to congruent == 0 (Ancestry != FamilySearch)
-use `congruent_f', clear
-keep if congruent == 0
-keep histid
-tempfile restr1940
-save `restr1940'
-
-* 1940 restricted clean names + denominator
-use `cn1940_full', clear
-merge 1:1 histid using `restr1940', keep(3) nogenerate
+* 1940 restricted: target records (Ancestry != FamilySearch)
+keep if target == 1
 scalar N_men_1940_restr = _N
 repnum linkDenomAbeDisc = N_men_1940_restr, format(%15.0fc)
 tempfile cn1940_restr
 save `cn1940_restr'
+keep histid
+tempfile restr1940
+save `restr1940'
+tempfile den1940_restr
+save `den1940_restr'
 
 * 1930 clean names
 use `names1930', clear
@@ -76,6 +91,10 @@ keep histid
 tempfile men1940
 save `men1940'
 
+* Denominator populations, one per sample: every count below is
+* restricted to these (fix 2026-11-15).
+local den1940_full `men1940'
+
 * True pairs: restricted to 1940 men
 use `true_links', clear
 keep histid1930 histid1940
@@ -86,7 +105,7 @@ rename histid histid1940
 tempfile true_pairs_full
 save `true_pairs_full'
 
-* True pairs: further restricted to 1940 congruent == 0
+* True pairs: further restricted to 1940 target records
 use `true_pairs_full', clear
 rename histid1940 histid
 merge m:1 histid using `restr1940', keep(3) nogenerate
@@ -125,7 +144,7 @@ foreach samp in full restr {
 
     di _newline _newline "============================================================"
     if "`samp'" == "full"  di "SAMPLE: FULL"
-    if "`samp'" == "restr" di "SAMPLE: RESTRICTED (congruent == 0)"
+    if "`samp'" == "restr" di "SAMPLE: RESTRICTED (target == 1)"
     di "============================================================"
 
     * ============================================================
@@ -149,12 +168,11 @@ foreach samp in full restr {
         keep histid1930 histid1940
         duplicates drop histid1930 histid1940, force
 
-        * If restricted, keep only pairs where histid1940 is in restricted set
-        if "`samp'" == "restr" {
-            rename histid1940 histid
-            merge m:1 histid using `restr1940', keep(3) nogenerate
-            rename histid histid1940
-        }
+        * Only links whose 1940 person is in this sample's denominator
+        * (fix 2026-11-15; the full sample used to keep every link).
+        rename histid1940 histid
+        merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
+        rename histid histid1940
 
         scalar N_linked_`samp'_`combo' = _N
         scalar rate_`samp'_`combo'     = N_linked_`samp'_`combo' / N_men_1940_`samp'
@@ -185,11 +203,11 @@ foreach samp in full restr {
         keep histid1930 histid1940
         duplicates drop histid1930 histid1940, force
 
-        if "`samp'" == "restr" {
-            rename histid1940 histid
-            merge m:1 histid using `restr1940', keep(3) nogenerate
-            rename histid histid1940
-        }
+        * Only links whose 1940 person is in this sample's denominator
+        * (fix 2026-11-15; the full sample used to keep every link).
+        rename histid1940 histid
+        merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
+        rename histid histid1940
 
         * Classify matched pairs (two-sided; fix 2026-10-19)
         merge m:1 histid1940 using `true_by1940', keep(1 3) gen(person_merge)
@@ -221,10 +239,13 @@ foreach samp in full restr {
             merge m:1 histid using `cn1930', keep(1 3) nogenerate
             rename histid histid1930
             rename mi mi1930
+            * Each version's own 1940 initial (2026-11-15): Ancestry's
+            * for old, ours for new.
+            local miv = cond(strpos("`combo'", "_old"), "mi_anc", "mi_ml")
             rename histid1940 histid
-            merge m:1 histid using `cn1940_`samp'', keep(1 3) nogenerate
+            merge m:1 histid using `cn1940_`samp'', keep(1 3) nogenerate keepusing(`miv')
             rename histid histid1940
-            rename mi mi1940
+            rename `miv' mi1940
             keep if mi1930 != "" & mi1940 != ""
             count
             scalar mi_denom_`samp'_`combo' = r(N)
@@ -262,11 +283,11 @@ foreach samp in full restr {
             rename Bhistid histid1940
         }
         keep histid1930 histid1940
-        if "`samp'" == "restr" {
-            rename histid1940 histid
-            merge m:1 histid using `restr1940', keep(3) nogenerate
-            rename histid histid1940
-        }
+        * Only links whose 1940 person is in this sample's denominator
+        * (fix 2026-11-15; the full sample used to keep every link).
+        rename histid1940 histid
+        merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
+        rename histid histid1940
         duplicates drop histid1930, force
         rename histid1940 histid1940_new
         tempfile new_`method'_`samp'
@@ -284,11 +305,11 @@ foreach samp in full restr {
             rename Bhistid histid1940
         }
         keep histid1930 histid1940
-        if "`samp'" == "restr" {
-            rename histid1940 histid
-            merge m:1 histid using `restr1940', keep(3) nogenerate
-            rename histid histid1940
-        }
+        * Only links whose 1940 person is in this sample's denominator
+        * (fix 2026-11-15; the full sample used to keep every link).
+        rename histid1940 histid
+        merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
+        rename histid histid1940
         duplicates drop histid1930, force
         rename histid1940 histid1940_old
 
@@ -380,6 +401,55 @@ foreach samp in full restr {
 
 
 * ============================================================
+* CHECK (2026-11-15): THE ABE COLUMNS REPRODUCE THE MAIN TABLE
+* ============================================================
+* Same links, sample, target and initials as tab:avg_performance
+* (raw= values in replication/results/create_figures_SSHA2025.tex).
+* A difference means the two tables still measure different things.
+
+local p_n_restr 14416543
+local p_n_full  51036859
+local p_lr_restr_abe_old  8.88273284378925
+local p_lr_restr_abe_new 19.4149041139752
+local p_lr_full_abe_old  22.8142938812124
+local p_lr_full_abe_new  24.6009379221398
+local p_nv_restr_abe_old  308513
+local p_nv_restr_abe_new  618732
+local p_nv_full_abe_old  2512418
+local p_nv_full_abe_new  2665324
+local p_sv_restr_abe_old 65.4053475866495
+local p_sv_restr_abe_new 83.5985531700316
+local p_sv_full_abe_old  85.9879207998032
+local p_sv_full_abe_new  87.137473718017
+local bad 0
+foreach samp in full restr {
+    if N_men_1940_`samp' != `p_n_`samp'' {
+        di as error "`samp' denominator: " N_men_1940_`samp' ", main table `p_n_`samp''"
+        local bad 1
+    }
+    foreach combo in abe_old abe_new {
+        if mi_denom_`samp'_`combo' != `p_nv_`samp'_`combo'' {
+            di as error "`samp' `combo' links with both initials: " mi_denom_`samp'_`combo' ", main table `p_nv_`samp'_`combo''"
+            local bad 1
+        }
+        if abs(100*rate_`samp'_`combo' - `p_lr_`samp'_`combo'') > 1e-9 {
+            di as error "`samp' `combo' linkage rate: " %18.0g 100*rate_`samp'_`combo' ", main table `p_lr_`samp'_`combo''"
+            local bad 1
+        }
+        if abs(100*mi_rate_`samp'_`combo' - `p_sv_`samp'_`combo'') > 1e-9 {
+            di as error "`samp' `combo' share validated: " %18.0g 100*mi_rate_`samp'_`combo' ", main table `p_sv_`samp'_`combo''"
+            local bad 1
+        }
+    }
+}
+if `bad' {
+    di as error "CHECK FAILED: the ABE columns do not reproduce tab:avg_performance; no table written"
+    exit 9
+}
+di "CHECK PASSED: the ABE columns reproduce tab:avg_performance"
+
+
+* ============================================================
 * PART 4: LATEX TABLES
 * ============================================================
 
@@ -416,11 +486,11 @@ foreach samp in full restr {
     * ---- Set output file and caption ----
     if "`samp'" == "full" {
         local outtex "$OUT_TABLES/linkage_table_abe_jw.tex"
-        local caption "Linkage Quality: Old vs.\ New Transcription, 1930--1940. Denominator is all men in the 1940 census."
+        local caption "Linkage Quality: Old vs.\ New Transcription, 1930--1940. Denominator is 1940 men aged 10 and above with both an Ancestry and a FamilySearch transcription. MI match rate scores each version against its own 1940 middle initial (Ancestry's for Old, ours for New), as in the main table."
     }
     if "`samp'" == "restr" {
         local outtex "$OUT_TABLES/linkage_table_abe_jw_restricted.tex"
-        local caption "Linkage Quality: Old vs.\ New Transcription, 1930--1940. Restricted to 1940 records where Ancestry and FamilySearch transcriptions disagree. Denominator is men in the 1940 census with discordant transcriptions."
+        local caption "Linkage Quality: Old vs.\ New Transcription, 1930--1940. Restricted to 1940 records where Ancestry and FamilySearch transcriptions disagree. Denominator is 1940 men aged 10 and above whose Ancestry and FamilySearch transcriptions disagree. MI match rate scores each version against its own 1940 middle initial (Ancestry's for Old, ours for New), as in the main table."
     }
 
     file open f using "`outtex'", write replace

@@ -7,12 +7,23 @@
 *   below that block refers to a specific linking method.
 *
 *   1. Linkage rates, old vs new transcription.
-*      Denominator = all men in 1940 census.
+*      Denominator = 1940 men aged 10+ with both an Ancestry and a
+*      FamilySearch transcription (2026-11-15; was men AND women 8+).
 *   2. Pair-level comparison of each matched file to true links.
 *      For new vs old transcription: what pairs were added/removed,
 *      and were they true or false matches?
 *   3. Repeat analyses (1) and (2) restricting to 1940 records
 *      where Ancestry and FamilySearch transcriptions disagree.
+*
+* 2026-11-15: SAME SAMPLE AND DEFINITIONS AS THE PAPER'S MAIN TABLE
+* AND THE ABE/JW TABLE (see LINKAGE/code/01_abe_jw/linkage_analysis.do):
+* 1940 men aged 10+ with both transcriptions (linkage_sample1940.dta,
+* built on machine A by LINKAGE/code/prep/build_linkage_sample1940.do
+* and copied to $D_FLAGS), target = Ancestry and FamilySearch disagree
+* on the first or last name, and each version's own 1940 middle
+* initial (Ancestry's for old, ours for new). Was: men and women aged
+* 8+, congruent == 0, and our 1940 initials for both versions. Links
+* whose 1940 person is a woman now fall outside the denominator.
 * ============================================================
 
 clear all
@@ -31,8 +42,7 @@ repnum open using "$REP_RESULTS/linkage_hlink.tex", script(LINKAGE/code/02_hlink
 
 * ---- Common file paths (all derived from paths.do) ----
 local names1930   "$D_APPENDED/divided_file1930_ans_cleaned_women_added.dta"
-local names1940   "$D_APPENDED/divided_file1940_true_cleaned_women_added.dta"
-local congruent_f "$D_FLAGS/ipums_fs_names_for_Deaglan1940.dta"
+local sample_f    "$D_FLAGS/linkage_sample1940.dta"
 
 local true_links "$D_TRUTH/mlp_training1930_1940.dta"
 
@@ -183,30 +193,24 @@ end
 * PART 0: TEMPFILES
 * ============================================================
 
-* 1940 clean names (full) — restricted to boys age 8+
-use `names1940', clear
-normalize_names
-keep if age >= 8 & !missing(age)
+* 1940 sample (full): men aged 10+ with both transcriptions, with each
+* version's 1940 middle initial (mi_anc = Ancestry, mi_ml = ours)
+use histid target mi_anc mi_ml using `sample_f', clear
+isid histid
 scalar N_men_1940_full = _N
 repnum linkDenomHlink = N_men_1940_full, format(%15.0fc)
-keep histid mi
 tempfile cn1940_full
 save `cn1940_full'
 
-* 1940 restricted to congruent == 0 (Ancestry != FamilySearch)
-use `congruent_f', clear
-keep if congruent == 0
-keep histid
-tempfile restr1940
-save `restr1940'
-
-* 1940 restricted clean names + denominator
-use `cn1940_full', clear
-merge 1:1 histid using `restr1940', keep(3) nogenerate
+* 1940 restricted: target records (Ancestry != FamilySearch)
+keep if target == 1
 scalar N_men_1940_restr = _N
 repnum linkDenomHlinkDisc = N_men_1940_restr, format(%15.0fc)
 tempfile cn1940_restr
 save `cn1940_restr'
+keep histid
+tempfile restr1940
+save `restr1940'
 
 * 1930 clean names
 use `names1930', clear
@@ -239,7 +243,7 @@ rename histid histid1940
 tempfile true_pairs_full
 save `true_pairs_full'
 
-* True pairs: further restricted to 1940 congruent == 0
+* True pairs: further restricted to 1940 target records
 use `true_pairs_full', clear
 rename histid1940 histid
 merge m:1 histid using `restr1940', keep(3) nogenerate
@@ -279,7 +283,7 @@ foreach samp in full restr {
     di _newline _newline "============================================================"
     di "METHOD: `mlabel'"
     if "`samp'" == "full"  di "SAMPLE: FULL"
-    if "`samp'" == "restr" di "SAMPLE: RESTRICTED (congruent == 0)"
+    if "`samp'" == "restr" di "SAMPLE: RESTRICTED (target == 1)"
     di "============================================================"
 
     * ============================================================
@@ -292,8 +296,8 @@ foreach samp in full restr {
 
         prep_links "`link_`ver''" "`id1930'" "`id1940'" "`keepif'"
 
-        * Numerator restricted to this sample's denominator population: age 8+,
-        * and congruent == 0 when restricted. Fix 2026-10-19; before, the full
+        * Numerator restricted to this sample's denominator population: men 10+
+        * with both transcriptions, and target == 1 when restricted. Fix 2026-10-19; before, the full
         * sample kept every pair and the restricted one checked congruence only.
         rename histid1940 histid
         merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
@@ -330,8 +334,8 @@ foreach samp in full restr {
 
         prep_links "`link_`ver''" "`id1930'" "`id1940'" "`keepif'"
 
-        * Numerator restricted to this sample's denominator population: age 8+,
-        * and congruent == 0 when restricted. Fix 2026-10-19; before, the full
+        * Numerator restricted to this sample's denominator population: men 10+
+        * with both transcriptions, and target == 1 when restricted. Fix 2026-10-19; before, the full
         * sample kept every pair and the restricted one checked congruence only.
         rename histid1940 histid
         merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
@@ -367,10 +371,13 @@ foreach samp in full restr {
             merge m:1 histid using `cn1930', keep(1 3) nogenerate
             rename histid histid1930
             rename mi mi1930
+            * Each version's own 1940 initial (2026-11-15): Ancestry's
+            * for old, ours for new.
+            local miv = cond("`ver'" == "old", "mi_anc", "mi_ml")
             rename histid1940 histid
-            merge m:1 histid using `cn1940_`samp'', keep(1 3) nogenerate
+            merge m:1 histid using `cn1940_`samp'', keep(1 3) nogenerate keepusing(`miv')
             rename histid histid1940
-            rename mi mi1940
+            rename `miv' mi1940
             keep if mi1930 != "" & mi1940 != ""
             count
             scalar mi_denom_`samp'_`ver' = r(N)
@@ -396,8 +403,8 @@ foreach samp in full restr {
 
     * ---- Load new transcription pairs ----
     prep_links "`link_new'" "`id1930'" "`id1940'" "`keepif'"
-    * Numerator restricted to this sample's denominator population: age 8+,
-    * and congruent == 0 when restricted. Fix 2026-10-19; before, the full
+    * Numerator restricted to this sample's denominator population: men 10+
+    * with both transcriptions, and target == 1 when restricted. Fix 2026-10-19; before, the full
     * sample kept every pair and the restricted one checked congruence only.
     rename histid1940 histid
     merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
@@ -409,8 +416,8 @@ foreach samp in full restr {
 
     * ---- Load old transcription pairs ----
     prep_links "`link_old'" "`id1930'" "`id1940'" "`keepif'"
-    * Numerator restricted to this sample's denominator population: age 8+,
-    * and congruent == 0 when restricted. Fix 2026-10-19; before, the full
+    * Numerator restricted to this sample's denominator population: men 10+
+    * with both transcriptions, and target == 1 when restricted. Fix 2026-10-19; before, the full
     * sample kept every pair and the restricted one checked congruence only.
     rename histid1940 histid
     merge m:1 histid using `den1940_`samp'', keep(3) nogenerate
@@ -541,11 +548,11 @@ foreach samp in full restr {
     local ftag = strlower("`mtag'")
     if "`samp'" == "full" {
         local outtex "`outdir'/linkage_table_`ftag'.tex"
-        local caption "Linkage Quality, `mlabel' Links: Old vs.\ New Transcription, 1930--1940. Denominator is all men in the 1940 census."
+        local caption "Linkage Quality, `mlabel' Links: Old vs.\ New Transcription, 1930--1940. Denominator is 1940 men aged 10 and above with both an Ancestry and a FamilySearch transcription. MI match rate scores each version against its own 1940 middle initial (Ancestry's for Old, ours for New), as in the main table."
     }
     if "`samp'" == "restr" {
         local outtex "`outdir'/linkage_table_`ftag'_restricted.tex"
-        local caption "Linkage Quality, `mlabel' Links: Old vs.\ New Transcription, 1930--1940. Restricted to 1940 records where Ancestry and FamilySearch transcriptions disagree. Denominator is men in the 1940 census with discordant transcriptions."
+        local caption "Linkage Quality, `mlabel' Links: Old vs.\ New Transcription, 1930--1940. Restricted to 1940 records where Ancestry and FamilySearch transcriptions disagree. Denominator is 1940 men aged 10 and above whose Ancestry and FamilySearch transcriptions disagree. MI match rate scores each version against its own 1940 middle initial (Ancestry's for Old, ours for New), as in the main table."
     }
 
     file open f using "`outtex'", write replace
