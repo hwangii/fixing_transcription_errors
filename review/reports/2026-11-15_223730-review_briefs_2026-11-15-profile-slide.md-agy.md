@@ -1,0 +1,97 @@
+# Antigravity review
+
+*Rendered 2026-11-15 22:44. Source: `D:\repos\fixing_transcription_errors\review\reports\2026-11-15_223730-review_briefs_2026-11-15-profile-slide.md-agy.json`*
+
+**Dimensions:** claims-vs-code, correctness
+
+**Result:** 2 major, 1 minor
+
+## Summary
+
+The numbers on the new profile agreement slide reproduce MATCHING/results/profile_names.md exactly, but the slide's documentation and presentation suffer from two major claims-vs-code defects. Most importantly, the slide comment equates 'Ours' with the linkage's 'New' transcription, but 'Ours' is raw uncleaned model output that scores 0% when missing and evaluates on concordant records, whereas 'New' is a hybrid that falls back to Ancestry on missing/duplicate outputs and standardizes nicknames via abeclean. Furthermore, omitting FamilySearch's agreement rate (53.5% on target, 67.6% on all) conceals that FamilySearch outperforms 'Ours' and that the 30-point leap over Ancestry on target records is driven by FamilySearch profile tree bias.
+
+## Triage
+
+| # | Sev | Conf | Finding | Location | Disposition |
+|---|-----|------|---------|----------|-------------|
+| 1 | MAJOR | verified | Slide comment equates 'Ours' with the linkage's 'New', but the two use different name sets and fallback rules | `slides_ssha2026.tex:339, MATCHING/profile_names_score.do:182-198, MATCHING/1_divide_and_clean_everyoneV5_women_addedV2.do:169-173` || Fixed: as codex #1. |
+| 2 | MAJOR | verified | Omitting FamilySearch's agreement rate hides that FamilySearch exceeds 'Ours' and that tree bias drives target gains | `slides_ssha2026.tex:346-357, MATCHING/profile_names_score.do:25-33, MATCHING/results/profile_names.md:120-126` || Accepted risk: the author asked for Ancestry vs ours only, for simplicity; the bias bullet on the slide names FamilySearch's advantage. FamilySearch's 53.5/67.6 raised with the author 2026-11-15 to decide whether to add the column. |
+| 3 | minor | verified | Profile slide table rows 'Target records' and 'All records' omit age cutoff, contrasting with men 10+ on subsequent slides | `slides_ssha2026.tex:341-353, slides_ssha2026.tex:400-410, slides_ssha2026.tex:426-438, MATCHING/profile_names_score.do:202` || Fixed: first bullet now says '(all ages)'. |
+
+> Fill the Disposition column: **Fixed** (with commit) / **Rebutted** (with reason) / **Accepted risk** (with why).
+
+## Findings
+
+### 1. Slide comment equates 'Ours' with the linkage's 'New', but the two use different name sets and fallback rules
+
+`ours-is-not-linkage-new` · **MAJOR** · claims-vs-code · confidence: **verified** (traced in source)
+
+**Where:** `slides_ssha2026.tex:339, MATCHING/profile_names_score.do:182-198, MATCHING/1_divide_and_clean_everyoneV5_women_addedV2.do:169-173`
+
+**What the code does**  
+The LaTeX slide comment at slides_ssha2026.tex:339 states: '"Ours" = model names on every record (the linkage\'s New)'. In MATCHING/profile_names_score.do:182-198, 'Ours' is evaluated strictly on the raw model variables (namefrst_ml, namelast_ml_ditto) across all records; records where the model produced no output (cell 4, N=552,328 in the death-month target sample) receive mf_ml=0 and mlast_ml=0 (0.0% agreement in profile_names.md:126), and concordant records (cell 0) are evaluated on raw ML predictions rather than consensus names (yielding 67.4% vs Ancestry/FS 72.3%). By contrast, in MATCHING/1_divide_and_clean_everyoneV5_women_addedV2.do:169-173, the linkage's 'New' transcription (_true_cleaned) executes 'replace namefrst`name_type\'=namefrst_ans if namefrst`name_type\'=="" & namefrst_ans!=""' (falling back to Ancestry) and runs 'abeclean ... nickname nonysiis' (standardizing nicknames).
+
+**Why it matters**  
+The claim that 'Ours' is the linkage's 'New' is false. If the linkage's 'New' transcription were scored on target records, cell 4 would receive Ancestry's 18.2% agreement instead of 0.0%, shifting the target agreement rate from 47.7% to 49.2%, and concordant records would retain Ancestry's 72.3% rather than dipping to 67.4%. Equating the two conflates raw ML output with the hybrid cleaned linkage input.
+
+**How to check**  
+Inspect MATCHING/results/profile_names.md:126 for cell 4, where 'ours' agreement is 0.0% because missing model names receive no credit; then inspect MATCHING/1_divide_and_clean_everyoneV5_women_addedV2.do:169-173, where namefrst_true_cleaned explicitly replaces missing model transcriptions with namefrst_ans and applies abeclean nickname standardization.
+
+**Suggested fix**  
+Clarify the slide note and commentary: state that 'Ours' on this slide is the standalone ML model output (namefrst_ml, namelast_ml_ditto) with unparsed/missing outputs scored as 0% agreement, rather than the linkage pipeline's hybrid 'New' transcription which falls back to Ancestry and standardizes nicknames. Alternatively, score the actual 'New' transcription (divided_file1940_true_cleaned) against profiles.
+
+---
+
+### 2. Omitting FamilySearch's agreement rate hides that FamilySearch exceeds 'Ours' and that tree bias drives target gains
+
+`omission-of-familysearch-baseline-hides-tree-bias` · **MAJOR** · claims-vs-code · confidence: **verified** (traced in source)
+
+**Where:** `slides_ssha2026.tex:346-357, MATCHING/profile_names_score.do:25-33, MATCHING/results/profile_names.md:120-126`
+
+**What the code does**  
+The slide table at slides_ssha2026.tex:348-353 reports only Ancestry (17.1% target, 58.4% all) and Ours (47.7% target, 62.4% all), omitting the FamilySearch column from MATCHING/results/profile_names.md:120-122 (53.5% target, 67.6% all). While the bullet at line 356 notes that profiles favour names that agree with FamilySearch, the presentation frames the 30.6 pp difference (47.7% vs 17.1%) as an external validation against Ancestry without showing that FamilySearch itself scores 53.5%. As documented in MATCHING/profile_names_score.do:26-31, 57.3% of target records are in Cell 2 (where model = FamilySearch != Ancestry, scoring 65.2% vs Ancestry 11.4%), mechanically inflating 'Ours' via profile attachment bias, whereas the only signed conservative benchmark (Cell 1: 45.8% vs 31.5%) is omitted.
+
+**Why it matters**  
+Presenting 'Ancestry' vs 'Ours' without 'FamilySearch' creates the visual impression that our model improves transcription accuracy by 30 percentage points over human transcription, when in fact FamilySearch's transcription achieves higher profile agreement than Ours in both rows, and the target gain is largely driven by agreement with FamilySearch's biased index.
+
+**How to check**  
+Compare slides_ssha2026.tex:348-353 with MATCHING/results/profile_names.md:120-122. Confirm that FamilySearch achieves 53.5% on target records and 67.6% on all records, both higher than 'Ours' (47.7% and 62.4%), and observe that the slide suppresses the FamilySearch column entirely while quoting a 30.6 percentage point gain over Ancestry.
+
+**Suggested fix**  
+Include the FamilySearch column (53.5% target, 67.6% all) in the slide table alongside Ancestry and Ours, or report the decomposition by cell (particularly Cell 1: 45.8% Ancestry/Ours vs 31.5% FamilySearch), where the directional bias of FamilySearch profiles is signed against the model.
+
+---
+
+### 3. Profile slide table rows 'Target records' and 'All records' omit age cutoff, contrasting with men 10+ on subsequent slides
+
+`all-ages-sample-unlabeled-against-linkage-universe` · **minor** · claims-vs-code · confidence: **verified** (traced in source)
+
+**Where:** `slides_ssha2026.tex:341-353, slides_ssha2026.tex:400-410, slides_ssha2026.tex:426-438, MATCHING/profile_names_score.do:202`
+
+**What the code does**  
+The slide text (slides_ssha2026.tex:342-351) describes the sample as '1940 men attached to a FamilySearch family-tree profile that records a death month' and labels the table rows 'Target records' and 'All records' without stating the age range. In the code (MATCHING/profile_names_score.do:202), 'men = sex==1' includes all ages (0 to 100+). However, subsequent slides 399 ('Target records') and 426 ('All records') use the exact same row titles for the linkage analysis sample, which is restricted to men aged 10+.
+
+**Why it matters**  
+An audience viewing consecutive slides with identical row labels ('Target records' and 'All records') is likely to assume they reflect the same underlying population, obscuring why Target records drops from 14.4M to 6.9M and All records drops from 51.0M to 27.3M beyond profile linkage attrition.
+
+**How to check**  
+Compare the sample sizes and definitions: slides_ssha2026.tex:350-351 reports 6,897,127 Target and 27,334,035 All records (men of all ages with death-month profiles, MATCHING/profile_names_score.do:202), whereas slides_ssha2026.tex:400-438 uses 'Target records' (14,416,543) and 'All records' (51,036,859) for men aged 10+.
+
+**Suggested fix**  
+Add a brief label or table note indicating that the profile agreement table covers men of all ages with death-month profiles (unlike the linkage tables on subsequent slides which restrict to men aged 10+).
+
+---
+
+## Checked and sound
+
+- **Slide numbers match profile_names.md exactly** — Records counts (6,897,127 and 27,334,035) and agreement percentages (Ancestry 17.1% and 58.4%, Ours 47.7% and 62.4%) in slides_ssha2026.tex:350-351 match MATCHING/results/profile_names.md:120-122 line for line.
+- **Target records definition in profile scoring code matches project standard** — MATCHING/profile_names_build.do:46 defines disc = !(namefrst==fs_namefrst & namelast==fs_namelast), which partitions into cells 1-4, matching MATCHING/profile_names_score.do:253 and the target definition used in LINKAGE/code/prep/build_linkage_sample1940.do:52.
+- **Missing and blank names do not falsely inflate agreement rates** — Match indicators in MATCHING/profile_names_score.do:194-198 require cf_s==ref_first & cf_s!="" and cl_s==ref_r & cl_s!="", preventing empty string comparisons ("" == "") from counting as matches.
+- **Both first name and surname agreement required for full name match** — MATCHING/profile_names_score.do:246 constructs full-name match as 'gen byte m_s = mf_s & mlast_s', and requires both reference parts non-empty in the denominator filter ok at line 243 (ref_first!="" & ref_last!="").
+- **Gender contradiction and profile multi-attachment drops are handled correctly** — MATCHING/profile_names_build.do:89-100 enforces 1:1 crosswalk matches dropping records attached to >1 profile and profiles attached to >1 record; MATCHING/profile_names_score.do:170-173 drops records where census sex contradicts profile gender before scoring.
+
+## What this review could not establish
+
+- No paper draft was supplied for this run; claims-vs-code review was conducted against the presentation slide diff (slides_ssha2026.tex), the review brief, and comments/labels embedded in the Stata code.
+- The external census microdata, FamilySearch profile scrapes, and intermediate .dta files reside on external storage drives and could not be read or executed in this sandbox.
+- Stata was not available in this environment; all Stata code behavior and macro expansions were inferred from static analysis of the .do source files rather than runtime execution.
