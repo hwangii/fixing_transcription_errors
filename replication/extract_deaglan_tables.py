@@ -78,9 +78,9 @@ def check_reproduction(paper, regenerated):
 HEADER = [
     "% EXTRACTED MECHANICALLY from {source} -- DO NOT EDIT BY HAND.",
     "% Tabular only. Deaglan's file is a complete table float; its caption and",
-    "% label stay there. The paper supplies its own caption, because the package",
-    "% caption on the HLINK tables says 'all men' when the denominator is men AND",
-    "% women aged 8+. See deaglan_results/current/PROVENANCE.md, Q3.",
+    "% label stay there. The paper supplies its own caption and notes (until",
+    "% 2026-11-15 the HLINK caption also misstated that table's denominator; see",
+    "% deaglan_results/current/PROVENANCE.md, Q3, and linkage_tables/README.md).",
 ]
 
 
