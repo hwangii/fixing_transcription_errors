@@ -22,10 +22,10 @@ Result files read: compare_sample_counts.tex, compute_county_correlates.tex, com
 | **UNCHECKED** | `gpu-benchmark` | 378 | ? | 299,880: unchecked<br>0.22: unchecked<br>1940: unchecked<br>1,600: unchecked | No benchmark code or log. 1940 Rhode Island had roughly 713,000 persons, so 299,880 as 'the complete Rhode Island sample' needs a definition. |
 | **UNCHECKED** | `gpu-extrapolation` | 379 | ? | 730,000: unchecked |  |
 | **UNCHECKED** | `n-males-ten` | 400 | A | 55,347,491: ok<br>10: unchecked<br>1940: unchecked |  |
-| **UNCHECKED** | `deaglan-denom-abe` | 604 | B | 57,589,273: ok<br>8: unchecked |  |
-| **UNCHECKED** | `deaglan-denom-abe-disc` | 619 | B | 15,003,537: ok<br>8: unchecked |  |
-| **UNCHECKED** | `deaglan-denom-hlink` | 636 | B | 115,030,746: ok<br>8: unchecked |  |
-| **UNCHECKED** | `deaglan-denom-hlink-disc` | 651 | B | 30,754,309: ok<br>8: unchecked |  |
+| **UNCHECKED** | `deaglan-denom-hlink` | 591 | B | 51,036,859: ok<br>10: unchecked<br>1940: unchecked<br>14,416,543: ok |  |
+| **UNCHECKED** | `deaglan-denom-abe` | 605 | B | 51,036,859: ok<br>10: unchecked |  |
+| **UNCHECKED** | `deaglan-denom-abe-disc` | 620 | B | 14,416,543: ok<br>10: unchecked |  |
+| **UNCHECKED** | `deaglan-denom-hlink-disc` | 651 | B | 14,416,543: ok<br>10: unchecked |  |
 | **UNCHECKED** | `fs-versions-anc-initials` | 666 | A | 75.7: ok<br>74.8: ok<br>1940: unchecked<br>65.4: ok |  |
 | **UNCHECKED** | `fs-versions-note-n` | 679 | A | 14,416,543: ok<br>10: unchecked<br>1940: unchecked<br>51,036,859: ok<br>10: unchecked |  |
 | **UNCHECKED** | `fs-cell1` | 689 | A | 21.6: ok<br>21.4: ok<br>82.8: ok<br>83.0: ok<br>1940: unchecked<br>13.0: ok<br>67.8: ok |  |
@@ -45,7 +45,7 @@ Result files read: compare_sample_counts.tex, compute_county_correlates.tex, com
 | **MATCH** | `intro-all-gain` | 99 | A | 8: ok |  |
 | **MATCH** | `intro-legibility` | 101 | A | 20: ok<br>1.6: ok |  |
 | **MATCH** | `intro-hardest-baseline` | 102 | A | assert: holds  [legGainLowest > legGainSecond and legGainLowest > legGainThird and legGainLowest > legGainHighest and legLinkBaseLowest < legLinkBaseHighest] |  |
-| **MATCH** | `intro-validation` | 108 | B | 523,399: ok<br>1,320,314: ok<br>11.1: ok<br>28.1: ok<br>5.13: ok<br>2.59: ok<br>0.77: ok<br>0.73: ok |  |
+| **MATCH** | `intro-validation` | 108 | B | 523,091: ok<br>1,319,555: ok<br>11.1: ok<br>28.1: ok<br>5.09: ok<br>2.56: ok<br>0.74: ok<br>0.69: ok |  |
 | **MATCH** | `intro-mortality` | 110 | B | 7.08: ok |  |
 | **MATCH** | `intro-doubling` | 135 | A | assert: holds  [linkRateTargetAfter / linkRateTargetBefore >= 2] |  |
 | **MATCH** | `sec3-disagree` | 181 | A | 28.2: ok |  |
@@ -69,13 +69,13 @@ Result files read: compare_sample_counts.tex, compute_county_correlates.tex, com
 | **MATCH** | `results-all-reading` | 555 | A | assert: holds  [ppReadingAncAll > ppLinksAncAll and ppReadingFsAll > ppLinksFsAll] |  |
 | **MATCH** | `results-all` | 555 | A | 8: ok<br>1: ok |  |
 | **MATCH** | `results-congruent-share` | 556 | A | 72: ok |  |
-| **MATCH** | `deaglan-abe-disc` | 566 | B | 8.6: ok<br>18.7: ok<br>118: ok<br>119: ok |  |
-| **MATCH** | `deaglan-jw-disc` | 567 | B | 14.9: ok<br>22.1: ok |  |
-| **MATCH** | `deaglan-hlink-disc` | 568 | B | 49.7: ok<br>56.5: ok |  |
-| **MATCH** | `deaglan-mi` | 571 | B | 76.8: ok<br>83.5: ok<br>79.7: ok<br>83.8: ok<br>82.7: ok<br>83.4: ok | These are discordant-sample values (full-sample MI rates are 86-87); the sentence does not say which sample. |
-| **MATCH** | `deaglan-verified` | 581 | B | 523,399: ok<br>1,320,314: ok<br>11.1: ok<br>28.1: ok<br>20.6: ok<br>32.5: ok<br>69.5: ok<br>77.4: ok |  |
-| **MATCH** | `deaglan-contradicted-counts` | 582 | B | 312,746: ok<br>278,940: ok<br>507,261: ok<br>509,706: ok<br>65,907: ok<br>72,769: ok<br>117,637: ok<br>127,195: ok |  |
-| **MATCH** | `deaglan-contradicted-shares` | 584 | B | 2.47: ok<br>2.07: ok<br>2.78: ok<br>2.36: ok<br>4.12: ok<br>2.27: ok<br>5.13: ok<br>2.59: ok<br>0.76: ok<br>0.74: ok<br>0.77: ok<br>0.73: ok |  |
+| **MATCH** | `deaglan-abe-disc` | 566 | B | 8.9: ok<br>19.4: ok<br>119: ok |  |
+| **MATCH** | `deaglan-jw-disc` | 567 | B | 15.4: ok<br>22.9: ok |  |
+| **MATCH** | `deaglan-hlink-disc` | 568 | B | 53.8: ok<br>61.8: ok |  |
+| **MATCH** | `deaglan-mi` | 571 | B | 65.4: ok<br>83.6: ok<br>72.4: ok<br>83.9: ok<br>76.5: ok<br>84.0: ok | These are discordant-sample values (full-sample MI rates are 86-87); the sentence does not say which sample. |
+| **MATCH** | `deaglan-verified` | 582 | B | 523,091: ok<br>1,319,555: ok<br>11.1: ok<br>28.1: ok<br>20.6: ok<br>32.5: ok<br>72.7: ok<br>81.6: ok |  |
+| **MATCH** | `deaglan-contradicted-counts` | 583 | B | 286,323: ok<br>254,780: ok<br>232,396: ok<br>231,567: ok<br>65,137: ok<br>71,662: ok<br>57,089: ok<br>61,244: ok |  |
+| **MATCH** | `deaglan-contradicted-shares` | 585 | B | 2.43: ok<br>2.03: ok<br>2.74: ok<br>2.32: ok<br>4.08: ok<br>2.24: ok<br>5.09: ok<br>2.56: ok<br>0.70: ok<br>0.68: ok<br>0.74: ok<br>0.69: ok |  |
 | **MATCH** | `fs-versions-target` | 663 | A | 20.1: ok<br>8.9: ok<br>19.4: ok<br>83.4: ok<br>65.4: ok<br>83.6: ok |  |
 | **MATCH** | `fs-versions-both` | 665 | A | 22.3: ok |  |
 | **MATCH** | `fs-cell1-size` | 688 | A | 14.3: ok |  |
@@ -110,8 +110,8 @@ Result files read: compare_sample_counts.tex, compute_county_correlates.tex, com
 | `figures/avg_performance_allstates.tex` | tab:avg_performance | yes | 538 | A | NO GENERATED-BY HEADER |  |
 | `figures/all_states_hetero_combinedV2.pdf` | fig:hetero_legibility | yes | 847 | A |  |  |
 | `figures/all_states_socio_demo_combinedV2.pdf` | fig:hetero_socio | yes | 807 | A |  |  |
-| `figures/deaglan_abe_jw.tex` | tab:deaglan_abe_jw | yes | 600,615 | B | header: extracted from Deaglan's package | The extraction step from deaglan_results/current/ into figures/ has no script. |
-| `figures/deaglan_abe_jw_restricted.tex` | tab:deaglan_abe_jw_restricted | yes | 615 | B | header: extracted from Deaglan's package |  |
+| `figures/deaglan_abe_jw.tex` | tab:deaglan_abe_jw | yes | 601,616 | B | header: extracted from Deaglan's package | The extraction step from deaglan_results/current/ into figures/ has no script. |
+| `figures/deaglan_abe_jw_restricted.tex` | tab:deaglan_abe_jw_restricted | yes | 616 | B | header: extracted from Deaglan's package |  |
 | `figures/deaglan_hlink.tex` | tab:deaglan_hlink | yes | 632,647 | B | header: extracted from Deaglan's package |  |
 | `figures/deaglan_hlink_restricted.tex` | tab:deaglan_hlink_restricted | yes | 647 | B | header: extracted from Deaglan's package |  |
 | `figures/deaglan_mortality_bunmd.tex` | tab:deaglan_mortality | yes | 751 | B | header: extracted from Deaglan's package |  |

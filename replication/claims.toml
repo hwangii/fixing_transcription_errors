@@ -95,7 +95,7 @@ machine = "A"
 
 [[claim]]
 id = "intro-validation"
-text = 'rises from 523,399 to 1,320,314 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 5.13 to 2.59 percent on that sample under exact names and from 0.77 to 0.73 percent under the machine-learning linker'
+text = 'rises from 523,091 to 1,319,555 and recall from 11.1 to 28.1 percent, while the share of links that the same data directly contradict falls in every specification we examine, from 5.09 to 2.56 percent on that sample under exact names and from 0.74 to 0.69 percent under the machine-learning linker'
 values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 3)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 4)',
@@ -419,20 +419,21 @@ machine = "A"
 
 [[claim]]
 id = "deaglan-abe-disc"
-text = 'the exact-name algorithm links 8.6 percent of its denominator before our transcriptions and 18.7 percent after, a 118 percent increase that reproduces the 119 percent'
+text = 'the exact-name algorithm links 8.9 percent of its denominator before our transcriptions and 19.4 percent after, a 119 percent increase'
 values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 3)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 4)',
-  '100*(cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 4)/cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 3)-1)',
   "linkGainTarget",
 ]
+# 2026-11-15: the ABE columns now ARE the main table's links and sample; the
+# do-file stops unless they reproduce it, so the gain is the main table's.
 status = "table"
 script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
 machine = "B"
 
 [[claim]]
 id = "deaglan-jw-disc"
-text = 'rises from 14.9 to 22.1 percent'
+text = 'rises from 15.4 to 22.9 percent'
 values = ['cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 1)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Match Rate", 2)']
 status = "table"
 script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
@@ -440,7 +441,7 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-hlink-disc"
-text = 'rises from 49.7 to 56.5 percent'
+text = 'rises from 53.8 to 61.8 percent'
 values = ['cell("figures/deaglan_hlink_restricted.tex", "Match Rate", 1)', 'cell("figures/deaglan_hlink_restricted.tex", "Match Rate", 2)']
 status = "table"
 script = "LINKAGE/code/00_run_all_tables.do -> linkage_tables/ -> figures/"
@@ -448,7 +449,7 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-mi"
-text = 'increases from 76.8 to 83.5 percent under exact names, from 79.7 to 83.8 percent under Jaro-Winkler, and from 82.7 to 83.4 percent under HLINK'
+text = 'increases from 65.4 to 83.6 percent under exact names, from 72.4 to 83.9 percent under Jaro-Winkler, and from 76.5 to 84.0 percent under HLINK'
 values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 4)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 1)', 'cell("figures/deaglan_abe_jw_restricted.tex", "MI Match Rate", 2)',
@@ -461,7 +462,7 @@ issue = "These are discordant-sample values (full-sample MI rates are 86-87); th
 
 [[claim]]
 id = "deaglan-verified"
-text = 'from 523,399 to 1,320,314 on discordant records under exact names, and recall rises with it, from 11.1 to 28.1 percent, from 20.6 to 32.5 percent under Jaro-Winkler, and from 69.5 to 77.4 percent under HLINK'
+text = 'from 523,091 to 1,319,555 on discordant records under exact names, and recall rises with it, from 11.1 to 28.1 percent, from 20.6 to 32.5 percent under Jaro-Winkler, and from 72.7 to 81.6 percent under HLINK'
 values = [
   'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Verified Correct", 4)',
   'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 3)', 'cell("figures/deaglan_abe_jw_restricted.tex", "Recall", 4)',
@@ -474,7 +475,7 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-contradicted-counts"
-text = 'in the full sample it falls under Jaro-Winkler and exact names, from 312,746 to 278,940 under Jaro-Winkler, but rises under HLINK, from 507,261 to 509,706, and on the discordant sample under exact names, from 65,907 to 72,769, and under HLINK, from 117,637 to 127,195'
+text = 'in the full sample it falls under all three algorithms, from 286,323 to 254,780 under Jaro-Winkler for example, though only from 232,396 to 231,567 under HLINK, but on the discordant sample it rises under exact names, from 65,137 to 71,662, and under HLINK, from 57,089 to 61,244'
 values = [
   'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_abe_jw.tex", "Directly Contradicted", 2)',
   'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 1)', 'cell("figures/deaglan_hlink.tex", "Directly Contradicted", 2)',
@@ -487,7 +488,7 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-contradicted-shares"
-text = 'from 2.47 to 2.07 percent under Jaro-Winkler and from 2.78 to 2.36 percent under exact names in the full sample, from 4.12 to 2.27 and from 5.13 to 2.59 percent on the discordant sample, and from 0.76 to 0.74 and from 0.77 to 0.73 percent under HLINK'
+text = 'from 2.43 to 2.03 percent under Jaro-Winkler and from 2.74 to 2.32 percent under exact names in the full sample, from 4.08 to 2.24 and from 5.09 to 2.56 percent on the discordant sample, and from 0.70 to 0.68 and from 0.74 to 0.69 percent under HLINK'
 values = [
   'contra("figures/deaglan_abe_jw.tex", 1)', 'contra("figures/deaglan_abe_jw.tex", 2)',
   'contra("figures/deaglan_abe_jw.tex", 3)', 'contra("figures/deaglan_abe_jw.tex", 4)',
@@ -502,7 +503,7 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-denom-abe"
-text = 'Denominator is the 57,589,273 men aged 8 and above'
+text = 'Denominator is the 51,036,859 men aged 10 and above'
 values = ["linkDenomAbe", ""]
 status = "scripted"
 script = "LINKAGE/code/01_abe_jw/linkage_analysis.do"
@@ -510,7 +511,7 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-denom-abe-disc"
-text = 'restricted throughout to the 15,003,537 men aged 8 and above'
+text = 'As Table \ref{tab:deaglan_abe_jw}, but restricted throughout to the 14,416,543 men aged 10 and above'
 values = ["linkDenomAbeDisc", ""]
 status = "scripted"
 script = "LINKAGE/code/01_abe_jw/linkage_analysis.do"
@@ -518,15 +519,15 @@ machine = "B"
 
 [[claim]]
 id = "deaglan-denom-hlink"
-text = 'Denominator is the 115,030,746 men and women aged 8 and above'
-values = ["linkDenomHlink", ""]
+text = 'all four tables use the sample of Table \ref{tab:avg_performance}: the 51,036,859 men aged 10 and above in the 1940 census with all four name fields present, or the 14,416,543 of them'
+values = ["linkDenomHlink", "", "", "linkDenomHlinkDisc"]
 status = "scripted"
 script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
 machine = "B"
 
 [[claim]]
 id = "deaglan-denom-hlink-disc"
-text = 'restricted throughout to the 30,754,309 men and women aged 8 and above'
+text = 'As Table \ref{tab:deaglan_hlink}, but restricted throughout to the 14,416,543 men aged 10 and above'
 values = ["linkDenomHlinkDisc", ""]
 status = "scripted"
 script = "LINKAGE/code/02_hlink/linkage_analysis_newlinks.do"
