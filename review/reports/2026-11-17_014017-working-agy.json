@@ -1,0 +1,95 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "correctness",
+      "how_to_check": "In Stata, load census1940_all_labeled_data.dta, compute target = !(namefrst==namefrst_fs & namelast==namelast_fs), merge 1:1 on histid with tgt_flag1940.dta, and run tab target tgt, missing. Count the number of records with target==1 & tgt!=1.",
+      "id": "target-only-definition-excludes-paper-targets",
+      "location": "MATCHING/1c_tgt_divided_files.do:53, MATCHING/1c_tgt_divided_files.do:60-65, MATCHING/fs_avg_performance.do:79-80, MATCHING/fs_cells.do:73-82, MATCHING/fs_cells.do:116-117",
+      "severity": "major",
+      "suggested_fix": "Build tgt_flag1940.dta directly from census1940_all_labeled_data.dta using the exact definition gen byte tgt = !(namefrst==namefrst_fs & namelast==namelast_fs) as in MATCHING/fs_avg_performance.do:80, or explicitly document and relabel the target-only linkage sample as restricted to the 4-cell human-complete discordant subset.",
+      "title": "Target-only flag in 1c_tgt_divided_files.do excludes discordant records with blank human fields and conflicting duplicate flags",
+      "what_the_code_does": "MATCHING/1c_tgt_divided_files.do:53 sets tgt = namefrst!=\"\" & namelast!=\"\" & fs_namefrst!=\"\" & fs_namelast!=\"\" & !(namefrst==fs_namefrst & namelast==fs_namelast), and line 64 sets replace tgt = 0 if _conf for any histid with discordant flags across state rows. In contrast, the paper's target definition in MATCHING/fs_avg_performance.do:80 is !(namefrst==namefrst_fs & namelast==namelast_fs) from census1940_all_labeled_data.dta. In MATCHING/fs_cells.do:73-82 and fs_cells.tex, records where a human field is empty (cell 5, 741 records) and unclassified/conflicting records (cell 0, 205,143 records) are part of the paper's 14,416,543 target universe.",
+      "why_it_matters": "More than 205,800 records that the paper classifies and evaluates as targets in its main exhibits are assigned tgt = 0 and thus retain Ancestry's transcriptions rather than model transcriptions. As a result, the target-only linkage file does not link on the paper's target universe, creating an unacknowledged sample discrepancy against published linkage benchmarks."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "replication",
+      "how_to_check": "Inspect MATCHING/_tgt_only_run.do lines 21-28 and verify that neither divided_file1940_tgt_cleaned, tgt_flag1940.dta, nor the intermediate directories r_ans_cleaned_tgt_cleaned1930_1940 and r_ans_cleaned_true_cleaned1930_1940 are checked before running stages 1 and 2.",
+      "id": "overwrite-guard-omits-intermediate-directories",
+      "location": "MATCHING/_tgt_only_run.do:10, MATCHING/_tgt_only_run.do:21-28, MATCHING/1c_tgt_divided_files.do:133, MATCHING/2_ABE_matchingV3_christian_torben.do:158",
+      "severity": "major",
+      "suggested_fix": "Add checks in MATCHING/_tgt_only_run.do for the existence of divided_file1940_tgt_cleaned, tgt_flag1940.dta, and the match directories, halting if any exist unless an explicit overwrite flag is supplied.",
+      "title": "Driver script overwrites existing target divided files and intermediate matching outputs despite stating no overwrites",
+      "what_the_code_does": "MATCHING/_tgt_only_run.do:10 claims: 'Neither overwrites an existing link file or divided-file folder.' However, the startup existence check (lines 22-27) only checks the two final link files (link1930_1940_mltgt1940_cleaned_noraceblock0.dta and link1930_1940_ml1940_cleaned_noraceblock0.dta). MATCHING/1c_tgt_divided_files.do:133 saves birthplace files into divided_file1940_tgt_cleaned using save ..., replace, and MATCHING/2_ABE_matchingV3_christian_torben.do:158 overwrites intermediate birthplace matches in r_ans_cleaned_tgt_cleaned1930_1940 and r_ans_cleaned_true_cleaned1930_1940 with save($outputfile) replace.",
+      "why_it_matters": "If divided_file1940_tgt_cleaned or the match folders exist from a previous or interrupted run, files within them are silently overwritten without warning. An interrupted run leaves hybrid intermediate directories, and r_ans_cleaned_true_cleaned1930_1940 is overwritten in place."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "identification",
+      "how_to_check": "Tabulate linkage rates and validation rates across the two new link files (mltgt1940 vs ml1940) separately for target records (tgt == 1) and non-target records (tgt == 0). Assess whether link gains on target records are accompanied by link losses or changes in composition.",
+      "id": "target-only-linkage-selection-asymmetry",
+      "location": "MATCHING/1c_tgt_divided_files.do:122-125, MATCHING/_tgt_only_run.do:3-9, review/briefs/2026-11-17-target-only-links.md:3",
+      "severity": "major",
+      "suggested_fix": "In exhibits or slides comparing target-only links with baseline links, present linkage rates and validation rates decomposed by target status (tgt == 1 vs tgt == 0) and discuss the potential selection and correlated-error mechanisms explicitly.",
+      "title": "Target-only substitution introduces asymmetric selection into the linkage sample between target and non-target records",
+      "what_the_code_does": "MATCHING/1c_tgt_divided_files.do:122-125 replaces 1940 names with model transcriptions only for records flagged as targets (Ancestry and FamilySearch disagree), while retaining Ancestry transcriptions for all non-target records.",
+      "why_it_matters": "Conditioning name substitution on disagreement between commercial transcribers selectively treats records with difficult handwriting or rare names, while freezing concordant records at Ancestry's transcription even if both commercial transcribers made a shared transcription error. When linked against 1930 Ancestry names, changes in linkage rates conflate improved transcription accuracy on difficult records with sample composition effects. Furthermore, if Ancestry made identical transcription errors in both 1930 and 1940 on a target record, correcting only the 1940 name will break a link that previously matched on correlated error."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "claims-vs-code",
+      "how_to_check": "In 1c_tgt_divided_files.do, count the number of records with tgt == 1 & name_true_cleaned_exists == 1 versus tgt == 1 & name_true_cleaned_exists == 0 across the 1940 divided files.",
+      "id": "target-records-without-model-output-retain-ancestry-names",
+      "location": "MATCHING/1c_tgt_divided_files.do:125-135, review/briefs/2026-11-17-target-only-links.md:3",
+      "severity": "minor",
+      "suggested_fix": "Update the console display and documentation to report both the total target records (ntgt) and the subset that actually received model transcriptions (count if tgt==1 & name_true_cleaned_exists==1).",
+      "title": "Console log and comments state all target records keep model names, but target records lacking model output retain Ancestry names",
+      "what_the_code_does": "MATCHING/1c_tgt_divided_files.do:135 prints display \"1940: \" `: word count `fT'' \" files, `tot' records, `ntgt' target records keep the model's names\", where ntgt is the total count of records with tgt == 1. However, lines 117-120 confirm that target records with name_true_cleaned_exists == 0 (where the model had no output) retain Ancestry's names from divided_file1940_true_cleaned.",
+      "why_it_matters": "In MATCHING/results/fs_cells.tex:29, 1,255,726 target records (8.7% of all target records) have no model output. Stating that all ntgt target records keep model names overstates the model's effective coverage by roughly 1.25 million records."
+    }
+  ],
+  "review_limits": [
+    "No paper draft was supplied; claims-vs-code review was conducted against internal script headers, comments, and the review brief (review/briefs/2026-11-17-target-only-links.md).",
+    "External census and linkage data reside outside the repository and could not be queried, preventing direct observation of affected record counts for duplicate or empty-field exclusions.",
+    "The Stata analysis pipeline and user-written commands (abematch, abeclean) were not executed; findings reflect source-code analysis under documented Stata semantics.",
+    "Review was scoped to the uncommitted working-tree diff and newly added files (MATCHING/1c_tgt_divided_files.do, MATCHING/_tgt_only_run.do, MATCHING/3_append_and_clean_all_links_christian_torbenV2.do, and related documentation)."
+  ],
+  "summary": "The target-only linkage implementation introduces a systematic sample discrepancy by restricting targets to records where all four human name fields are non-empty and forcing conflicting duplicate records to non-target status, omitting over 205,800 records that the paper's canonical definition treats as targets. In addition, the driver script's overwrite protections check only the final link outputs while silently replacing intermediate divided files and match products. The single most important fix is to construct the target indicator directly from census1940_all_labeled_data.dta using the exact definition from fs_avg_performance.do and to guard all intermediate output directories.",
+  "verified_clean": [
+    {
+      "evidence": "In MATCHING/3_append_and_clean_all_links_christian_torbenV2.do:86-90, ver is constructed strictly from fstype and fs_years when ml_years is empty, ensuring identical output filenames and behavior for existing FS runs.",
+      "item": "Existing FamilySearch-only append logic and file naming remain unchanged"
+    },
+    {
+      "evidence": "In MATCHING/3_append_and_clean_all_links_christian_torbenV2.do:129-140, both _true_cleaned and _tgt_cleaned branches merge mi_true_cleaned, assert _merge==3, and drop _merge, preventing silent merge errors or unlinked ID mismatches.",
+      "item": "Middle initial extraction and merge integrity in stage 3"
+    },
+    {
+      "evidence": "MATCHING/1c_tgt_divided_files.do:75-85 sorts and asserts identical file lists between _true_cleaned and _ans_cleaned using : list fT === fA, and lines 89-94 verify that no extra unexpected .dta files exist in dst.",
+      "item": "Source birthplace file identity and destination verification in 1c_tgt_divided_files.do"
+    },
+    {
+      "evidence": "MATCHING/1c_tgt_divided_files.do:102-114 executes isid id on both sources and enforces merge 1:1 id using ans, assert(3) nogen, guaranteeing exact record alignment across all 139 birthplaces.",
+      "item": "Strict 1:1 join verification between Ancestry and model divided files"
+    },
+    {
+      "evidence": "MATCHING/1c_tgt_divided_files.do:116-121 and 137-140 verifies that records with name_true_cleaned_exists==0 have f_name and l_name identical to _ans_cleaned, halting with error 459 if any discrepancy exists.",
+      "item": "Consistency of Ancestry fallback values in true cleaned files"
+    },
+    {
+      "evidence": "MATCHING/_tgt_only_run.do:21-28 confirms that neither link1930_1940_mltgt1940_cleaned_noraceblock0.dta nor link1930_1940_ml1940_cleaned_noraceblock0.dta exists before proceeding, exiting with code 602 if either is present.",
+      "item": "Startup guard against overwriting the final target link files"
+    },
+    {
+      "evidence": "MATCHING/_tgt_only_run.do:32-37 executes stages 2 and 3 sequentially for _tgt_cleaned and _true_cleaned using identical arguments, ensuring that differences between output link files stem solely from 1940 name inputs.",
+      "item": "Common execution pipeline ensuring comparability between target-only and all-records link files"
+    }
+  ]
+}
