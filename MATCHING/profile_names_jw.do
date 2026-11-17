@@ -232,3 +232,46 @@ foreach spec in "men&has_dmonth&hasml|Men, death month on profile, model names p
 }
 file close md
 display "wrote `md'"
+
+/*=========================================================*/
+/*SPREAD (2026-11-17): THE SLIDE'S SAMPLES (DEATH MONTH, MODEL NAMES        */
+/*PRESENT), GROUPS all, 0 (NON-TARGET) AND disc (TARGET). FOR ANCESTRY AND  */
+/*OURS: MEAN AND SD OF THE JW SIMILARITY; AND OF THE PER-RECORD DIFFERENCE   */
+/*ours - Ancestry: MEAN, SD, AND THE MEAN AS A SHARE OF ANCESTRY'S SD.       */
+/*MEN: FULL NAME (jn); WOMEN: FIRST NAME (jf), AS ON THE SLIDE.             */
+/*=========================================================*/
+local sdmd "$REP_REPO/MATCHING/results/profile_names_jw_sd.md"
+file open sd using `"`sdmd'"', write replace text
+file write sd "# Spread of Jaro-Winkler similarity to FamilySearch profile names" _n _n
+file write sd "Written by MATCHING/profile_names_jw.do. Samples as the slide 'Agreement with FamilySearch profiles': profile records a death month; the model produced every name scored. Men: full name (mean of first-name and surname JW); women: first name. Group 0 = Ancestry and FamilySearch agree (non-target); disc = they disagree (target). diff = ours - Ancestry, per record; diff/SD = mean diff divided by the SD of Ancestry's JW." _n _n
+file write sd "| sample | group | N | Ancestry mean | Ancestry SD | ours mean | ours SD | diff mean | diff SD | diff/SD |" _n
+file write sd "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|" _n
+gen double _d = .
+foreach smp in men wom {
+	local m = cond("`smp'"=="men", "jn", "jf")
+	replace _d = `m'_ml - `m'_anc
+	foreach g in all 0 disc {
+		if "`g'"=="all"       local gc "1"
+		else if "`g'"=="disc" local gc "inrange(cell,1,4)"
+		else                  local gc "cell==0"
+		local cond "`smp' & has_dmonth & hasml & `gc'"
+		quietly sum `m'_anc if `cond'
+		local n = r(N)
+		local am = r(mean)
+		local as = r(sd)
+		quietly sum `m'_ml if `cond'
+		assert r(N)==`n'
+		local om = r(mean)
+		local os = r(sd)
+		quietly sum _d if `cond'
+		assert r(N)==`n'
+		local dm = r(mean)
+		local ds = r(sd)
+		local row = "| `smp' | `g' | " + string(`n', "%15.0fc") + " | " + string(`am', "%5.3f") + " | " + string(`as', "%5.3f") + " | " + string(`om', "%5.3f") + " | " + string(`os', "%5.3f") + " | " + string(`dm', "%6.3f") + " | " + string(`ds', "%5.3f") + " | " + string(`dm'/`as', "%6.2f") + " |"
+		file write sd "`row'" _n
+		display "SD `row'"
+	}
+}
+drop _d
+file close sd
+display "wrote `sdmd'"

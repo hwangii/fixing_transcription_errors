@@ -1,0 +1,5 @@
+# Review brief: SD of profile Jaro-Winkler similarity (2026-11-17)
+
+The author wants the standard deviation of the JW similarity between FamilySearch profile names and Ancestry's names, to gauge the size of the improvement on the slide 'Agreement with FamilySearch profiles' (means 0.906 -> 0.939 men target, etc., from MATCHING/results/profile_names_jw.md 'model names present' sections). Change: an output-only block at the end of MATCHING/profile_names_jw.do writing MATCHING/results/profile_names_jw_sd.md: for the slide samples (men & has_dmonth & hasml: full-name JW jn; wom & has_dmonth & hasml: first-name JW jf), groups all / 0 / disc, the mean and SD for Ancestry and ours (ml), and the per-record difference ours-Ancestry (mean, SD, mean/SD_Ancestry). Nothing earlier in the file changes.
+
+CHECK: (1) samples and measures match the slide's numbers (the means must equal the md's 'model names present' JW columns: Ancestry / ours); (2) no Stata silent failure (missing values, sample mismatch between the sums — asserted); (3) diff/SD is a sensible effect-size summary and is labelled correctly.
