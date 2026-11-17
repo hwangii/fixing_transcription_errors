@@ -71,6 +71,8 @@ def input_list():
         if not div:
             sys.exit(f"no norace*.dta under {d}")
         files += div
+    # Profile names (MATCHING/profile_names_score.do, profile_names_jw.do), 2026-11-16.
+    files.append(f"{f_ft}/INTERMEDIATE/profile_names/profile_names.dta")
     # Written by create_figures_SSHA2025.do; hashed so a -SkipRebuild run can
     # be tied to the analysis file it used.
     files.append(f"{snu_ed}/INTERMEDIATE/temp.dta")
@@ -79,7 +81,7 @@ def input_list():
     return files
 
 
-NOTE = 'Every row but the last is a frozen input: the 103 read since 2026-11-03, plus, since 2026-11-10, the three FamilySearch-name link files and the Ancestry divided files read by the Sec 4.3 scripts. The last, `temp.dta`, is the analysis file: a full run writes it (`create_figures_SSHA2025.do`) and a `-SkipRebuild` run reads it, so its hash identifies the analysis file as of this manifest, not a full-run input. Code inputs (e.g. `CODE/label_socio_demo.do`) are versioned by git, not hashed here.'
+NOTE = 'Every row but the last is a frozen input: the 103 read since 2026-11-03, plus, since 2026-11-10, the three FamilySearch-name link files and the Ancestry divided files read by the Sec 4.3 scripts, and, since 2026-11-16, `profile_names.dta`, read by the profile-name scripts behind the slide on agreement with FamilySearch profiles. The last, `temp.dta`, is the analysis file: a full run writes it (`create_figures_SSHA2025.do`) and a `-SkipRebuild` run reads it, so its hash identifies the analysis file as of this manifest, not a full-run input. Code inputs (e.g. `CODE/label_socio_demo.do`) are versioned by git, not hashed here.'
 
 
 def sha256(path):

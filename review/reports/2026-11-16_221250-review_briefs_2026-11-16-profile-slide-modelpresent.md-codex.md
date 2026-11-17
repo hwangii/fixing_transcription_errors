@@ -1,0 +1,38 @@
+# Codex review
+
+*Rendered 2026-11-16 22:14. Source: `D:\repos\fixing_transcription_errors\review\reports\2026-11-16_221250-review_briefs_2026-11-16-profile-slide-modelpresent.md-codex.json`*
+
+**Dimensions:** correctness, claims-vs-code
+
+**Result:** no findings
+
+## Summary
+
+No result-changing defect was found in the reviewed slide update. Every displayed number maps to the stated model-name-present rows and columns, the restriction uses the correct sex-specific normalized model fields, and the slide consistently describes agreement rather than accuracy.
+
+## Findings
+
+None reported. Read the section below before trusting that.
+
+## Checked and sound
+
+- **Every slide number matches the intended result cells** — The men Target and All values at review/briefs/2026-11-16-profile-slide-modelpresent.md:38-39 match MATCHING/results/profile_names_jw.md:13 and MATCHING/results/profile_names_jw.md:11; the women values at review/briefs/2026-11-16-profile-slide-modelpresent.md:43-44 match MATCHING/results/profile_names_jw.md:25 and MATCHING/results/profile_names_jw.md:23.
+- **The model-name-present restriction uses every field actually scored** — Model availability is measured after normalization at MATCHING/profile_names_jw.do:135-139, and `hasml` requires first name plus surname for men but only first name for women at MATCHING/profile_names_jw.do:148-150.
+- **The slide uses model-only columns with no Ancestry fallback** — The brief identifies the `ours` columns at review/briefs/2026-11-16-profile-slide-modelpresent.md:19-23, while the output loop keeps model-only `ml` and fallback `mf` as distinct sources at MATCHING/profile_names_jw.do:220-227. On the restricted sample, the relevant model fields are nonempty.
+- **Ancestry and the model are evaluated on the same restricted records** — A single condition containing `hasml` is applied to every source within each summary at MATCHING/profile_names_jw.do:199 and MATCHING/profile_names_jw.do:220-225.
+- **Men and women use the documented measures** — Men output exact full-name and mean first/surname JW measures, while women output exact-first and JW-first only at MATCHING/profile_names_jw.do:202-210; full-name JW is constructed as the mean at MATCHING/profile_names_jw.do:144.
+- **Empty strings cannot inflate the displayed exact-agreement rates** — Exact full-name and first-name indicators explicitly require nonempty normalized source fields at MATCHING/profile_names_jw.do:132-133.
+- **The sex-specific profile-name eligibility rules match the slide description** — Men require usable profile first and last names, while women require a usable profile first name, at MATCHING/profile_names_jw.do:92-98.
+- **The target and all rows use the stated denominators** — The output defines `all` as all observations satisfying the section condition and `disc` as cells 1 through 4 at MATCHING/profile_names_jw.do:213-218. The result rows partition correctly: group 0 plus disc equals all, and component target groups sum to disc at MATCHING/results/profile_names_jw.md:11-17 and MATCHING/results/profile_names_jw.md:23-29.
+- **The ditto-resolved surname is accurately disclosed** — The model surname is assigned from `namelast_ml_ditto` at MATCHING/profile_names_jw.do:123-124, matching the slide comment at review/briefs/2026-11-16-profile-slide-modelpresent.md:28.
+- **The slide avoids treating agreement as accuracy** — The slide explicitly says `Agreement, not accuracy` at review/briefs/2026-11-16-profile-slide-modelpresent.md:51, consistent with the generated report qualification at MATCHING/profile_names_jw.do:197.
+- **The two post-run edits are output-only and the hand-edited report matches them** — The prose-only change is confined to the emitted sentence at MATCHING/profile_names_jw.do:197, which matches MATCHING/results/profile_names_jw.md:5. The zero-observation formatting at MATCHING/profile_names_jw.do:225 changes only the rendered cell and is reflected by hyphens at MATCHING/results/profile_names_jw.md:17.
+- **The logged run produced the result values and completed its benchmark check** — The log reports `CHECK PASSED` at MATCHING/profile_names_jw.log:568 and prints the model-name-present rows used by the slide at MATCHING/profile_names_jw.log:623-636.
+- **The profile-reference merge rejects unmatched observations** — The positional one-to-one merge uses `assert(match)` at MATCHING/profile_names_jw.do:85-88.
+
+## What this review could not establish
+
+- No paper draft was supplied, so claims-vs-code review was limited to the slide diff, comments, generated report, and code contained or referenced by the review brief.
+- The paper repository and complete slides_ssha2026.tex file were unavailable; only the slide diff embedded at review/briefs/2026-11-16-profile-slide-modelpresent.md:7-54 could be reviewed.
+- The external data were unavailable and the Stata pipeline was not rerun. Runtime verification was limited to the checked-in log and generated result file.
+- The installed `jarowinkler` package and its numerical behavior could not be independently verified.

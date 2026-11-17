@@ -59,6 +59,10 @@ foreach y in 1930 1940 {
 		local inputs `"`inputs' "`f_ed'/INTERMEDIATE/divided_file`y'_ans_cleaned/`f'""'
 	}
 }
+/*PROFILE NAMES (SLIDES; MATCHING/profile_names_score.do, profile_names_jw.do):*/
+/*THE 1940 RECORD-TO-PROFILE FILE, BUILT BY MATCHING/profile_names_build.do  */
+/*FROM ~200 GB OF PROFILE SCRAPES ON E:; FROZEN HERE, NOT REBUILT.          */
+local inputs `"`inputs' "`f_ft'/INTERMEDIATE/profile_names/profile_names.dta""'
 if $REP_SKIP_REBUILD == 1 {
 	local inputs `"`inputs' "`snu_ed'/INTERMEDIATE/temp.dta""'
 }
@@ -123,6 +127,22 @@ foreach s in validation_by_link_status validation_fixed_initials {
 /*Run-MachineA.ps1 THEN RUNS MATCHING/fs_draft_tables.py, WHICH TURNS THEM    */
 /*INTO THE DRAFT'S figures/fs_*_allstates.tex. ABOUT 1 HOUR 45 MINUTES.       */
 foreach s in fs_avg_performance fs_cells {
+	local ++t
+	display as text _n "{hline 78}" _n "RUNNING MATCHING/`s'.do" _n "{hline 78}"
+	local t0 = clock("`c(current_date)' `c(current_time)'", "DMYhms")
+	do "$REP_REPO/MATCHING/`s'.do"
+	local t1 = clock("`c(current_date)' `c(current_time)'", "DMYhms")
+	display as text "DONE `s' in " %6.1f (`t1'-`t0')/60000 " min"
+}
+
+/*=========================== PROFILE NAMES (SLIDES) ========================*/
+/*AGREEMENT AND JARO-WINKLER SIMILARITY OF EACH 1940 TRANSCRIPTION TO THE    */
+/*NAME ON THE ATTACHED FAMILYSEARCH PROFILE: MATCHING/results/profile_names.md*/
+/*AND profile_names_jw.md (SLIDE 'Agreement with FamilySearch profiles').    */
+/*ORDER MATTERS: score WRITES (OR REUSES) THE SPLIT PROFILE NAMES refs_*.dta  */
+/*THAT jw READS, AND jw STOPS UNLESS IT REPRODUCES score's AGREEMENT SHARES. */
+/*SLOW: jw ABOUT 5 HOURS; score LONGER WHEN refs_*.dta MUST BE REBUILT.      */
+foreach s in profile_names_score profile_names_jw {
 	local ++t
 	display as text _n "{hline 78}" _n "RUNNING MATCHING/`s'.do" _n "{hline 78}"
 	local t0 = clock("`c(current_date)' `c(current_time)'", "DMYhms")
