@@ -309,7 +309,13 @@ function Invoke-CodexReview {
         "--output-last-message", $jsonOut,
         "--color", "never"
     )
-    if (-not [string]::IsNullOrWhiteSpace($Model)) { $args += @("--model", $Model) }
+    # MODEL AND EFFORT are set explicitly (2026-11-17). Left unset, Codex picked
+    # gpt-5.6-sol but reported "reasoning effort: none". gpt-5.6-sol is the
+    # strongest model this ChatGPT account accepts: gpt-6-sol/-terra/-luna are
+    # all refused ("not supported when using Codex with a ChatGPT account").
+    # xhigh, not max: max also works but costs more ChatGPT quota per review.
+    $codexModel = if ([string]::IsNullOrWhiteSpace($Model)) { "gpt-5.6-sol" } else { $Model }
+    $args += @("--model", $codexModel, "-c", 'model_reasoning_effort="xhigh"')
     if ($External) {
         # The read-only sandbox is scoped to the working directory; the external
         # tree lives elsewhere on disk. Reading is widened, writing is not.
@@ -373,7 +379,13 @@ function Invoke-AgyReview {
     # have agy print the current list. Note the tier suffix is load-bearing:
     # "gemini-3.8-flash-high" rejects --effort, while bare "gemini-3.8-flash"
     # REQUIRES it, which is what the conditional below handles.
-    $agyModel = if ([string]::IsNullOrWhiteSpace($Model)) { "gemini-3.8-flash-high" } else { $Model }
+    #
+    # 2026-11-17: gemini-3.8-flash-high (a Flash stopgap after 3.1-pro vanished)
+    # replaced by gemini-4-argon-high. Gemini 4 Argon and Hydrogen are both
+    # offered and both accepted a test prompt; Argon was picked because agy's
+    # "Orchestrator" is labelled Argon, which suggests it is the flagship -- a
+    # guess from the naming, not a documented ranking.
+    $agyModel = if ([string]::IsNullOrWhiteSpace($Model)) { "gemini-4-argon-high" } else { $Model }
     $agyLog   = Join-Path $Reports "$baseName-agy.log"
     $args = @("-p", $pointer, "--mode", "plan",
               "--json-schema", $SchemaF, "--output-format", "json",
