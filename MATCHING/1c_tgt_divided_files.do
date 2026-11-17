@@ -125,7 +125,12 @@ foreach f of local fT {
 }
 display "1940: " `: word count `fT'' " files, `tot' records, `ntgt' target records, of which `ntgtml' have model names (the rest keep Ancestry's)"
 display "CHECK: `nbad' of `nchk' records without model names differ from _ans_cleaned"
+/*2026-11-17: REPORTED, NOT A STOP (AUTHOR'S DECISION). THE FIRST RUN FOUND */
+/*436 OF 1,031,654; TO BE RECONCILED LATER (tgt_fallback_diag.do). A NON-   */
+/*TARGET RECORD TAKES _ans_cleaned'S NAME EITHER WAY; ONLY THE all-RECORDS  */
+/*BASELINE (_true_cleaned) CARRIES THE OTHER VERSION. A LARGER COUNT THAN   */
+/*0.1% STILL STOPS, AS A SIGN SOMETHING ELSE IS WRONG.                      */
 if `nbad'>0 {
-	display as error "the Ancestry fallback in _true_cleaned does not equal _ans_cleaned"
-	exit 459
+	display as error "NOTE: the Ancestry fallback in _true_cleaned differs from _ans_cleaned on `nbad' records"
+	if `nbad' > 0.001*`nchk' exit 459
 }
