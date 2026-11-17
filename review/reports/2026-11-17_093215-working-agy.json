@@ -1,0 +1,78 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [
+    {
+      "confidence": "verified",
+      "dimension": "correctness",
+      "how_to_check": "In Stata, count records in tgt_flag1940.dta (it holds ~35.5M records, not 122.6M). Merge one divided file against tgt_flag1940.dta versus the full census1940_all_labeled_data.dta ID list; observe that _merge==1 against tgt_flag1940.dta includes all non-target records.",
+      "id": "target-only-flag-breaks-census-membership-diagnostic",
+      "location": "MATCHING/1c_tgt_divided_files.do:58-65, MATCHING/tgt_fallback_diag.do:18-21, MATCHING/tgt_fallback_diag.do:43-45, MATCHING/tgt_fallback_diag.do:75-77",
+      "severity": "blocker",
+      "suggested_fix": "In tgt_fallback_diag.do, extract ids directly from histid in census1940_all_labeled_data.dta without filtering on tgt. Retain the keep if tgt optimization in 1c_tgt_divided_files.do for production matching speed, but do not use tgt_flag1940.dta as a proxy for labeled census membership.",
+      "title": "The diagnostic merges against target-only flags, misclassifying ~44 million labeled non-target records as absent from census1940_all_labeled_data",
+      "what_the_code_does": "In 1c_tgt_divided_files.do:63, `keep if tgt` filters tgt_flag1940.dta to target IDs only (~35.5M records out of 122.6M in census1940_all_labeled_data.dta). tgt_fallback_diag.do:18-21 then loads this target-only file into ids and selects records with `_merge==1` at lines 43-44, claiming at line 77: '## Divided-file records not in census1940_all_labeled_data.dta: `nn''. Because `_merge==1` captures all divided-file records not in tgt_flag1940.dta, it absorbs ~44 million labeled records with `tgt==0` in addition to the 4,819,575 genuinely absent records.",
+      "why_it_matters": "The diagnostic will report ~48.8 million records rather than 4.8 million records under the heading 'Divided-file records not in census1940_all_labeled_data.dta'. Its age breakdown and birthplace rankings will reflect ordinary non-target census records rather than the genuinely missing census records, completely distorting any identification assessment of selection into the target sample."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "correctness",
+      "how_to_check": "Inspect lines 25-26 and 46-50 of MATCHING/tgt_fallback_diag.do; notice `local ++zn' at line 47 followed by `if `zb'>1 append using `nomatch'' at line 48.",
+      "id": "typo-zb-instead-of-zn-in-nomatch-append",
+      "location": "MATCHING/tgt_fallback_diag.do:46-50",
+      "severity": "blocker",
+      "suggested_fix": "Change line 48 to `if `zn'>1 append using `nomatch''.",
+      "title": "Loop variable typo in nomatch accumulation uses zb instead of zn, causing tempfile overwrite or runtime crash",
+      "what_the_code_does": "At line 48 of MATCHING/tgt_fallback_diag.do, the code executes `if `zb'>1 append using `nomatch''. Here, `zb' is the counter for files with fallback discrepancies (bad), whereas `zn' is the counter for files with unmatched records (nomatch).",
+      "why_it_matters": "If zb remains 0 or 1, `if `zb'>1` is never true; each file's unmatched records overwrite nomatch rather than appending, discarding all prior files and leaving nomatch with only the final file's records. Conversely, if zb > 1 before a subsequent file first encounters unmatched records (zn == 1), line 48 attempts to append to a nonexistent nomatch tempfile, crashing Stata with error 601 (file not found)."
+    },
+    {
+      "confidence": "verified",
+      "dimension": "correctness",
+      "how_to_check": "Run tgt_fallback_diag.do on inputs where no fallback records differ; Stata aborts at line 56 with 'file __000001 not found'.",
+      "id": "missing-zero-observation-guards-for-tempfile-use",
+      "location": "MATCHING/tgt_fallback_diag.do:56, MATCHING/tgt_fallback_diag.do:75",
+      "severity": "minor",
+      "suggested_fix": "Guard lines 56-74 with `if `zb'>0 { ... } else { file write md \\\"No discrepant fallback records found.\\\" _n }` and lines 75-90 with `if `zn'>0 { ... } else { file write md \\\"No unmatched records found.\\\" _n }`.",
+      "title": "Unconditional use of bad and nomatch tempfiles crashes if zero records qualify",
+      "what_the_code_does": "At lines 37-41, `save `bad', replace` is executed only if `_N > 0`. If no records meet the discrepancy condition across all files, zb is 0 and bad is never created. Line 56 unconditionally executes `use `bad', clear`, which crashes Stata with error 601. Line 75 does the same for nomatch if zn is 0.",
+      "why_it_matters": "Once the 436 fallback discrepancies are resolved or when testing on clean datasets, the diagnostic crashes with error 601 instead of writing a clean summary, leaving the markdown file handle open."
+    }
+  ],
+  "review_limits": [
+    "No paper draft was supplied; claims-vs-code review was limited to assertions and comments in the modified scripts and review brief.",
+    "External data files in $REP_F and $REP_SNU are outside the repository and gitignored; runtime execution of the Stata pipeline could not be performed.",
+    "Review was scoped to the uncommitted working tree and untracked diagnostic files as reported by git status --short, not a full-repository audit."
+  ],
+  "summary": "The target-only optimization in 1c_tgt_divided_files.do correctly preserves record-level target assignments while speeding up merges, but it directly breaks the companion diagnostic tgt_fallback_diag.do. Because tgt_flag1940.dta now contains only target IDs, the diagnostic misclassifies ~44 million labeled non-target records as absent from census1940_all_labeled_data.dta, and a loop variable typo (zb instead of zn) further corrupts tempfile accumulation. The diagnostic must be fixed to merge against the full labeled census ID universe and use the correct loop counter before running.",
+  "verified_clean": [
+    {
+      "evidence": "In MATCHING/1c_tgt_divided_files.do:54-65, 100-103, saving only `tgt==1` in `tgt_flag1940.dta` assigns `_merge==3` (`tgt=1`) to targets and `_merge==1` to non-targets and unflagged records, which `replace tgt = 0 if _merge==1` sets to 0. Every record receives the exact same `tgt` value as before the optimization.",
+      "item": "Target assignment invariance in 1c_tgt_divided_files.do"
+    },
+    {
+      "evidence": "MATCHING/1c_tgt_divided_files.do:54 defines `tgt = !(namefrst==namefrst_fs & namelast==namelast_fs)`, exactly matching the canonical definition in MATCHING/fs_avg_performance.do:80.",
+      "item": "Canonical target definition consistency"
+    },
+    {
+      "evidence": "MATCHING/1c_tgt_divided_files.do:33-42 checks `direxists` for the destination folder and `confirm file` for the flag file, halting with exit code 602 if either exists.",
+      "item": "Pre-execution destination and flag existence guards"
+    },
+    {
+      "evidence": "MATCHING/1c_tgt_divided_files.do:75-78 verifies `fT === fA`, lines 92 and 97 assert `isid id` on both sources, line 99 asserts `assert(3)` on the 1:1 merge between sources, and line 103 asserts `_N==n0` after flag merging.",
+      "item": "Birthplace file alignment and record uniqueness assertions"
+    },
+    {
+      "evidence": "MATCHING/tgt_fallback_diag.do:78-83 categorizes age using `age<10`, `age>=10 & age<.`, and `age>=.`, correctly preventing missing ages from being grouped into age 10+.",
+      "item": "Missing age handling in diagnostic age breakdown"
+    },
+    {
+      "evidence": "MATCHING/tgt_fallback_diag.do:37-41 correctly increments `zb`, appends `bad` when `zb>1`, and replaces `bad`, correctly accumulating all discrepant records across birthplace files.",
+      "item": "Discrepancy tempfile accumulation logic for bad records"
+    }
+  ]
+}

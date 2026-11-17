@@ -55,6 +55,12 @@ gen byte tgt = !(namefrst==namefrst_fs & namelast==namelast_fs)
 keep histid tgt
 quietly count if tgt
 display "target histids: " r(N) " of " _N
+/*SPEED (2026-11-17): THE FILE IS MERGED ONCE PER BIRTHPLACE FILE (139    */
+/*TIMES). KEEPING ONLY TARGET ids MAKES IT ABOUT A THIRD THE SIZE; A       */
+/*RECORD NOT IN IT IS NOT A TARGET, WHICH IS WHAT SECTION 2 ALREADY DOES    */
+/*WITH UNMATCHED RECORDS. nnomatch BELOW THEN COUNTS NON-TARGETS TOO, SO    */
+/*IT IS NO LONGER REPORTED.                                                */
+keep if tgt
 rename histid id
 save `"`flags'"', replace
 
@@ -79,7 +85,6 @@ tempfile ans
 local tot 0
 local ntgt 0
 local ntgtml 0
-local nnomatch 0
 local nchk 0
 local nbad 0
 foreach f of local fT {
@@ -93,8 +98,6 @@ foreach f of local fT {
 	local n0 = _N
 	merge 1:1 id using `ans', assert(3) nogen
 	merge 1:1 id using `"`flags'"', keep(1 3) keepusing(tgt)
-	quietly count if _merge==1
-	local nnomatch = `nnomatch' + r(N)
 	replace tgt = 0 if _merge==1
 	drop _merge
 	assert _N==`n0'
@@ -121,7 +124,6 @@ foreach f of local fT {
 	save `"`dst'/`f'"', replace
 }
 display "1940: " `: word count `fT'' " files, `tot' records, `ntgt' target records, of which `ntgtml' have model names (the rest keep Ancestry's)"
-display "records not in census1940_all_labeled_data (not target): `nnomatch'"
 display "CHECK: `nbad' of `nchk' records without model names differ from _ans_cleaned"
 if `nbad'>0 {
 	display as error "the Ancestry fallback in _true_cleaned does not equal _ans_cleaned"
