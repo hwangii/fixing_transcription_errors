@@ -1,0 +1,33 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [],
+  "review_limits": [
+    "No paper draft was supplied for this review run, so claims-vs-code could not be evaluated against manuscript prose.",
+    "The uncommitted diff only modifies replication/extract_deaglan_tables.py (a Python table-extraction and reproduction-checking utility) and makes no changes to sample construction, linkage, or econometric specifications under identification.",
+    "The new branches for missing committed tables (not committed.exists()) were verified by static trace because all 7 tables currently exist in linkage_tables/ and the review runs in a read-only sandbox."
+  ],
+  "summary": "The uncommitted diff in replication/extract_deaglan_tables.py cleanly handles newly added tables in TABLES that do not yet have a committed reference copy in linkage_tables/. Instead of crashing with FileNotFoundError in check_reproduction() or main(), the script now flags the missing committed table, sets the exit status to non-zero, and extracts the tabular block from the regenerated file when --regenerated is provided. Read-only verification with --check and --regenerated confirmed all seven tables reproduce byte-for-byte. No defects were found.",
+  "verified_clean": [
+    {
+      "evidence": "replication/extract_deaglan_tables.py:67-75 checks regen.exists() and then committed.exists() before calling sha256(committed), printing 'NOT COMMITTED', setting ok = False, and continuing without raising FileNotFoundError.",
+      "item": "Graceful handling of uncommitted tables in check_reproduction()"
+    },
+    {
+      "evidence": "replication/extract_deaglan_tables.py:138-152,166 sets failed = True when committed.exists() is false, prints 'MISSING' and continues if args.regenerated is absent or the regenerated file is missing, and otherwise reads regen and passes ref = regen to tabular(text, ref).",
+      "item": "Fallback extraction from --regenerated and non-zero exit code when a committed table is absent in main()"
+    },
+    {
+      "evidence": "replication/extract_deaglan_tables.py:153 guards the text-diff check with 'if args.regenerated and committed.exists():', avoiding unbound ctext references and redundant reads when committed is missing.",
+      "item": "Interaction between the not-committed branch and the existing --regenerated comparison branch"
+    },
+    {
+      "evidence": "Ran 'python replication/extract_deaglan_tables.py --check --regenerated F:/Deaglan/Census_Transcriptions/output/tables'; exited with code 0, all 7 tables byte-identical by SHA-256 and all 7 figures/deaglan_*.tex files unchanged.",
+      "item": "Read-only execution of extract_deaglan_tables.py --check against committed and regenerated tables"
+    }
+  ]
+}

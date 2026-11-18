@@ -68,6 +68,11 @@ def check_reproduction(paper, regenerated):
             print(f"  MISSING     {fname}")
             ok = False
             continue
+        if not committed.exists():
+            # A new table not yet copied into linkage_tables/ (review 2026-11-18)
+            print(f"  NOT COMMITTED {fname}: not in {COMMITTED}/ yet")
+            ok = False
+            continue
         a, b = sha256(regen), sha256(committed)
         same = a == b
         ok &= same
@@ -130,10 +135,22 @@ def main():
     for name in TABLES:
         fname = f"linkage_table_{name}.tex"
         committed = paper / COMMITTED / fname
-        ctext, eol = read(committed)
-        source_label, text = f"{COMMITTED}/{fname}", ctext
+        if not committed.exists():
+            # A new table not yet copied into linkage_tables/ (review 2026-11-18):
+            # report it instead of crashing; extract from the regenerated file if given.
+            failed = True
+            regen = args.regenerated / fname if args.regenerated else None
+            if regen is None or not regen.exists():
+                print(f"  MISSING     {fname}: not in {COMMITTED}/" + (f" or {args.regenerated}" if args.regenerated else ""))
+                continue
+            print(f"  not committed: {fname} -- extracting from the regenerated file")
+            rtext, eol = read(regen)
+            source_label, text, ref = regen.as_posix(), rtext, regen
+        else:
+            ctext, eol = read(committed)
+            source_label, text, ref = f"{COMMITTED}/{fname}", ctext, committed
 
-        if args.regenerated:
+        if args.regenerated and committed.exists():
             regen = args.regenerated / fname
             if not regen.exists():
                 print(f"  MISSING     {fname}: not in {args.regenerated}")
@@ -146,7 +163,7 @@ def main():
                 failed = True
 
         target = paper / "figures" / f"deaglan_{name}.tex"
-        new = build(source_label, tabular(text, committed), eol)
+        new = build(source_label, tabular(text, ref), eol)
         old = target.read_bytes().decode("utf-8") if target.exists() else None
         same = old == new
         if args.check:
