@@ -79,6 +79,22 @@ save `restr1940'
 tempfile den1940_restr
 save `den1940_restr'
 
+* 1940 non-target records (Ancestry == FamilySearch on first and last
+* name), built exactly like restr (2026-11-18, review/handoff_nontarget_machineB.md)
+use `cn1940_full', clear
+assert inlist(target, 0, 1)
+keep if target == 0
+scalar N_men_1940_non = _N
+tempfile cn1940_non
+save `cn1940_non'
+keep histid
+tempfile den1940_non
+save `den1940_non'
+if N_men_1940_restr + N_men_1940_non != N_men_1940_full {
+    di as error "restr + non != full: " N_men_1940_restr " + " N_men_1940_non " vs " N_men_1940_full
+    exit 9
+}
+
 * 1930 clean names
 use `names1930', clear
 keep histid mi
@@ -113,6 +129,14 @@ rename histid histid1940
 tempfile true_pairs_restr
 save `true_pairs_restr'
 
+* True pairs: 1940 non-target records
+use `true_pairs_full', clear
+rename histid1940 histid
+merge m:1 histid using `den1940_non', keep(3) nogenerate
+rename histid histid1940
+tempfile true_pairs_non
+save `true_pairs_non'
+
 * Person-level true links (histid1940 -> true_histid1930)
 * Single file — classification does not depend on congruence
 use `true_pairs_full', clear
@@ -140,11 +164,12 @@ save `true_by1930'
 * OUTER LOOP: run all analyses for full and restricted samples
 * ============================================================
 
-foreach samp in full restr {
+foreach samp in full restr non {
 
     di _newline _newline "============================================================"
     if "`samp'" == "full"  di "SAMPLE: FULL"
     if "`samp'" == "restr" di "SAMPLE: RESTRICTED (target == 1)"
+    if "`samp'" == "non"   di "SAMPLE: NON-TARGET (target == 0)"
     di "============================================================"
 
     * ============================================================
@@ -261,6 +286,12 @@ foreach samp in full restr {
            "  Recall=" %5.3f recall_`samp'_`combo' ///
            "  MI match rate=" %5.3f mi_rate_`samp'_`combo'
     }
+
+    * Non-target: Panel A only. Panel B is not computed: it pairs each
+    * 1930 person's old and new link within the sample, so a link that
+    * moves between target and non-target records would be counted as
+    * removed in one sample and added in the other.
+    if "`samp'" == "non" continue
 
 
     * ============================================================
@@ -534,5 +565,99 @@ foreach samp in full restr {
     file close f
     di _newline "LaTeX table written to: `outtex'"
 }
+
+
+* ============================================================
+* PART 5 (2026-11-18): NON-TARGET RECORDS, PANEL A
+* ============================================================
+* review/handoff_nontarget_machineB.md. Runs after the tables above, so
+* a failure here cannot stop them; it stops only the non-target table.
+
+* ---- Check 1: every count partitions, full = restr + non ----
+local bad 0
+foreach combo in jw_old jw_new abe_old abe_new {
+    foreach s in N_linked verified unverifiable contradicted FN mi_denom mi_match {
+        if `s'_full_`combo' != `s'_restr_`combo' + `s'_non_`combo' {
+            di as error "`combo' `s': full " `s'_full_`combo' " != restr " `s'_restr_`combo' " + non " `s'_non_`combo'
+            local bad 1
+        }
+    }
+}
+
+* ---- Check 2: denominator and ABE exact columns against
+* MATCHING/results/tgt_linkage_abe.md, "Non-target records",
+* Old and New (paper) ----
+if N_men_1940_non != 36620316 {
+    di as error "non-target denominator " N_men_1940_non ", expected 36,620,316"
+    local bad 1
+}
+local e_links_abe_old 10363116
+local e_links_abe_new  9756588
+local e_nv_abe_old     2203905
+local e_nv_abe_new     2046592
+local e_sv_abe_old       88.87
+local e_sv_abe_new       88.21
+foreach combo in abe_old abe_new {
+    if N_linked_non_`combo' != `e_links_`combo'' {
+        di as error "non `combo' links: " N_linked_non_`combo' ", tgt_linkage_abe.md `e_links_`combo''"
+        local bad 1
+    }
+    if mi_denom_non_`combo' != `e_nv_`combo'' {
+        di as error "non `combo' links with both initials: " mi_denom_non_`combo' ", tgt_linkage_abe.md `e_nv_`combo''"
+        local bad 1
+    }
+    if abs(100*mi_rate_non_`combo' - `e_sv_`combo'') > 0.005 {
+        di as error "non `combo' share validated: " %6.3f 100*mi_rate_non_`combo' ", tgt_linkage_abe.md `e_sv_`combo''"
+        local bad 1
+    }
+}
+* Not gated, shown for comparison with the same file
+di _newline "non-target ABE, this run vs tgt_linkage_abe.md (Old; New):"
+di "  verified     " verified_non_abe_old     " vs 5407550; " verified_non_abe_new     " vs 5096391"
+di "  unverifiable " unverifiable_non_abe_old " vs 4701840; " unverifiable_non_abe_new " vs 4440884"
+di "  contradicted " contradicted_non_abe_old " vs 253726; "  contradicted_non_abe_new " vs 219313"
+di "  recall (%)   " %5.2f 100*recall_non_abe_old " vs 38.59; " %5.2f 100*recall_non_abe_new " vs 36.37"
+
+if `bad' {
+    di as error "NON-TARGET CHECK FAILED: no non-target table written"
+    exit 9
+}
+di "NON-TARGET CHECK PASSED"
+
+* ---- Table ----
+foreach combo in jw_old jw_new abe_old abe_new {
+    local rate_`combo'         : di %5.2f  (rate_non_`combo'    * 100)
+    local recall_`combo'       : di %5.2f  (recall_non_`combo'  * 100)
+    local mi_rate_`combo'      : di %5.2f  (mi_rate_non_`combo' * 100)
+    local verified_`combo'     : di %12.0fc verified_non_`combo'
+    local unverifiable_`combo' : di %12.0fc unverifiable_non_`combo'
+    local contradicted_`combo' : di %12.0fc contradicted_non_`combo'
+}
+local outtex "$OUT_TABLES/linkage_table_abe_jw_nontarget.tex"
+local caption "Linkage Quality: Old vs.\ New Transcription, 1930--1940. Restricted to 1940 records where Ancestry and FamilySearch transcriptions agree (non-target records). Denominator is 1940 men aged 10 and above whose Ancestry and FamilySearch transcriptions agree. MI match rate scores each version against its own 1940 middle initial (Ancestry's for Old, ours for New), as in the main table."
+
+file open f using "`outtex'", write replace
+file write f "\begin{table}[htbp]" _n
+file write f "\centering" _n
+file write f "\caption{`caption'}" _n
+file write f "\label{tab:linkage_quality_non}" _n
+file write f "\begin{tabular}{lcccc}" _n
+file write f "\toprule" _n
+file write f " & \multicolumn{2}{c}{Jaro-Winkler} & \multicolumn{2}{c}{ABE} \\" _n
+file write f "\cmidrule(lr){2-3}\cmidrule(lr){4-5}" _n
+file write f " & Old & New & Old & New \\" _n
+file write f "\midrule" _n
+file write f "\multicolumn{5}{l}{\textit{Panel A: Coverage and Link Quality}} \\" _n
+file write f "Match Rate (\%)       & `rate_jw_old'         & `rate_jw_new'         & `rate_abe_old'         & `rate_abe_new'         \\" _n
+file write f "MI Match Rate (\%)    & `mi_rate_jw_old'      & `mi_rate_jw_new'      & `mi_rate_abe_old'      & `mi_rate_abe_new'      \\" _n
+file write f "Verified Correct      & `verified_jw_old'     & `verified_jw_new'     & `verified_abe_old'     & `verified_abe_new'     \\" _n
+file write f "Unverifiable          & `unverifiable_jw_old' & `unverifiable_jw_new' & `unverifiable_abe_old' & `unverifiable_abe_new' \\" _n
+file write f "Directly Contradicted & `contradicted_jw_old' & `contradicted_jw_new' & `contradicted_abe_old' & `contradicted_abe_new' \\" _n
+file write f "Recall (\%)           & `recall_jw_old'       & `recall_jw_new'       & `recall_abe_old'       & `recall_abe_new'       \\" _n
+file write f "\bottomrule" _n
+file write f "\end{tabular}" _n
+file write f "\end{table}" _n
+file close f
+di _newline "LaTeX table written to: `outtex'"
 
 repnum close

@@ -233,6 +233,22 @@ keep histid
 tempfile den1940_restr
 save `den1940_restr'
 
+* 1940 non-target records (Ancestry == FamilySearch on first and last
+* name), built exactly like restr (2026-11-18, review/handoff_nontarget_machineB.md)
+use `cn1940_full', clear
+assert inlist(target, 0, 1)
+keep if target == 0
+scalar N_men_1940_non = _N
+tempfile cn1940_non
+save `cn1940_non'
+keep histid
+tempfile den1940_non
+save `den1940_non'
+if N_men_1940_restr + N_men_1940_non != N_men_1940_full {
+    di as error "restr + non != full: " N_men_1940_restr " + " N_men_1940_non " vs " N_men_1940_full
+    exit 9
+}
+
 * True pairs: restricted to 1940 men
 use `true_links', clear
 keep histid1930 histid1940
@@ -250,6 +266,14 @@ merge m:1 histid using `restr1940', keep(3) nogenerate
 rename histid histid1940
 tempfile true_pairs_restr
 save `true_pairs_restr'
+
+* True pairs: 1940 non-target records
+use `true_pairs_full', clear
+rename histid1940 histid
+merge m:1 histid using `den1940_non', keep(3) nogenerate
+rename histid histid1940
+tempfile true_pairs_non
+save `true_pairs_non'
 
 * Person-level true links (histid1940 -> true_histid1930)
 * Single file — classification does not depend on congruence
@@ -278,12 +302,13 @@ save `true_by1930'
 * OUTER LOOP: run all analyses for full and restricted samples
 * ============================================================
 
-foreach samp in full restr {
+foreach samp in full restr non {
 
     di _newline _newline "============================================================"
     di "METHOD: `mlabel'"
     if "`samp'" == "full"  di "SAMPLE: FULL"
     if "`samp'" == "restr" di "SAMPLE: RESTRICTED (target == 1)"
+    if "`samp'" == "non"   di "SAMPLE: NON-TARGET (target == 0)"
     di "============================================================"
 
     * ============================================================
@@ -393,6 +418,12 @@ foreach samp in full restr {
            "  Recall=" %5.3f recall_`samp'_`ver' ///
            "  MI match rate=" %5.3f mi_rate_`samp'_`ver'
     }
+
+    * Non-target: Panel A only. Panel B is not computed: it pairs each
+    * 1930 person's old and new link within the sample, so a link that
+    * moves between target and non-target records would be counted as
+    * removed in one sample and added in the other.
+    if "`samp'" == "non" continue
 
 
     * ============================================================
@@ -596,5 +627,69 @@ foreach samp in full restr {
     file close f
     di _newline "LaTeX table written to: `outtex'"
 }
+
+
+* ============================================================
+* PART 5 (2026-11-18): NON-TARGET RECORDS, PANEL A
+* ============================================================
+* review/handoff_nontarget_machineB.md. Runs after the tables above, so
+* a failure here cannot stop them; it stops only the non-target table.
+
+* ---- Checks: denominator, and every count partitions, full = restr + non ----
+local bad 0
+if N_men_1940_non != 36620316 {
+    di as error "non-target denominator " N_men_1940_non ", expected 36,620,316"
+    local bad 1
+}
+foreach ver in old new {
+    foreach s in N_linked verified unverifiable contradicted FN mi_denom mi_match {
+        if `s'_full_`ver' != `s'_restr_`ver' + `s'_non_`ver' {
+            di as error "`ver' `s': full " `s'_full_`ver' " != restr " `s'_restr_`ver' " + non " `s'_non_`ver'
+            local bad 1
+        }
+    }
+}
+if `bad' {
+    di as error "NON-TARGET CHECK FAILED: no non-target table written"
+    exit 9
+}
+di "NON-TARGET CHECK PASSED"
+
+* ---- Table ----
+foreach ver in old new {
+    local rate_`ver'         : di %5.2f  (rate_non_`ver'    * 100)
+    local recall_`ver'       : di %5.2f  (recall_non_`ver'  * 100)
+    local mi_rate_`ver'      : di %5.2f  (mi_rate_non_`ver' * 100)
+    local verified_`ver'     : di %12.0fc verified_non_`ver'
+    local unverifiable_`ver' : di %12.0fc unverifiable_non_`ver'
+    local contradicted_`ver' : di %12.0fc contradicted_non_`ver'
+}
+local ftag = strlower("`mtag'")
+local outtex "`outdir'/linkage_table_`ftag'_nontarget.tex"
+local caption "Linkage Quality, `mlabel' Links: Old vs.\ New Transcription, 1930--1940. Restricted to 1940 records where Ancestry and FamilySearch transcriptions agree (non-target records). Denominator is 1940 men aged 10 and above whose Ancestry and FamilySearch transcriptions agree. MI match rate scores each version against its own 1940 middle initial (Ancestry's for Old, ours for New), as in the main table."
+
+file open f using "`outtex'", write replace
+file write f "\begin{table}[htbp]" _n
+file write f "\centering" _n
+file write f "\caption{`caption'}" _n
+file write f "\label{tab:linkage_quality_`mtag'_non}" _n
+file write f "\begin{tabular}{lcc}" _n
+file write f "\toprule" _n
+file write f " & \multicolumn{2}{c}{`mlabel'} \\" _n
+file write f "\cmidrule(lr){2-3}" _n
+file write f " & Old & New \\" _n
+file write f "\midrule" _n
+file write f "\multicolumn{3}{l}{\textit{Panel A: Coverage and Link Quality}} \\" _n
+file write f "Match Rate (\%)       & `rate_old'         & `rate_new'         \\" _n
+file write f "MI Match Rate (\%)    & `mi_rate_old'      & `mi_rate_new'      \\" _n
+file write f "Verified Correct      & `verified_old'     & `verified_new'     \\" _n
+file write f "Unverifiable          & `unverifiable_old' & `unverifiable_new' \\" _n
+file write f "Directly Contradicted & `contradicted_old' & `contradicted_new' \\" _n
+file write f "Recall (\%)           & `recall_old'       & `recall_new'       \\" _n
+file write f "\bottomrule" _n
+file write f "\end{tabular}" _n
+file write f "\end{table}" _n
+file close f
+di _newline "LaTeX table written to: `outtex'"
 
 repnum close

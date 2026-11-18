@@ -23,8 +23,8 @@ frozen, as the historical record.
 
 With --regenerated, two separate checks run:
 
-1. REPRODUCTION. All five tables (ABE/JW and HLINK, full and restricted, and
-   mortality) are compared with the committed copies by SHA-256 of their raw
+1. REPRODUCTION. All seven tables (ABE/JW and HLINK, full, restricted and
+   non-target (since 2026-11-18), and mortality) are compared with the committed copies by SHA-256 of their raw
    bytes, and both hashes are printed. (Review 2026-10-19: the first version
    compared four tables, as text.)
 2. EXTRACTION. A table whose regenerated text equals the committed copy is
@@ -46,7 +46,9 @@ import tomllib
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-TABLES = ["abe_jw", "abe_jw_restricted", "hlink", "hlink_restricted", "mortality_bunmd"]
+TABLES = ["abe_jw", "abe_jw_restricted", "hlink", "hlink_restricted", "mortality_bunmd",
+          # Non-target records, Panel A only (2026-11-18, review/handoff_nontarget_machineB.md)
+          "abe_jw_nontarget", "hlink_nontarget"]
 ALL_TABLES = TABLES
 COMMITTED = "linkage_tables"
 
@@ -56,7 +58,7 @@ def sha256(path):
 
 
 def check_reproduction(paper, regenerated):
-    """SHA-256 of raw bytes, regenerated vs committed, for all five tables."""
+    """SHA-256 of raw bytes, regenerated vs committed, for every table."""
     print(f"reproduction (SHA-256 of raw bytes), {regenerated} vs {COMMITTED}/:")
     ok = True
     for name in ALL_TABLES:
