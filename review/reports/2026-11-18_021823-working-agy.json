@@ -1,0 +1,37 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [],
+  "review_limits": [
+    "No paper draft was supplied for this run; claims-vs-code was reviewed against in-repo result files (replication/results/*.tex, MATCHING/results/tgt_linkage_abe.md) and replication/check_claims.py rather than manuscript text.",
+    "Stata was not executed and external datasets on D:/SNU ECON Dropbox/... and F:/enum_date/... were not inspected; runtime behavior was assessed by static reading of the Stata and PowerShell source files.",
+    "Per review/briefs/2026-11-18-figs-tgt.md, untracked Run-Stata wrapper remnants (MATCHING/_run_*.do) and review/revision-notes-2026-11-13.md were excluded from scope."
+  ],
+  "summary": "The target-only heterogeneity figure changes in CODE/create_figures_SSHA2025.do, CODE/compute_legibility_quartiles.do, and MATCHING/_figs_tgt_run.do are clean and resolve all defects from the prior round. With $FIG_NEWLINKS empty, all input and output paths and computations remain identical to the baseline; with $FIG_NEWLINKS set to mltgt1940, every output is suffixed _tgt and repnum outputs are routed to MATCHING/results/ so neither paper exhibits nor replication/check_claims.py are affected. Named-log handling (sdlog) in CODE/create_figures_SSHA2025.do uses valid Stata 15 syntax inside quietly blocks, preserving both the pipe-delimited socio-demographic log format and Run-Stata.ps1's unnamed batch log.",
+  "verified_clean": [
+    {
+      "evidence": "CODE/create_figures_SSHA2025.do:32-46,101,119,130,158,275-302,313,361,401,420-427 and CODE/compute_legibility_quartiles.do:19-29,36 — when $FIG_NEWLINKS is empty, newv=\"true_cleaned\", sfx=\"\", and repdir=\"$REP_RESULTS\", leaving every read/write path identical to the prior version.",
+      "item": "Default-mode invariance when $FIG_NEWLINKS is empty"
+    },
+    {
+      "evidence": "CODE/create_figures_SSHA2025.do:39-46,119,158,275-302,361,420-427 and CODE/compute_legibility_quartiles.do:25-29,36 — when $FIG_NEWLINKS==\"mltgt1940\", temp_tgt.dta, avg_performance_allstates_tgt.tex, 1_tgt.gph, 2_tgt.gph, all_states_effect_socio_demo_tgt.log, all seven *_tgt.pdf figures, and MATCHING/results/{create_figures_SSHA2025,compute_legibility_quartiles}_tgt.tex are written without touching any unsuffixed paper file or placing duplicate keys in replication/results/ where replication/check_claims.py:38-50 would abort.",
+      "item": "Complete separation of _tgt outputs from paper and replication/results files"
+    },
+    {
+      "evidence": "CODE/create_figures_SSHA2025.do:3,360-394,401 and replication/Run-Stata.ps1:35-65 — capture log close sdlog and log using/off/on/close with name(sdlog) only manipulate the named log, leaving Run-Stata.ps1's unnamed batch log open so RUN-STATA-RC is always recorded; keeping log using/off/on/close inside quietly blocks suppresses Stata log banners so import delimited on line 401 reads only the pipe-delimited noisily di lines.",
+      "item": "Stata 15 named-log syntax (sdlog) and batch-log compatibility with Run-Stata.ps1"
+    },
+    {
+      "evidence": "CODE/create_figures_SSHA2025.do:39,90-107, MATCHING/1c_tgt_divided_files.do:91-114, MATCHING/3_append_and_clean_all_links_christian_torbenV2.do:88-90,129-141, and MATCHING/score_tgt_links.do:103-108 — link1930_1940_mltgt1940_cleaned_noraceblock0.dta carries mi1940 equal to the ML middle initial on target records and Ancestry's middle initial on non-target records, matching the convention verified in score_tgt_links.do.",
+      "item": "Target-only link file stem (mltgt1940_cleaned) and 1940 middle-initial definition"
+    },
+    {
+      "evidence": "CODE/create_figures_SSHA2025.do:34-38, CODE/compute_legibility_quartiles.do:20-24, and MATCHING/_figs_tgt_run.do:11-18 — invalid non-empty values of $FIG_NEWLINKS fail fast with exit 198, and _figs_tgt_run.do clears global FIG_NEWLINKS after capture noisily before exiting with _rc.",
+      "item": "Guardrail on invalid $FIG_NEWLINKS values and global cleanup in _figs_tgt_run.do"
+    }
+  ]
+}
