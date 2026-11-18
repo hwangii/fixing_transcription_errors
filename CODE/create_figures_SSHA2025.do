@@ -1,4 +1,6 @@
-capture log close
+/*CLOSES ONLY THIS FILE'S OWN NAMED LOG (2026-11-18 REVIEW: A BARE  */
+/*capture log close SHUT Run-Stata.ps1'S BATCH LOG).                 */
+capture log close sdlog
 set scheme s1mono 
 set seed 1000
 
@@ -22,7 +24,26 @@ local figure "`overleaf'figures\"
 /*REPLICATION PACKAGE: THE NUMBERS THE DRAFT QUOTES ARE WRITTEN BY repnum  */
 /*TO THE FILE BELOW, NOT ONLY INTO THE TABLE. SEE replication/README.md.    */
 if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
-repnum open using "$REP_RESULTS/create_figures_SSHA2025.tex", script(CODE/create_figures_SSHA2025.do)
+/*TARGET-ONLY SWITCH (2026-11-18, FOR THE SLIDES). EMPTY (THE DEFAULT)  */
+/*= THE PAPER: "AFTER" LINKS USE OUR NAMES ON EVERY 1940 RECORD. SET     */
+/*global FIG_NEWLINKS mltgt1940 (MATCHING/_figs_tgt_run.do) TO USE OUR   */
+/*NAMES ON TARGET RECORDS ONLY (MATCHING/_tgt_only_run.do); EVERY OUTPUT */
+/*THEN GETS THE SUFFIX _tgt, SO THE PAPER'S FILES ARE NEVER OVERWRITTEN. */
+local newv "true_cleaned"
+local sfx ""
+if `"$FIG_NEWLINKS"'!="" {
+	if `"$FIG_NEWLINKS"'!="mltgt1940" {
+		display as error "FIG_NEWLINKS must be empty or mltgt1940"
+		exit 198
+	}
+	local newv "mltgt1940_cleaned"
+	local sfx "_tgt"
+}
+/*TARGET-ONLY NUMBERS GO TO MATCHING/results (SLIDE OUTPUTS), NOT          */
+/*replication/results, WHOSE KEYS check_claims.py REQUIRES TO BE UNIQUE.    */
+local repdir "$REP_RESULTS"
+if "`sfx'"!="" local repdir "$REP_REPO/MATCHING/results"
+repnum open using "`repdir'/create_figures_SSHA2025`sfx'.tex", script(CODE/create_figures_SSHA2025.do)
 
 /*SUFFIX ON THE 1930-1940 LINK FILES. The un-suffixed pair the older*/
 /*do-files referenced no longer exists; the "0" pair (2026-02-15) is*/
@@ -77,7 +98,7 @@ drop mi`beg_yr' mi1940 fiveyr _merge
 
 
 capture drop _merge
-merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_true_cleaned_noraceblock`linksuf'.dta"',keepusing(mi`beg_yr' mi1940 id_A fiveyr) keep(1 3)
+merge 1:1 id_B using `"`intermediate'link`beg_yr'_1940_`newv'_noraceblock`linksuf'.dta"',keepusing(mi`beg_yr' mi1940 id_A fiveyr) keep(1 3)
 
 gen linked_after=_merge==3 & fiveyr==1
 gen validated_after=mi`beg_yr'==mi1940 if mi`beg_yr'!="" & mi1940!="" & linked_after==1
@@ -95,7 +116,7 @@ keep if sex==1 & age>=10 & age<.
 
 bysort state_folder_name county_folder_name eventdistrict: replace rep=_n==1
 
-save `"`intermediate'temp.dta"',replace
+save `"`intermediate'temp`sfx'.dta"',replace
 
 
 
@@ -106,7 +127,7 @@ save `"`intermediate'temp.dta"',replace
 /***********************************************************************************/
 /*FIGURE 2: INCREASE IN LINKAGE RATES AND SHARE VALIDATED, BY ENUMERATION DISTRICTS*/
 /***********************************************************************************/
-use `"`intermediate'temp.dta"',clear
+use `"`intermediate'temp`sfx'.dta"',clear
 
 /*SAMPLE: all states. Minnesota, Mississippi and Missouri (and DC) were
   dropped for the SSHA2025 presentation because those extracts were not
@@ -134,7 +155,7 @@ gen target=!(namefrst==fs_namefrst & namelast==fs_namelast)
 /*                     records" column moves too.                      */
 /***********************************************************************/
 capture file close avgperf
-file open avgperf using `"`figure'avg_performance_allstates.tex"', write replace text
+file open avgperf using `"`figure'avg_performance_allstates`sfx'.tex"', write replace text
 
 file write avgperf "\begin{tabular}{@{\extracolsep{3pt}}ccccccc@{}}" _n
 file write avgperf "  \hline\hline" _n
@@ -251,19 +272,19 @@ collapse (mean) linked_before linked_after validated_before validated_after legi
 rename (linked_before linked_after validated_before validated_after) (l1 l2 v1 v2)
 reshape long v l,i(state_folder_name county_folder_name eventdistrict) j(j)
 
-binsreg l legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Linkage rates") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow diamond_hollow) bycolors(red%50 blue%50) saving(1.gph,replace) /*plotxrange(0.4 1)*/
+binsreg l legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Linkage rates") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow diamond_hollow) bycolors(red%50 blue%50) saving(1`sfx'.gph,replace) /*plotxrange(0.4 1)*/
 /*NB: these single-panel exports used to be written under the rhode_island_*
   names, which overwrote the Rhode-Island figures in the Overleaf folder with
   all-states content. Renamed to all_states_* so the two samples cannot
   clobber each other.*/
-graph export `"`figure'all_states_linkage_rate_hetero.pdf"', as(pdf) replace
+graph export `"`figure'all_states_linkage_rate_hetero`sfx'.pdf"', as(pdf) replace
 
-binsreg v legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Share validated") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow diamond_hollow) bycolors(red%50 blue%50) saving(2.gph,replace) /*plotxrange(0.4 1)*/
-graph export `"`figure'all_states_sh_validated_hetero.pdf"', as(pdf) replace
+binsreg v legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Share validated") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow diamond_hollow) bycolors(red%50 blue%50) saving(2`sfx'.gph,replace) /*plotxrange(0.4 1)*/
+graph export `"`figure'all_states_sh_validated_hetero`sfx'.pdf"', as(pdf) replace
 
-grc1leg 1.gph 2.gph,xcommon
+grc1leg 1`sfx'.gph 2`sfx'.gph,xcommon
 
-graph export `"`figure'all_states_hetero_combined.pdf"', as(pdf) replace		
+graph export `"`figure'all_states_hetero_combined`sfx'.pdf"', as(pdf) replace		
 
 
 
@@ -272,13 +293,13 @@ graph export `"`figure'all_states_hetero_combined.pdf"', as(pdf) replace
 capture rename (linked_before linked_after validated_before validated_after) (l1 l2 v1 v2)
 capture reshape long v l,i(state_folder_name county_folder_name eventdistrict) j(j)
 
-binsreg l legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Linkage rates") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow plus) bycolors(red%50 blue%50) saving(1.gph,replace) /*plotxrange(0.4 1)*/
+binsreg l legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Linkage rates") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow plus) bycolors(red%50 blue%50) saving(1`sfx'.gph,replace) /*plotxrange(0.4 1)*/
 
-binsreg v legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Share validated") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow plus) bycolors(red%50 blue%50) saving(2.gph,replace) /*plotxrange(0.4 1)*/
+binsreg v legibility /*[fw=Nall]*/, by(j) xtitle("Legibility of census form") ytitle("Share validated") legend(order(1 "Before" 2 "After")) bysymbols(circle_hollow plus) bycolors(red%50 blue%50) saving(2`sfx'.gph,replace) /*plotxrange(0.4 1)*/
 
-grc1leg 1.gph 2.gph,xcommon
+grc1leg 1`sfx'.gph 2`sfx'.gph,xcommon
 
-graph export `"`figure'all_states_hetero_combinedV2.pdf"', as(pdf) replace
+graph export `"`figure'all_states_hetero_combinedV2`sfx'.pdf"', as(pdf) replace
 
 
 
@@ -289,7 +310,7 @@ graph export `"`figure'all_states_hetero_combinedV2.pdf"', as(pdf) replace
 /********************************************************************/
 /*FIGURE 4: INCREASE IN QUALITY BY SOCIO-DEMOGRAPHIC CHARACTERISTICS*/
 /********************************************************************/
-use `"`intermediate'temp.dta"',clear
+use `"`intermediate'temp`sfx'.dta"',clear
 
 
 /*CLEAN VARIABLE*/
@@ -337,8 +358,8 @@ recode migrate5 (9=.)
 local old_linesize = c(linesize)
 set linesize 255
 qui {
-	log using `"`intermediate_nondb'all_states_effect_socio_demo.log"',replace
-	log off
+	log using `"`intermediate_nondb'all_states_effect_socio_demo`sfx'.log"',replace name(sdlog)
+	log off sdlog
 }
 
 qui foreach var in gq relate marst race bpl /*school*/ higrade empstat /*labforce*/ classwkr occ1950 ind1950 wkswork2 hrswork2 migrate5 /*durunemp_qrt incwage_qrt*/ incnonwg non_english_mtongue {
@@ -360,16 +381,16 @@ qui foreach var in gq relate marst race bpl /*school*/ higrade empstat /*labforc
 		sum validated_after if `var'==`val'	
 		local sv_after=`r(mean)'
 		
-		log on
+		log on sdlog
 		noisily di `"`var'|`val'|`N'|"',`lr_before',"|",`lr_after',"|",`sv_before',"|",`sv_after',"|",100*(`lr_after'/`lr_before'-1),"|",100*(`sv_after'/`sv_before'-1)
-		log off
+		log off sdlog
 
 	}
 
 }
 
 qui {
-	log close
+	log close sdlog
 }
 set linesize `old_linesize'
 
@@ -377,7 +398,7 @@ set linesize `old_linesize'
 
 
 
-import delimited `"`intermediate_nondb'all_states_effect_socio_demo.log"', delimiter("|") clear
+import delimited `"`intermediate_nondb'all_states_effect_socio_demo`sfx'.log"', delimiter("|") clear
 
 do `"`code'label_socio_demo.do"'
 
@@ -396,13 +417,13 @@ repnum socioGroupsMissing = r(N), format(%5.0f)
 gsort v4
 
 /*MUNIR'S REVISION*/
-tw (scatter v8 v4, mcolor(blue%30) mlabel(socio_demo_label) mlabsize(`label_size') mlabposition(`label_position')), plotregion(lstyle(none)) xtitle("Pre-improvement linkage rate") ytitle("% increase in linkage rate") saving(1.gph,replace) /*aspectratio(1)*/ yline(0,lpatter(dash) lcolor(black%25)) legend(off)
-graph export `"`figure'all_states_improvement_linkage_rate.pdf"', as(pdf) replace
+tw (scatter v8 v4, mcolor(blue%30) mlabel(socio_demo_label) mlabsize(`label_size') mlabposition(`label_position')), plotregion(lstyle(none)) xtitle("Pre-improvement linkage rate") ytitle("% increase in linkage rate") saving(1`sfx'.gph,replace) /*aspectratio(1)*/ yline(0,lpatter(dash) lcolor(black%25)) legend(off)
+graph export `"`figure'all_states_improvement_linkage_rate`sfx'.pdf"', as(pdf) replace
 
-tw (scatter v9 v6, mcolor(blue%30) mlabel(socio_demo_label) mlabsize(`label_size') mlabposition(`label_position')), plotregion(lstyle(none)) xtitle("Pre-improvement Share validated") ytitle("% increase in share validated") /*xline(0,lpatter(dash) lcolor(black%25))*/ yline(0,lpatter(dash) lcolor(black%25)) saving(2.gph,replace) legend(off) /*aspectratio(1)*/
-graph export `"`figure'all_states_improvement_sh_validated.pdf"', as(pdf) replace
+tw (scatter v9 v6, mcolor(blue%30) mlabel(socio_demo_label) mlabsize(`label_size') mlabposition(`label_position')), plotregion(lstyle(none)) xtitle("Pre-improvement Share validated") ytitle("% increase in share validated") /*xline(0,lpatter(dash) lcolor(black%25))*/ yline(0,lpatter(dash) lcolor(black%25)) saving(2`sfx'.gph,replace) legend(off) /*aspectratio(1)*/
+graph export `"`figure'all_states_improvement_sh_validated`sfx'.pdf"', as(pdf) replace
 
-graph combine 1.gph 2.gph, rows(2) cols(1) ysize(7)
-graph export `"`figure'all_states_socio_demo_combinedV2.pdf"', as(pdf) replace 
+graph combine 1`sfx'.gph 2`sfx'.gph, rows(2) cols(1) ysize(7)
+graph export `"`figure'all_states_socio_demo_combinedV2`sfx'.pdf"', as(pdf) replace 
 
 repnum close

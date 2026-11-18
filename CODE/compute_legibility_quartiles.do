@@ -14,14 +14,26 @@ set more off
 /*REPLICATION PACKAGE: THE NUMBERS THE DRAFT QUOTES ARE WRITTEN BY repnum  */
 /*TO THE FILE BELOW, NOT ONLY DISPLAYED. SEE replication/README.md.         */
 if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/config.do"
-repnum open using "$REP_RESULTS/compute_legibility_quartiles.tex", script(CODE/compute_legibility_quartiles.do)
+/*TARGET-ONLY SWITCH (2026-11-18), AS IN create_figures_SSHA2025.do: WITH  */
+/*global FIG_NEWLINKS mltgt1940 IT READS temp_tgt.dta AND WRITES _tgt.     */
+local sfx ""
+if `"$FIG_NEWLINKS"'!="" {
+	if `"$FIG_NEWLINKS"'!="mltgt1940" {
+		display as error "FIG_NEWLINKS must be empty or mltgt1940"
+		exit 198
+	}
+	local sfx "_tgt"
+}
+local repdir "$REP_RESULTS"
+if "`sfx'"!="" local repdir "$REP_REPO/MATCHING/results"
+repnum open using "`repdir'/compute_legibility_quartiles`sfx'.tex", script(CODE/compute_legibility_quartiles.do)
 
 local intermediate "D:/SNU ECON Dropbox/sam hwang/enum_date/DATA/INTERMEDIATE"
 
 /*temp.dta IS BUILT BY create_figures_SSHA2025.do. IT IS THE 51,036,859-RECORD   */
 /*ALL-STATES ANALYSIS FILE, ALREADY RESTRICTED TO sex==1 & age>=10.            */
 
-use congruent legibility linked_before linked_after state_folder_name county_folder_name eventdistrict using `"`intermediate'/temp.dta"', clear
+use congruent legibility linked_before linked_after state_folder_name county_folder_name eventdistrict using `"`intermediate'/temp`sfx'.dta"', clear
 
 display "records loaded: " _N
 
