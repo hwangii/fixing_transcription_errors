@@ -42,6 +42,19 @@ local combos ans true fs12 fs30 fs40
 local mode `"`1'"'
 local f_fs30ml "`links'/link1930_1940_fs1930_ml1940_cleaned_noraceblock0.dta"
 if "`mode'"=="slides" local combos `combos' fs30ml
+/*2026-11-18, SLIDES WITH OUR NAMES ON 1940 TARGET RECORDS ONLY: do          */
+/*MATCHING/fs_avg_performance.do slidestgt ADDS mltgt                        */
+/*(link1930_1940_mltgt1940, _tgt_only_run.do) AND fs30mltgt (FAMILYSEARCH    */
+/*1930 x TARGET-ONLY 1940, _fs_tgt_run.do), CHECKS mltgt AGAINST             */
+/*create_figures_SSHA2025_tgt.tex, AND WRITES                                */
+/*MATCHING/results/fs_avg_performance_slides_tgt.tex.                        */
+local f_mltgt     "`links'/link1930_1940_mltgt1940_cleaned_noraceblock0.dta"
+local f_fs30mltgt "`links'/link1930_1940_fs1930_mltgt1940_cleaned_noraceblock0.dta"
+if "`mode'"=="slidestgt" local combos `combos' fs30ml mltgt fs30mltgt
+if !inlist("`mode'","","slides","slidestgt") {
+	display as error "unknown mode `mode'"
+	exit 198
+}
 
 /*THE PAPER'S VALUES (raw= IN replication/results/create_figures_SSHA2025.tex).*/
 local p_n_target 14416543
@@ -58,6 +71,13 @@ local p_sv_target_ans  65.4053475866495
 local p_sv_target_true 83.5985531700316
 local p_sv_all_ans     85.9879207998032
 local p_sv_all_true    87.137473718017
+/*TARGET-ONLY VALUES (raw= IN MATCHING/results/create_figures_SSHA2025_tgt.tex).*/
+local p_lr_target_mltgt 19.3885455063672
+local p_lr_all_mltgt    25.5382957638518
+local p_nv_target_mltgt 618327
+local p_nv_all_mltgt    2799255
+local p_sv_target_mltgt 83.6199939514205
+local p_sv_all_mltgt    87.9577959135556
 
 /*ANCESTRY MIDDLE INITIALS BY histid, BOTH YEARS (THE MEN-ONLY ANCESTRY      */
 /*DIVIDED FILES THE ANCESTRY LINKS WERE MATCHED FROM).                       */
@@ -93,6 +113,7 @@ foreach c of local combos {
 	if "`c'"=="fs30" local fsv "fs_used1930"
 	if "`c'"=="fs40" local fsv "fs_used1940"
 	if "`c'"=="fs30ml" local fsv "fs_used1930"
+	if "`c'"=="fs30mltgt" local fsv "fs_used1930"
 	merge 1:1 id_B using `"`f_`c''"', keepusing(id_A mi1930 mi1940 fiveyr_band `fsv') keep(1 3)
 	gen byte linked_`c' = _merge==3 & fiveyr_band==1
 	gen byte val_`c' = mi1930==mi1940 if mi1930!="" & mi1940!="" & linked_`c'==1
@@ -132,7 +153,9 @@ foreach grp in target all {
 		display "`grp' `c': linkage rate " %6.3f lr_`grp'_`c' "  share validated " %6.3f sv_`grp'_`c' " (N=" nv_`grp'_`c' ")" ///
 			"  with Ancestry initials " %6.3f sva_`grp'_`c' " (N=" nva_`grp'_`c' ")"
 	}
-	foreach c in ans true {
+	local chk ans true
+	if "`mode'"=="slidestgt" local chk ans true mltgt
+	foreach c of local chk {
 		foreach k in nv {
 			if `k'_`grp'_`c' != `p_`k'_`grp'_`c'' {
 				display as error "`grp' `c' `k': " `k'_`grp'_`c' ", paper `p_`k'_`grp'_`c''"
@@ -164,12 +187,18 @@ display "REPLICATION PASSED: Ancestry and ML columns equal the paper's main tabl
 capture mkdir "$REP_REPO/MATCHING/results"
 local outtex "$REP_REPO/MATCHING/results/fs_avg_performance.tex"
 if "`mode'"=="slides" local outtex "$REP_REPO/MATCHING/results/fs_avg_performance_slides.tex"
+if "`mode'"=="slidestgt" local outtex "$REP_REPO/MATCHING/results/fs_avg_performance_slides_tgt.tex"
 file open f using "`outtex'", write replace
 file write f "% Written by MATCHING/fs_avg_performance.do; do not edit by hand." _n
 file write f "% Sample and definitions as in tab:avg_performance. FS = FamilySearch names where FamilySearch has them, Ancestry otherwise (field by field)." _n
 file write f "% Own initials: Ancestry column from matching_intgen; ML column 1930 Ancestry, 1940 ML; FS columns from each side's divided file (FS where the FS first name is used)." _n
 file write f "% Ancestry initials: every column scored with the Ancestry initials from the men-only Ancestry divided files." _n
-if "`mode'"=="slides" {
+if "`mode'"=="slidestgt" {
+	file write f "\begin{tabular}{llcccccccc}" _n
+	file write f "\toprule" _n
+	file write f " & & Ancestry & ML & FS 1930 \& 1940 & FS 1930 & FS 1940 & FS 1930, ML 1940 & ML target only & FS 1930, ML target only \\" _n
+}
+else if "`mode'"=="slides" {
 	file write f "\begin{tabular}{llcccccc}" _n
 	file write f "\toprule" _n
 	file write f " & & Ancestry & ML & FS 1930 \& 1940 & FS 1930 & FS 1940 & FS 1930, ML 1940 \\" _n
