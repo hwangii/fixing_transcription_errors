@@ -1,0 +1,32 @@
+{
+  "dimensions_reviewed": [
+    "correctness",
+    "claims-vs-code",
+    "replication",
+    "identification"
+  ],
+  "findings": [],
+  "review_limits": [
+    "No paper draft or slide deck was supplied; claims-vs-code review was limited to checking consistency between MATCHING/linked_groups_socio.do, its generated markdown header, and upstream code/results in the repository.",
+    "The Stata pipeline and external datasets ($REP_SNU/enum_date/DATA/INTERMEDIATE/temp_tgt.dta) could not be executed or inspected directly in this read-only review environment; runtime properties were inferred from source code and committed repnum outputs."
+  ],
+  "summary": "The uncommitted changes in MATCHING/linked_groups_socio.do (and its companion brief) are clean across all four review dimensions. Both defects from the prior iteration—referencing an unsaved target variable in temp_tgt.dta and recoding incnonwg==1 to missing when computing within-group category shares—have been resolved and gated with exact assertions against MATCHING/results/create_figures_SSHA2025_tgt.tex.",
+  "verified_clean": [
+    {
+      "evidence": "MATCHING/linked_groups_socio.do:30-43 asserts _N==51036859, linked_before mean 22.8142938812124%, linked_after mean 25.5382957638518%, binary domains for linked_before/linked_after/congruent, and reconstructed target = 1 - congruent mean 28.2473163170171%, matching CODE/create_figures_SSHA2025.do:73,119,138 and MATCHING/results/create_figures_SSHA2025_tgt.tex:8-10,22 to within 1e-9.",
+      "item": "Input dataset gate and reconstruction of target = 1 - congruent from temp_tgt.dta"
+    },
+    {
+      "evidence": "MATCHING/linked_groups_socio.do:46-63 matches the recodes in CODE/create_figures_SSHA2025.do:317-352 for all 15 socio-demographic variables while changing incnonwg from (1 9=.) to (0 9=.) so both <=$50 (1) and >$50 (2) categories are retained for within-group shares, and adding the missing label for incnonwg==1 at MATCHING/linked_groups_socio.do:102.",
+      "item": "Socio-demographic recodes and category completeness for within-group share calculations"
+    },
+    {
+      "evidence": "In MATCHING/results/create_figures_SSHA2025_tgt.tex:23, \\socioGroups is 65, which equals the exact number of labeled categories in CODE/label_socio_demo.do across the 15 variables in Figure 4 (after excluding incnonwg==1 and migrate5==4). Thus, in temp_tgt.dta, no unrecoded residual codes exist for any of the 15 variables, and all 67 categories in MATCHING/linked_groups_socio.do receive labels at lines 101-103.",
+      "item": "Absence of unrecoded IPUMS codes and completeness of category labels in temp_tgt.dta"
+    },
+    {
+      "evidence": "MATCHING/linked_groups_socio.do:65-78 partitions all records into grp 1..4 (Both, After only, Neither, Before only) after asserting linked_before and linked_after are in {0,1}, checks N1+N2+N3+N4 == _N, and computes category shares at lines 83-96 over non-missing denominators (!missing(v)) with levelsof excluding missing values.",
+      "item": "Link-status group partition and missing-value handling in numerators and denominators"
+    }
+  ]
+}
