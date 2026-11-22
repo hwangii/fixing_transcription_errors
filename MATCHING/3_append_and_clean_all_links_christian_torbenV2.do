@@ -85,7 +85,9 @@ if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" {
 		if "`typeB'"!="`typeA'" local B_tag "`typeB'"
 		local ver ""
 		if strtrim(`"`fs_years'"')!="" local ver = subinstr("`fstype'","_cleaned","",1) + subinstr(strtrim(stritrim(`"`fs_years'"')), " ", "_", .)
-		local mltag = cond("`mltype'"=="_tgt_cleaned", "_mltgt", "_ml")
+		/*2026-11-22: "_tgtns_cleaned" = TARGET-ONLY WITHOUT THE "InvalidPred"  */
+		/*SENTINEL (1e_tgtns_divided_files.do), TAG _mltgtns.                  */
+		local mltag = cond("`mltype'"=="_tgt_cleaned", "_mltgt", cond("`mltype'"=="_tgtns_cleaned", "_mltgtns", "_ml"))
 		if strtrim(`"`ml_years'"')!="" local ver = "`ver'`mltag'" + subinstr(strtrim(stritrim(`"`ml_years'"')), " ", "_", .)
 
 		local rdir `"`f_intermediate'r`typeA'`B_tag'`yr1'_`yr2'"'
@@ -126,7 +128,7 @@ if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" {
 					gen byte fs_used`y' = fs_frst_used==1 | fs_last_used==1
 					drop fs_frst_used fs_last_used
 				}
-				else if inlist("`type'","_true_cleaned","_tgt_cleaned") {
+				else if inlist("`type'","_true_cleaned","_tgt_cleaned","_tgtns_cleaned") {
 					/*OURS: THE ML MIDDLE INITIAL, AS THE PAPER'S ML LINK FILE  */
 					/*TAKES IT (ORIGINAL BRANCH BELOW: mi_true_cleaned).        */
 					merge m:1 id using `"`f_intermediate'divided_file`y'`type'/norace`b'.dta"', keepusing(mi_true_cleaned) keep(1 3)

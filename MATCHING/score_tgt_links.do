@@ -6,6 +6,10 @@
 /*         1940 target records only, Ancestry's elsewhere                    */
 /*  ml     link1930_1940_ml1940_cleaned_noraceblock0.dta: model names on     */
 /*         every 1940 record, rerun through the same code the same day       */
+/*2026-11-22: _tgtns_run.do adds                                            */
+/*  mltgtns link1930_1940_mltgtns1940_cleaned_noraceblock0.dta: as mltgt,    */
+/*         with the "InvalidPred" sentinel replaced by Ancestry's field      */
+/*         (1e_tgtns_divided_files.do)                                       */
 /*They are scored here beside the paper's two:                               */
 /*  ans    link1930_1940_ans_cleaned_noraceblock0.dta  (the paper's "Old")   */
 /*  true   link1930_1940_true_cleaned_noraceblock0.dta (the paper's "New")   */
@@ -40,7 +44,8 @@ local f_ans   "`links'/link1930_1940_ans_cleaned_noraceblock0.dta"
 local f_true  "`links'/link1930_1940_true_cleaned_noraceblock0.dta"
 local f_ml    "`links'/link1930_1940_ml1940_cleaned_noraceblock0.dta"
 local f_mltgt "`links'/link1930_1940_mltgt1940_cleaned_noraceblock0.dta"
-local combos ans true ml mltgt
+local f_mltgtns "`links'/link1930_1940_mltgtns1940_cleaned_noraceblock0.dta"
+local combos ans true ml mltgt mltgtns
 
 /*THE MAIN TABLE'S VALUES, AS IN linkage_analysis.do (full = all, restr = target).*/
 local p_n_full  51036859
@@ -90,21 +95,40 @@ rename (id mi_true_cleaned) (histid mi_tgt)
 isid histid
 tempfile mi_tgt
 save `mi_tgt'
+/*AND THE ONE THE SENTINEL-FREE MATCHER USED.*/
+clear
+local files : dir `"`div'/divided_file1940_tgtns_cleaned"' files "norace*.dta"
+foreach f of local files {
+	append using `"`div'/divided_file1940_tgtns_cleaned/`f'"', keep(id mi_true_cleaned)
+}
+rename (id mi_true_cleaned) (histid mi_tgtns)
+isid histid
+tempfile mi_tgtns
+save `mi_tgtns'
 
 use histid target mi_anc mi_ml using `"`sample_f'"', clear
 isid histid
 merge 1:1 histid using `mi_tgt', keep(1 3) nogen
+merge 1:1 histid using `mi_tgtns', keep(1 3) nogen
 /*THE FOUR VERSIONS' 1940 INITIALS, NAMED BY VERSION.*/
 gen mi_v_ans  = mi_anc
 gen mi_v_true = mi_ml
 gen mi_v_ml   = mi_ml
 gen mi_v_mltgt = mi_tgt
+gen mi_v_mltgtns = mi_tgtns
 /*SANITY: mltgt's initial is ours on target records, Ancestry's elsewhere.*/
 quietly count if target==1 & mi_tgt!=mi_ml
 display "target records whose mltgt initial differs from ours: " r(N)
 assert r(N)==0
 quietly count if target==0 & mi_tgt!=mi_anc
 display "non-target records whose mltgt initial differs from Ancestry's: " r(N)
+assert r(N)==0
+/*SANITY: THE SENTINEL FIX CAN CHANGE AN INITIAL ONLY WHERE mltgt'S WAS   */
+/*EMPTY (A SENTINEL FIRST NAME; 1e_tgtns_divided_files.do EXPECTS NONE).   */
+quietly count if mi_tgtns!=mi_tgt
+scalar n_mi_changed = r(N)
+display "records whose mltgtns initial differs from mltgt's: " r(N)
+quietly count if mi_tgtns!=mi_tgt & mi_tgt!=""
 assert r(N)==0
 keep histid target mi_v_* mi_anc
 tempfile cn1940_full
@@ -296,7 +320,7 @@ foreach w in a s {
 file open md using `"`md'"', write replace text
 file write md "# Target-only ABE links, 1930-1940 men" _n _n
 file write md "Written by MATCHING/score_tgt_links.do (definitions of LINKAGE/code/01_abe_jw/linkage_analysis.do; ans and true checked against the main table)." _n _n
-file write md "Columns: **Old** = Ancestry names; **New (paper)** = model names on every record, the paper's file; **New (rerun)** = the same, rerun 2026-11-17 by the code that made Target-only; **Target-only** = model names on target records only." _n _n
+file write md "Columns: **Old** = Ancestry names; **New (paper)** = model names on every record, the paper's file; **New (rerun)** = the same, rerun 2026-11-17 by the code that made Target-only; **Target-only** = model names on target records only; **Target-only, no sentinel** = the same with the model's literal 'InvalidPred' replaced by Ancestry's field (2026-11-22), with the middle initial the pipeline's fallback gives; that changes the own 1940 initial of " %9.0fc (n_mi_changed) " sample records from Target-only's. Own initials of fallback records: where the model gave no first name, New (paper), New (rerun) and the target records of both Target-only columns have an empty initial (1_divide re-cleans Ancestry's already-cleaned first name), so those records enter the Ancestry-MI rows but not the own-MI rows; the non-target records of both Target-only columns carry Ancestry's initial. The Ancestry-MI rows hold the yardstick fixed across columns. Comparing Target-only with New (rerun) isolates the target-only restriction (both with the sentinel); comparing Target-only, no sentinel with Target-only isolates the sentinel fix on target records. New (paper) and New (rerun) still carry the sentinel on every record." _n _n
 file write md "Share validated uses each version's own 1940 middle initial (Old: Ancestry's; New: ours; Target-only: ours on target records, Ancestry's elsewhere), as the paper does; the Ancestry-MI row uses Ancestry's 1940 initial for every version. Verified/contradicted are against the FamilySearch-profile sample and cover only links it reaches (unverifiable excluded)." _n _n
 foreach w in a s {
 	if "`w'"=="a" local lab "all pairs"
@@ -307,13 +331,14 @@ foreach s in full restr non {
 	if "`s'"=="full"  file write md _n "## All records (N = " %12.0fc (N_full) ")" _n _n
 	if "`s'"=="restr" file write md _n "## Target records (N = " %12.0fc (N_restr) ")" _n _n
 	if "`s'"=="non"   file write md _n "## Non-target records (N = " %12.0fc (N_non) ")" _n _n
-	file write md "| | Old | New (paper) | New (rerun) | Target-only |" _n "|---|---:|---:|---:|---:|" _n
-	foreach r in L rate sv nv sva ver unv con cshare recall {
+	file write md "| | Old | New (paper) | New (rerun) | Target-only | Target-only, no sentinel |" _n "|---|---:|---:|---:|---:|---:|" _n
+	foreach r in L rate sv nv sva nva ver unv con cshare recall {
 		if "`r'"=="L"      local lab "Links"
 		if "`r'"=="rate"   local lab "Match rate (%)"
 		if "`r'"=="sv"     local lab "Share validated, MI (%)"
 		if "`r'"=="nv"     local lab "Links with both initials"
 		if "`r'"=="sva"    local lab "Share validated, Ancestry 1940 MI (%)"
+		if "`r'"=="nva"    local lab "Links with both initials, Ancestry 1940 MI"
 		if "`r'"=="ver"    local lab "Verified correct"
 		if "`r'"=="unv"    local lab "Unverifiable"
 		if "`r'"=="con"    local lab "Directly contradicted"
@@ -321,7 +346,7 @@ foreach s in full restr non {
 		if "`r'"=="recall" local lab "Recall (%)"
 		file write md "| `lab'"
 		foreach c of local combos {
-			if inlist("`r'","L","nv","ver","unv","con") local v : di %13.0fc `r'_`s'_`c'
+			if inlist("`r'","L","nv","nva","ver","unv","con") local v : di %13.0fc `r'_`s'_`c'
 			if inlist("`r'","rate","sv","sva","recall")        local v : di %6.2f 100*`r'_`s'_`c'
 			if "`r'"=="cshare" local v : di %6.2f 100*con_`s'_`c'/(ver_`s'_`c'+con_`s'_`c')
 			file write md " | `=strtrim("`v'")'"
