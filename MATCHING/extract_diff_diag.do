@@ -83,7 +83,7 @@ foreach yr in 1940 1930 {
 	gen int dage = age_W - age_M if d_age
 	tab dage if inrange(dage,-12,12), missing
 	gen dage_bin = cond(missing(age_M)|missing(age_W), 99, cond(abs(dage)<=12, 0, cond(abs(dage)<=50, 1, 2))) if d_age
-	label define dbin 0 "|d|<=12" 1 "12<|d|<=50" 2 "|d|>50" 99 "a side missing"
+	label define dbin 0 "|d|<=12" 1 "12<|d|<=50" 2 "|d|>50" 99 "a side missing", replace
 	label values dage_bin dbin
 	tab dage_bin, missing
 	quietly summarize dage
