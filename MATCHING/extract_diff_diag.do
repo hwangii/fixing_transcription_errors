@@ -54,8 +54,8 @@ foreach yr in 1940 1930 {
 	/*BIRTHPLACE FILES IN ONE SOURCE ONLY.                                    */
 	local onlyM : list flM - flW
 	local onlyW : list flW - flM
-	display "`yr' birthplace files in men-only source only: `onlyM'"
-	display "`yr' birthplace files in women-added source only: `onlyW'"
+	display `"`yr' birthplace files in men-only source only: `onlyM'"'
+	display `"`yr' birthplace files in women-added source only: `onlyW'"'
 	use `sM', clear
 	merge 1:1 histid using `sW'
 	display "`yr': men-only source only " _continue
