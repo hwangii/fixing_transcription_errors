@@ -32,7 +32,17 @@ foreach yr in 1940 1930 {
 			local b = subinstr(subinstr("`f'", "norace", "", 1), ".dta", "", 1)
 			confirm integer number `b'
 			local ++k
-			use histid sex age mi namefrst_ans_cleaned namelast_ans_cleaned using `"`d'/`f'"', clear
+			/*THE MEN-ONLY 1930 FILES CARRY NO sex VARIABLE (r(111), 2026-11-23);  */
+			/*THE MEN-ONLY SOURCE IS MEN BY CONSTRUCTION (0_create: keep if sex==1).*/
+			use `"`d'/`f'"' in 1, clear
+			capture confirm variable sex
+			local hassex = !_rc
+			if `hassex' use histid sex age mi namefrst_ans_cleaned namelast_ans_cleaned using `"`d'/`f'"', clear
+			else {
+				assert "`v'"=="M"
+				use histid age mi namefrst_ans_cleaned namelast_ans_cleaned using `"`d'/`f'"', clear
+				gen byte sex = 1
+			}
 			gen int bpl = `b'
 			tempfile p`k'
 			save `p`k''
