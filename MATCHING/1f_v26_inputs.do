@@ -85,8 +85,10 @@ confirm file `"`flags'"'
 local dirs divided_file1930_v26_ans_cleaned divided_file1940_v26_ans_cleaned divided_file1940_v26_true_cleaned divided_file1940_v26_tgt_cleaned
 foreach d of local dirs {
 	mata: st_local("dex", strofreal(direxists(st_local("f_intermediate") + st_local("d"))))
-	if `dex' {
-		display as error "`f_intermediate'`d' exists; move it aside first"
+	local dfl ""
+	if `dex' local dfl : dir `"`f_intermediate'`d'"' files "*"
+	if `"`dfl'"'!="" {
+		display as error "`f_intermediate'`d' is not empty; move it aside first"
 		exit 602
 	}
 }
@@ -130,7 +132,9 @@ save `model'
 /*2. PER YEAR AND BIRTHPLACE FILE                          */
 /*=========================================================*/
 foreach d of local dirs {
-	mkdir `"`f_intermediate'`d'"'
+	capture mkdir `"`f_intermediate'`d'"'
+	mata: st_local("dex", strofreal(direxists(st_local("f_intermediate") + st_local("d"))))
+	assert `dex'
 }
 foreach yr in 1930 1940 {
 	local src `"`f_intermediate'divided_file`yr'_women_added"'
@@ -226,15 +230,17 @@ foreach yr in 1930 1940 {
 		if _N==0 local ++nnomen
 		rename histid id
 		if `yr'==1940 {
+			/*STATA ALLOWS ONE preserve; THE MEN ARE HELD IN A TEMPFILE     */
+			/*(r(621), 2026-11-24 RUN).                                      */
+			tempfile men
+			save `men'
 			/*ALL RECORDS WITH MODEL NAMES                                   */
-			preserve
 			keep id name_true_cleaned_exists age mi_true_cleaned f_ml l_ml
 			rename (f_ml l_ml) (f_name l_name)
 			order id name_true_cleaned_exists age mi_true_cleaned f_name l_name
 			if _N save `"`f_intermediate'divided_file1940_v26_true_cleaned/`f'"'
-			restore
+			use `men', clear
 			/*TARGET-ONLY                                                    */
-			preserve
 			gen f_name = cond(tgt, f_ml, f_ans)
 			gen l_name = cond(tgt, l_ml, l_ans)
 			replace mi_true_cleaned = mi if !tgt
@@ -242,7 +248,7 @@ foreach yr in 1930 1940 {
 			keep id name_true_cleaned_exists age mi_true_cleaned f_name l_name
 			order id name_true_cleaned_exists age mi_true_cleaned f_name l_name
 			if _N save `"`f_intermediate'divided_file1940_v26_tgt_cleaned/`f'"'
-			restore
+			use `men', clear
 		}
 		keep id age mi f_ans l_ans
 		rename (f_ans l_ans) (f_name l_name)
