@@ -21,6 +21,13 @@ local ml_years=`"`8'"'
 /*_mltgt<years>. WITH ml_years AND NO fs_years THE BRANCH BELOW STILL RUNS. */
 local mltype=`"`9'"'
 if `"`mltype'"'=="" local mltype "_true_cleaned"
+/*2026-11-25: THE FOLDER TYPE FOR ANCESTRY'S NAMES. "_ans_cleaned" (DEFAULT) */
+/*OR "_v26_ans_cleaned" (1f_v26_inputs.do: abeclean 0.26 ON THE 00655/00656 */
+/*RAW NAMES). A NON-DEFAULT TYPE TAKES THE BRANCH BELOW AND PREFIXES THE    */
+/*OUTPUT TAG WITH ITS STEM, e.g. link1930_1940_v26_cleaned_noraceblock0.dta  */
+/*(ANCESTRY BOTH YEARS), ..._v26_ml1940_..., ..._v26_mltgt1940_....          */
+local anstype=`"`10'"'
+if `"`anstype'"'=="" local anstype "_ans_cleaned"
 
 if `location'==1 { /*SERVER AT HOME*/
 
@@ -70,13 +77,13 @@ else {
 /*THE ORIGINAL BRANCH BELOW READS matching_intgen<yr>.dta, WHICH NO LONGER*/
 /*EXISTS UNDER THAT NAME; THIS BRANCH DOES NOT NEED IT.                   */
 /*************************************************************************/
-if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" {
+if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" | "`anstype'"!="_ans_cleaned" {
 
 	foreach yr1 in `yr_list' {
 
 		local yr2=`yr1'+`interval'
-		local typeA "_ans_cleaned"
-		local typeB "_ans_cleaned"
+		local typeA "`anstype'"
+		local typeB "`anstype'"
 		if strpos(`" `ml_years' "', " `yr1' ") local typeA "`mltype'"
 		if strpos(`" `ml_years' "', " `yr2' ") local typeB "`mltype'"
 		if strpos(`" `fs_years' "', " `yr1' ") local typeA "`fstype'"
@@ -87,7 +94,9 @@ if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" {
 		if strtrim(`"`fs_years'"')!="" local ver = subinstr("`fstype'","_cleaned","",1) + subinstr(strtrim(stritrim(`"`fs_years'"')), " ", "_", .)
 		/*2026-11-22: "_tgtns_cleaned" = TARGET-ONLY WITHOUT THE "InvalidPred"  */
 		/*SENTINEL (1e_tgtns_divided_files.do), TAG _mltgtns.                  */
-		local mltag = cond("`mltype'"=="_tgt_cleaned", "_mltgt", cond("`mltype'"=="_tgtns_cleaned", "_mltgtns", "_ml"))
+		/*2026-11-25: "_v26_true_cleaned" -> _ml, "_v26_tgt_cleaned" -> _mltgt.*/
+		local mltag = cond(strpos("`mltype'","_tgtns_cleaned"), "_mltgtns", cond(strpos("`mltype'","_tgt_cleaned"), "_mltgt", "_ml"))
+		if "`anstype'"!="_ans_cleaned" local ver = subinstr("`anstype'","_ans_cleaned","",1) + "`ver'"
 		if strtrim(`"`ml_years'"')!="" local ver = "`ver'`mltag'" + subinstr(strtrim(stritrim(`"`ml_years'"')), " ", "_", .)
 
 		local rdir `"`f_intermediate'r`typeA'`B_tag'`yr1'_`yr2'"'
@@ -128,7 +137,7 @@ if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" {
 					gen byte fs_used`y' = fs_frst_used==1 | fs_last_used==1
 					drop fs_frst_used fs_last_used
 				}
-				else if inlist("`type'","_true_cleaned","_tgt_cleaned","_tgtns_cleaned") {
+				else if inlist("`type'","_true_cleaned","_tgt_cleaned","_tgtns_cleaned","_v26_true_cleaned","_v26_tgt_cleaned") {
 					/*OURS: THE ML MIDDLE INITIAL, AS THE PAPER'S ML LINK FILE  */
 					/*TAKES IT (ORIGINAL BRANCH BELOW: mi_true_cleaned).        */
 					merge m:1 id using `"`f_intermediate'divided_file`y'`type'/norace`b'.dta"', keepusing(mi_true_cleaned) keep(1 3)
