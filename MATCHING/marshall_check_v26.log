@@ -1,0 +1,725 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   15.1   Copyright 1985-2017 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     MP - Parallel Edition            College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+Single-user 8-core Stata perpetual license:
+       Serial number:  501506330335
+         Licensed to:  Munir and sam
+                       UBC
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  More than 2 billion observations are allowed; see help obs_advice.
+      4.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+
+running c:\ado\personal\profile.do ...
+
+. do D:\repos\fixing_transcription_errors\MATCHING\_run_marshall_check_v26.do 
+
+. capture noisily do "D:\repos\fixing_transcription_errors\MATCHING\marshall_ch
+> eck_v26.do"
+
+. /*IS THE "marshall" CLEANING DEFECT GONE FROM THE v26 INPUTS? (2026-11-25) */
+. /*marshall_diag.log: the old stored cleaned names (abeclean <0.25) turned   *
+> /
+. /*lee, edgar, dock, abram, ... into "marshall" (~290k per year/source).     *
+> /
+. /*1f_v26_inputs.do rebuilt everything with 0.26. Here, per year:           */
+. /* (1) every "marshall" in the new Ancestry first name, tabulated against   *
+> /
+. /*     the raw Ancestry name it came from (divided_file<yr>_women_added);  */
+. /* (2) 1940: every "marshall" in the new model first name, tabulated        *
+> /
+. /*     against the raw Ancestry name (raw model output is not re-read);    */
+. /* (3) old stored cleaned name vs new, among records stored as "marshall": */
+. /*     the most common old->new pairs, so lee/edgar/... should now appear. */
+. /*READ-ONLY; writes only the log.                                          */
+. 
+. clear all
+
+. set more off
+
+. if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/con
+> fig.do"
+
+. /****************************************************************************
+> */
+. /*REPLICATION PACKAGE CONFIGURATION -- THE ONE PLACE PATHS ARE SET.          
+>  */
+. /*                                                                           
+> */
+. /*Run by replication/run_machineA.do. A script run on its own loads this     
+> */
+. /*file itself if $REP_REPO is empty (globals survive `clear all`; tested on  
+> */
+. /*Stata/MP 15.1, 2026-10-15).                                                
+> */
+. /*                                                                           
+> */
+. /*The analysis scripts in CODE/ still carry their own hardcoded data paths.  
+> */
+. /*Those have NOT been rewritten to use the globals below -- CLAUDE.md asks   
+> */
+. /*that path changes across files be agreed first. The globals here are used  
+> */
+. /*by the package's own files and by the preflight check, which confirms that 
+> */
+. /*every frozen input the scripts read exists before anything runs.           
+> */
+. /****************************************************************************
+> */
+. 
+. version 15.1
+
+. 
+. /*ONE BLOCK PER MACHINE. A machine with no block stops here, rather than     
+> */
+. /*running with paths that silently point at nothing.                         
+> */
+. if c(hostname) == "ARTS-ECON-CM" {
+.         global REP_MACHINE "A"
+.         global REP_REPO    "D:/repos/fixing_transcription_errors"
+.         global REP_PAPER   "D:/repos/6638fa0fd89fbec05130caeb"
+.         global REP_SNU     "D:/SNU ECON Dropbox/sam hwang"
+.         global REP_F       "F:"
+. }
+
+. else if c(hostname) == "ARTS-ECON-SHSRV" {
+.         /*MACHINE B: DEAGLAN'S LINKAGE PACKAGE. CODE IS THIS REPO'S LINKAGE/c
+> ode; */
+.         /*DATA STAYS IN HIS FOLDER ON F:, WHICH NOW HOLDS DATA ONLY. LINKAGE'
+> S OWN */
+.         /*paths.do READS $ROOT (DATA) AND $LCODE (CODE), SET HERE FROM THESE.
+>      */
+.         global REP_MACHINE "B"
+.         global REP_REPO    "F:/github_repos/fixing_transcription_errors"
+.         global REP_PAPER   "F:/github_repos/6638fa0fd89fbec05130caeb"
+.         global REP_LINK    "F:/Deaglan/Census_Transcriptions"
+.         global ROOT        "$REP_LINK"
+.         global LCODE       "$REP_REPO/LINKAGE/code"
+. }
+
+. else {
+.         display as error "replication/config.do: no paths for machine `c(host
+> name)'."
+.         display as error "Add a block for it at the top of this file."
+.         exit 198
+. }
+
+. 
+. global REP_RESULTS "$REP_REPO/replication/results"
+
+. adopath ++ "$REP_REPO/replication/stata"
+  [1]              "D:/repos/fixing_transcription_errors/replication/stata"
+  [2]  (BASE)      "C:\Program Files (x86)\Stata15\ado\base/"
+  [3]  (SITE)      "C:\Program Files (x86)\Stata15\ado\site/"
+  [4]              "."
+  [5]  (PERSONAL)  "c:\ado\personal/"
+  [6]  (PLUS)      "c:\ado\plus/"
+  [7]  (OLDPLACE)  "c:\ado/"
+
+. 
+. /*MACHINE A: THE 50 ANCESTRY-FAMILYSEARCH STATE FILES THAT                  *
+> /
+. /*CODE/make_balance_exhibits.do READS, AS $REP_F/fixing_transcription_errors/
+>  */
+. /*DATA/INTERMEDIATE/merged_<name>1940.dta. ONE LIST, SO run_machineA.do'S    
+> */
+. /*PREFLIGHT AND THE SCRIPT CANNOT DISAGREE. ALASKA HAS NO FILE.              
+> */
+. global REP_A_STATES "alabama arizona arkansas california colorado connecticut
+>  delaware district_of_columbia florida georgia hawaii idaho illinois indiana 
+> iowa kansas kentucky louisiana maine maryland massachusetts michigan minnesot
+> a mississippi missouri montana nebraska nevada new_hampshire new_jersey new_m
+> exico new_york north_carolina north_dakota ohio oklahoma oregon pennsylvania 
+> rhode_island south_carolina south_dakota tennessee texas utah vermont virgini
+> a washington west_virginia wisconsin wyoming"
+
+. 
+. /*`version` SET IN A DO-FILE REVERTS WHEN THAT FILE ENDS, SO THE ONE ABOVE  *
+> /
+. /*COVERS ONLY THIS FILE. run_machineA.do SETS IT FOR THE SCRIPTS. Results    
+> */
+. /*were produced on Stata/MP 15.1; record what this run uses.                *
+> /
+. display as text "config: machine $REP_MACHINE (`c(hostname)'), Stata `c(stata
+> _version)' `c(edition_real)', `c(current_date)' `c(current_time)'"
+config: machine A (ARTS-ECON-CM), Stata 15.1 , 25 Nov 2026 00:41:51
+
+. 
+end of do-file
+
+. local f_intermediate "$REP_F/enum_date/DATA/INTERMEDIATE/"
+
+. 
+. foreach yr in 1930 1940 {
+  2.         /*RAW AND OLD STORED ANCESTRY NAMES, BOTH SEXES                   
+>      */
+.         local src `"`f_intermediate'divided_file`yr'_women_added"'
+  3.         local fl : dir `"`src'"' files "norace*.dta"
+  4.         if `"`fl'"'=="" {
+  5.                 display as error "no norace*.dta files in `src'"
+  6.                 exit 601
+  7.         }
+  8.         local k 0
+  9.         foreach f of local fl {
+ 10.                 local ++k
+ 11.                 use histid namefrst_ans namefrst_ans_cleaned using `"`src'
+> /`f'"', clear
+ 12.                 tempfile r`k'
+ 13.                 save `r`k''
+ 14.         }
+ 15.         use `r1', clear
+ 16.         forvalues i = 2/`k' {
+ 17.                 append using `r`i''
+ 18.         }
+ 19.         isid histid
+ 20.         rename namefrst_ans_cleaned old_f
+ 21.         tempfile raw
+ 22.         save `raw'
+ 23. 
+.         if `yr'==1940 use histid namefrst namefrst_true_cleaned using `"`f_in
+> termediate'for_mlp1940_v26.dta"', clear
+ 24.         else          use histid namefrst using `"`f_intermediate'for_mlp1
+> 930_v26.dta"', clear
+ 25.         merge 1:1 histid using `raw', assert(3) nogen
+ 26.         display _n "===== `yr': " %15.0fc _N " records"
+ 27. 
+.         /*(1) NEW ANCESTRY "marshall"                                        
+>   */
+.         display "`yr' new Ancestry first name marshall: " _continue
+ 28.         count if namefrst=="marshall"
+ 29.         display "`yr' ... of which raw name lacks 'marsh': " _continue
+ 30.         count if namefrst=="marshall" & !strpos(lower(namefrst_ans),"marsh
+> ")
+ 31.         preserve
+ 32.         keep if namefrst=="marshall"
+ 33.         contract namefrst_ans
+ 34.         gsort -_freq
+ 35.         list in 1/`=min(25,_N)', noobs
+ 36.         restore
+ 37. 
+.         /*(2) NEW MODEL "marshall", 1940                                     
+>   */
+.         if `yr'==1940 {
+ 38.                 display "1940 new model first name marshall: " _continue
+ 39.                 count if namefrst_true_cleaned=="marshall"
+ 40.                 display "1940 ... of which raw Ancestry name lacks 'marsh'
+> : " _continue
+ 41.                 count if namefrst_true_cleaned=="marshall" & !strpos(lower
+> (namefrst_ans),"marsh")
+ 42.                 preserve
+ 43.                 keep if namefrst_true_cleaned=="marshall" & !strpos(lower(
+> namefrst_ans),"marsh")
+ 44.                 if _N {
+ 45.                         contract namefrst_ans
+ 46.                         gsort -_freq
+ 47.                         list in 1/`=min(25,_N)', noobs
+ 48.                 }
+ 49.                 restore
+ 50.         }
+ 51. 
+.         /*(3) OLD STORED "marshall" -> NEW                                   
+>    */
+.         display "`yr' old stored marshall: " _continue
+ 52.         count if old_f=="marshall"
+ 53.         display "`yr' old stored marshall, new still marshall: " _continue
+ 54.         count if old_f=="marshall" & namefrst=="marshall"
+ 55.         preserve
+ 56.         keep if old_f=="marshall"
+ 57.         contract namefrst
+ 58.         gsort -_freq
+ 59.         list in 1/`=min(25,_N)', noobs
+ 60.         restore
+ 61. }
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000001.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000002.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000003.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000004.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000005.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000006.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000007.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000008.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000009.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000a.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000k.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000m.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000o.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000q.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000s.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000u.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000w.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00000x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000010.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000011.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000012.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000013.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000014.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000015.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000016.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000017.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000018.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000019.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001a.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001k.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001m.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001o.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001q.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001s.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001u.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001w.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00001x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000020.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000021.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000022.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000023.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000024.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000025.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000026.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000027.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000028.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000029.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002a.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002k.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002m.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002o.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002q.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002s.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002u.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002w.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00002x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000030.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000031.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000032.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000033.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000034.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000035.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000036.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000037.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000038.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000039.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003a.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003k.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003m.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003o.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003q.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003s.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003u.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003w.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00003x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000040.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000041.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000042.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000043.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000044.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000045.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000046.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000047.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000048.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000049.tmp saved
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                       122,771,589  
+    -----------------------------------------
+
+===== 1930:     122,771,589 records
+1930 new Ancestry first name marshall:   42,930
+1930 ... of which raw name lacks 'marsh':   0
+(122,728,659 observations deleted)
+
+  +--------------------+
+  | namefrst~s   _freq |
+  |--------------------|
+  |   MARSHALL   19965 |
+  |    MARSHAL    4820 |
+  | MARSHALL E    1289 |
+  |    MARSHEL    1215 |
+  | MARSHALL L    1066 |
+  |--------------------|
+  | MARSHALL J     905 |
+  | MARSHALL W     879 |
+  | MARSHALL A     869 |
+  | MARSHALL H     854 |
+  | MARSHALL C     753 |
+  |--------------------|
+  | MARSHALL M     681 |
+  | MARSHALL R     599 |
+  | MARSHALL B     579 |
+  | MARSHALL D     535 |
+  | MARSHALL F     514 |
+  |--------------------|
+  |   MARSHELL     460 |
+  | MARSHALL S     441 |
+  | MARSHALL G     414 |
+  | MARSHALL T     393 |
+  | MARSHALL P     346 |
+  |--------------------|
+  |  MARSHAL L     277 |
+  |  MARSHAL E     277 |
+  | J MARSHALL     214 |
+  | MARSHALL N     204 |
+  |  MARSHAL H     202 |
+  +--------------------+
+1930 old stored marshall:   325,627
+1930 old stored marshall, new still marshall:   40,246
+(122,445,962 observations deleted)
+
+  +-------------------+
+  | namefrst    _freq |
+  |-------------------|
+  |      lee   142625 |
+  |    edgar   120055 |
+  | marshall    40246 |
+  |     dock     9737 |
+  |    abram     8515 |
+  |-------------------|
+  |     lane     2434 |
+  |      key      444 |
+  | woodruff      387 |
+  |      nay      379 |
+  |     gard      356 |
+  |-------------------|
+  |      ney      319 |
+  |   gerone       52 |
+  |      mcd       34 |
+  |  ashbury       27 |
+  |     laft       11 |
+  |-------------------|
+  |       dn        6 |
+  +-------------------+
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004k.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004m.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004o.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004q.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004s.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004u.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004w.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00004x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000050.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000051.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000052.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000053.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000054.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000055.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000056.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000057.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000058.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000059.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005a.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005k.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005m.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005o.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005q.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005s.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005u.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005w.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00005x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000060.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000061.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000062.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000063.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000064.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000065.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000066.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000067.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000068.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000069.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006a.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006k.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006m.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006o.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006q.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006s.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006u.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006w.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00006x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000070.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000071.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000072.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000073.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000074.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000075.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000076.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000077.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000078.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000079.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007a.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007k.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007m.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007o.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007q.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007s.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007u.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007w.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00007x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000080.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000081.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000082.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000083.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000084.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000085.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000086.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000087.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000088.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_000089.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008a.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008c.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008e.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008g.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008i.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_3370_00008k.tmp saved
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                       131,899,064  
+    -----------------------------------------
+
+===== 1940:     131,899,064 records
+1940 new Ancestry first name marshall:   43,686
+1940 ... of which raw name lacks 'marsh':   0
+(131,855,378 observations deleted)
+
+  +--------------------+
+  | namefrst~s   _freq |
+  |--------------------|
+  |   MARSHALL   26796 |
+  |    MARSHAL    5032 |
+  | MARSHALL E     976 |
+  | MARSHALL L     827 |
+  | MARSHALL J     639 |
+  |--------------------|
+  | MARSHALL W     635 |
+  | MARSHALL H     603 |
+  | MARSHALL A     585 |
+  | MARSHALL C     540 |
+  | MARSHALL M     496 |
+  |--------------------|
+  | MARSHALL R     461 |
+  | MARSHALL D     440 |
+  | MARSHALL B     433 |
+  | MARSHALL F     356 |
+  | MARSHALL G     324 |
+  |--------------------|
+  | MARSHALL S     311 |
+  | MARSHALL T     262 |
+  | MARSHALL P     232 |
+  | J MARSHALL     190 |
+  |  MARSHAL E     171 |
+  |--------------------|
+  | MARSHALL N     167 |
+  |  MARSHAL L     163 |
+  | MARSHALL K     126 |
+  |  MARSHAL H     119 |
+  |  MARSHAL A     117 |
+  +--------------------+
+1940 new model first name marshall:   47,378
+1940 ... of which raw Ancestry name lacks 'marsh':   4,164
+(131,894,900 observations deleted)
+
+  +--------------------+
+  | namefrst~s   _freq |
+  |--------------------|
+  |   MARCHALL     682 |
+  |    MARCHAL     171 |
+  |   MARSBALL     168 |
+  |   MARAHALL     157 |
+  |   MARCHELL     105 |
+  |--------------------|
+  |    MASHALL      96 |
+  |    MARCHEL      84 |
+  |   MERSHALL      63 |
+  |   MARCHAEL      48 |
+  |   MORSHALL      43 |
+  |--------------------|
+  | MARCHALL E      41 |
+  |   MAESHALL      39 |
+  |   MARABELL      38 |
+  |    MICHAEL      35 |
+  |   MARTHALL      32 |
+  |--------------------|
+  |   MARIBELL      25 |
+  |    MARDELL      24 |
+  | MARCHALL J      21 |
+  | MARCHALL C      21 |
+  | MARCHALL L      21 |
+  |--------------------|
+  |    MARAHAL      19 |
+  | MARCHALL W      18 |
+  |   MARHSALL      17 |
+  |   MASSHALL      15 |
+  | MARCHALL R      14 |
+  +--------------------+
+1940 old stored marshall:   332,430
+1940 old stored marshall, new still marshall:   41,957
+(131,566,634 observations deleted)
+
+  +-------------------+
+  | namefrst    _freq |
+  |-------------------|
+  |      lee   160894 |
+  |    edgar   113401 |
+  | marshall    41957 |
+  |     dock     6208 |
+  |    abram     5457 |
+  |-------------------|
+  |     lane     2722 |
+  |      key      366 |
+  | woodruff      360 |
+  |      nay      276 |
+  |     gard      247 |
+  |-------------------|
+  |      ney      243 |
+  |   gerone      126 |
+  |  ashbury       56 |
+  |     laft       41 |
+  |      mcd       38 |
+  |-------------------|
+  |       dn       36 |
+  |   lainar        2 |
+  +-------------------+
+
+. display "MARSHALL CHECK V26 DONE"
+MARSHALL CHECK V26 DONE
+
+. 
+end of do-file
+
+. display "RUN-STATA-RC: " _rc
+RUN-STATA-RC: 0
+
