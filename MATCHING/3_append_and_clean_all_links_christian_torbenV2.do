@@ -28,6 +28,17 @@ if `"`mltype'"'=="" local mltype "_true_cleaned"
 /*(ANCESTRY BOTH YEARS), ..._v26_ml1940_..., ..._v26_mltgt1940_....          */
 local anstype=`"`10'"'
 if `"`anstype'"'=="" local anstype "_ans_cleaned"
+/*2026-11-25: EXPLICIT OVERRIDES FOR THE v26 FAMILYSEARCH VERSIONS          */
+/*(1g_v26_fs_inputs.do): folder type for year 1 (arg 11), year 2 (arg 12),  */
+/*and the output tag (arg 13), e.g. "_v26_fs_cleaned" "_v26_fsmltgt_cleaned" */
+/*"_v26_fs1930_1940_mltgt1940". All three or none.                          */
+local typeA_o=`"`11'"'
+local typeB_o=`"`12'"'
+local ver_o=`"`13'"'
+if (`"`typeA_o'"'=="") + (`"`typeB_o'"'=="") + (`"`ver_o'"'=="") == 1 | (`"`typeA_o'"'=="") + (`"`typeB_o'"'=="") + (`"`ver_o'"'=="") == 2 {
+	display as error "3_append: arguments 11-13 must be given together"
+	exit 198
+}
 
 if `location'==1 { /*SERVER AT HOME*/
 
@@ -77,7 +88,7 @@ else {
 /*THE ORIGINAL BRANCH BELOW READS matching_intgen<yr>.dta, WHICH NO LONGER*/
 /*EXISTS UNDER THAT NAME; THIS BRANCH DOES NOT NEED IT.                   */
 /*************************************************************************/
-if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" | "`anstype'"!="_ans_cleaned" {
+if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" | "`anstype'"!="_ans_cleaned" | `"`ver_o'"'!="" {
 
 	foreach yr1 in `yr_list' {
 
@@ -98,6 +109,13 @@ if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" | "`anstype'"!="_ans_cleaned
 		local mltag = cond(strpos("`mltype'","_tgtns_cleaned"), "_mltgtns", cond(strpos("`mltype'","_tgt_cleaned"), "_mltgt", "_ml"))
 		if "`anstype'"!="_ans_cleaned" local ver = subinstr("`anstype'","_ans_cleaned","",1) + "`ver'"
 		if strtrim(`"`ml_years'"')!="" local ver = "`ver'`mltag'" + subinstr(strtrim(stritrim(`"`ml_years'"')), " ", "_", .)
+		if `"`ver_o'"'!="" {
+			local typeA "`typeA_o'"
+			local typeB "`typeB_o'"
+			local B_tag ""
+			if "`typeB'"!="`typeA'" local B_tag "`typeB'"
+			local ver "`ver_o'"
+		}
 
 		local rdir `"`f_intermediate'r`typeA'`B_tag'`yr1'_`yr2'"'
 		local files : dir `"`rdir'"' files "norace*.dta"
@@ -132,7 +150,7 @@ if `"`fs_years'"'!="" | strtrim(`"`ml_years'"')!="" | "`anstype'"!="_ans_cleaned
 				local y    = cond("`side'"=="A", `yr1', `yr2')
 				local type = cond("`side'"=="A", "`typeA'", "`typeB'")
 				rename id_`side' id
-				if "`type'"=="`fstype'" {
+				if "`type'"=="`fstype'" | strpos("`type'","_v26_fs") {
 					merge m:1 id using `"`f_intermediate'divided_file`y'`type'/norace`b'.dta"', keepusing(mi fs_frst_used fs_last_used) keep(1 3)
 					gen byte fs_used`y' = fs_frst_used==1 | fs_last_used==1
 					drop fs_frst_used fs_last_used
