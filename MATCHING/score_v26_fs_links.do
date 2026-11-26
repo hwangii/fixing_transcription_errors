@@ -38,7 +38,9 @@ local f_v26tgt "`links'/link1930_1940_v26_mltgt1940_cleaned_noraceblock0.dta"
 local f_fsa "`links'/link1930_1940_v26_fstgt1940_cleaned_noraceblock0.dta"
 local f_fsc "`links'/link1930_1940_v26_fs1930_1940_cleaned_noraceblock0.dta"
 local f_fsd "`links'/link1930_1940_v26_fs1930_1940_mltgt1940_cleaned_noraceblock0.dta"
-local combos ans true v26 v26ml v26tgt fsa fsc fsd
+/*2026-11-26: (e) 1930 FamilySearch wherever it exists, 1940 Ancestry.     */
+local f_fse "`links'/link1930_1940_v26_fs1930_cleaned_noraceblock0.dta"
+local combos ans true v26 v26ml v26tgt fsa fsc fsd fse
 
 /*THE MAIN TABLE'S VALUES, AS IN linkage_analysis.do (full = all, restr = target).*/
 local p_n_full  51036859
@@ -112,6 +114,7 @@ gen mi_v_v26tgt = mi26_tgt
 gen mi_v_fsa    = mi26_fstgt
 gen mi_v_fsc    = mi26_fs
 gen mi_v_fsd    = mi26_fsmltgt
+gen mi_v_fse    = mi26_ans
 /*REPORTED (2026-11-26 REVIEW): HOW FAR (b) WOULD DIFFER FROM (a) IN THE    */
 /*SAMPLE'S INITIALS, AND (d) FROM (c) OFF TARGET.                           */
 quietly count if mi26_fstgt!=mi26_fs
@@ -247,7 +250,7 @@ foreach s in full restr non {
 		rename histid histid1930
 		/*OWN 1930 INITIAL; THE ANCESTRY-MI YARDSTICK USES THE PAPER'S.       */
 		if inlist("`c'","ans","true") gen mi1930 = mi1930_p
-		else if inlist("`c'","fsc","fsd") gen mi1930 = mi1930_fs
+		else if inlist("`c'","fsc","fsd","fse") gen mi1930 = mi1930_fs
 		else gen mi1930 = mi1930_v26
 		rename histid1940 histid
 		preserve
@@ -318,7 +321,7 @@ assert N_restr + N_non == N_full
 /*============================================================*/
 file open md using `"`md'"', write replace text
 file write md "# ABE exact with FamilySearch names on the v26 inputs, 1930-1940 men" _n _n
-file write md "**(a)** 1930 Ancestry, 1940 FamilySearch on target records (Ancestry elsewhere). **(c)** FamilySearch in both years wherever it exists. **(d)** (c), with our model's names on 1940 target records (empty model field -> FamilySearch -> Ancestry). (b), 1940 FamilySearch wherever it exists, equals (a) by construction and is not run. Per-field fallback to Ancestry where FamilySearch lacks a field. Caveat: the verified/contradicted/recall rows compare with FamilySearch-profile links, which may favour versions that use FamilySearch's names." _n _n
+file write md "**(a)** 1930 Ancestry, 1940 FamilySearch on target records (Ancestry elsewhere). **(c)** FamilySearch in both years wherever it exists. **(d)** (c), with our model's names on 1940 target records (empty model field -> FamilySearch -> Ancestry). **(e)** 1930 FamilySearch wherever it exists, 1940 Ancestry. (b), 1940 FamilySearch wherever it exists, equals (a) by construction and is not run. Per-field fallback to Ancestry where FamilySearch lacks a field. Caveat: the verified/contradicted/recall rows compare with FamilySearch-profile links, which may favour versions that use FamilySearch's names." _n _n
 file write md "Written by MATCHING/score_v26_fs_links.do (definitions of LINKAGE/code/01_abe_jw/linkage_analysis.do; the paper's Old and New columns are checked against the main table)." _n _n
 file write md "Columns: **Old (paper)** and **New (paper)** = the paper's files, on names whose stored cleaning carried the pre-0.25 abeclean 'marshall' defect, from the men-only extracts. **Old (v26)**, **New (v26)**, **Target-only (v26)** = rebuilt from the 00655/00656 raw names with abeclean 0.26 (1f_v26_inputs.do), the same men and names as the MLP input; New (v26) has model names on every 1940 record with a per-field Ancestry fallback where the model field is empty, Target-only (v26) the same on target records only and Ancestry's elsewhere; 'InvalidPred' is blanked before the fallback. Same sample, denominators and truth as the paper." _n _n
 file write md "Share validated uses each version's own 1930 and 1940 middle initials; the Ancestry-MI rows use the paper's Ancestry initials for every column. Verified/contradicted are against the FamilySearch-profile sample and cover only links it reaches." _n _n
@@ -326,7 +329,7 @@ foreach s in full restr non {
 	if "`s'"=="full"  file write md _n "## All records (N = " %12.0fc (N_full) ")" _n _n
 	if "`s'"=="restr" file write md _n "## Target records (N = " %12.0fc (N_restr) ")" _n _n
 	if "`s'"=="non"   file write md _n "## Non-target records (N = " %12.0fc (N_non) ")" _n _n
-	file write md "| | Old (paper) | New (paper) | Old (v26) | New (v26) | Target-only (v26) | (a) | (c) | (d) |" _n "|---|---:|---:|---:|---:|---:|---:|---:|---:|" _n
+	file write md "| | Old (paper) | New (paper) | Old (v26) | New (v26) | Target-only (v26) | (a) | (c) | (d) | (e) |" _n "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|" _n
 	foreach r in L rate sv nv sva nva ver unv con cshare recall {
 		if "`r'"=="L"      local lab "Links"
 		if "`r'"=="rate"   local lab "Match rate (%)"
