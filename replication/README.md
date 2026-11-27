@@ -244,6 +244,7 @@ Each step can also be run on its own, in this order.
 |---|---|---|---|
 | 1 | `1f_v26_inputs.do` | `divided_file{1930,1940}_v26_ans_cleaned`, `divided_file1940_v26_{true,tgt}_cleaned`, `for_mlp1930_v26.dta`, `for_mlp1940_v26{,_tgt}.dta` | abeclean must be 0.26; no "marshall" from a raw name without "marsh" (`nmar`=0) |
 | 2 | `1h_for_mlp1940_v26_combined.do` | `for_mlp1940_v26_combined.dta` | the two 1940 files agree on all shared columns; Target-only equals New or Old on every record |
+| 2b | `1i_for_mlp1930_v26_combined.do` | `for_mlp1930_v26_combined.dta` | the two copies equal the Ancestry columns |
 | 3 | `verify_mlp_v26_independent.do` | nothing | rebuilds three birthplaces from the raw sources with separately written code; exit 9 on any cell difference |
 | 4 | `_v26_run.do` | ABE exact Old, New, Target-only links | runs `check_v26_same_input.do` first (ABE men = MLP men; exit 9 otherwise) |
 | 5 | `score_v26_links.do` | `MATCHING/results/v26_linkage_abe.md` | the paper's two columns must reproduce the main table |
@@ -255,7 +256,7 @@ Each step can also be run on its own, in this order.
 
 Two files, both sexes, in `F:/enum_date/DATA/INTERMEDIATE/`; their checksums are in `ipums_v26_manifest.md`.
 
-- `for_mlp1930_v26.dta`: `histid age sex bpl namefrst namelast mi` (Ancestry, cleaned).
+- `for_mlp1930_v26_combined.dta`: `histid age sex bpl`, and the same three name versions as the 1940 file (`namefrst namelast mi`, `..._true_cleaned`, `..._tgt_cleaned`; no exists flags). In 1930 all three are Ancestry's cleaned names; the copies let IPUMS run MLP three times, pairing each 1930 set with the 1940 set of the same name.
 - `for_mlp1940_v26_combined.dta`: the same, plus two more name versions for the same records.
   - Old: `namefrst namelast mi` (Ancestry).
   - New: `namefrst_true_cleaned namelast_true_cleaned mi_true_cleaned name_true_cleaned_exists` (the model's names on every record; Ancestry's where the model gives none).

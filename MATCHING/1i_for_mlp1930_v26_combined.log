@@ -1,0 +1,225 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   15.1   Copyright 1985-2017 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     MP - Parallel Edition            College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+Single-user 8-core Stata perpetual license:
+       Serial number:  501506330335
+         Licensed to:  Munir and sam
+                       UBC
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  More than 2 billion observations are allowed; see help obs_advice.
+      4.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+
+running c:\ado\personal\profile.do ...
+
+. do D:\repos\fixing_transcription_errors\MATCHING\_run_1i_for_mlp1930_v26_comb
+> ined.do 
+
+. capture noisily do "D:\repos\fixing_transcription_errors\MATCHING\1i_for_mlp1
+> 930_v26_combined.do"
+
+. /*1930 FILE FOR IPUMS MLP LINKING WITH THE SAME THREE NAME VERSIONS AS       
+>  */
+. /*for_mlp1940_v26_combined.dta (2026-11-27). MACHINE A. Read only on its     
+> */
+. /*input. In 1930 all three are Ancestry's names; the copies only let IPUMS   
+>  */
+. /*run MLP three times, pairing each 1930 set with the 1940 set of the same   
+> */
+. /*name (author, 2026-11-27). Writes for_mlp1930_v26_combined.dta:            
+> */
+. /*  histid age sex bpl                                                       
+>  */
+. /*  namefrst namelast mi                                   Old               
+>  */
+. /*  namefrst_true_cleaned namelast_true_cleaned mi_true_cleaned  New         
+>  */
+. /*  namefrst_tgt_cleaned namelast_tgt_cleaned mi_tgt_cleaned     Target-only 
+>  */
+. /*(no exists flags: no 1930 record has model names). Refuses to overwrite.  *
+> /
+. /*                                                                           
+>  */
+. /*  powershell -File replication/Run-Stata.ps1 MATCHING/1i_for_mlp1930_v26_co
+> mbined.do */
+. 
+. if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/con
+> fig.do"
+
+. /****************************************************************************
+> */
+. /*REPLICATION PACKAGE CONFIGURATION -- THE ONE PLACE PATHS ARE SET.          
+>  */
+. /*                                                                           
+> */
+. /*Run by replication/run_machineA.do. A script run on its own loads this     
+> */
+. /*file itself if $REP_REPO is empty (globals survive `clear all`; tested on  
+> */
+. /*Stata/MP 15.1, 2026-10-15).                                                
+> */
+. /*                                                                           
+> */
+. /*The analysis scripts in CODE/ still carry their own hardcoded data paths.  
+> */
+. /*Those have NOT been rewritten to use the globals below -- CLAUDE.md asks   
+> */
+. /*that path changes across files be agreed first. The globals here are used  
+> */
+. /*by the package's own files and by the preflight check, which confirms that 
+> */
+. /*every frozen input the scripts read exists before anything runs.           
+> */
+. /****************************************************************************
+> */
+. 
+. version 15.1
+
+. 
+. /*ONE BLOCK PER MACHINE. A machine with no block stops here, rather than     
+> */
+. /*running with paths that silently point at nothing.                         
+> */
+. if c(hostname) == "ARTS-ECON-CM" {
+.         global REP_MACHINE "A"
+.         global REP_REPO    "D:/repos/fixing_transcription_errors"
+.         global REP_PAPER   "D:/repos/6638fa0fd89fbec05130caeb"
+.         global REP_SNU     "D:/SNU ECON Dropbox/sam hwang"
+.         global REP_F       "F:"
+. }
+
+. else if c(hostname) == "ARTS-ECON-SHSRV" {
+.         /*MACHINE B: DEAGLAN'S LINKAGE PACKAGE. CODE IS THIS REPO'S LINKAGE/c
+> ode; */
+.         /*DATA STAYS IN HIS FOLDER ON F:, WHICH NOW HOLDS DATA ONLY. LINKAGE'
+> S OWN */
+.         /*paths.do READS $ROOT (DATA) AND $LCODE (CODE), SET HERE FROM THESE.
+>      */
+.         global REP_MACHINE "B"
+.         global REP_REPO    "F:/github_repos/fixing_transcription_errors"
+.         global REP_PAPER   "F:/github_repos/6638fa0fd89fbec05130caeb"
+.         global REP_LINK    "F:/Deaglan/Census_Transcriptions"
+.         global ROOT        "$REP_LINK"
+.         global LCODE       "$REP_REPO/LINKAGE/code"
+. }
+
+. else {
+.         display as error "replication/config.do: no paths for machine `c(host
+> name)'."
+.         display as error "Add a block for it at the top of this file."
+.         exit 198
+. }
+
+. 
+. global REP_RESULTS "$REP_REPO/replication/results"
+
+. adopath ++ "$REP_REPO/replication/stata"
+  [1]              "D:/repos/fixing_transcription_errors/replication/stata"
+  [2]  (BASE)      "C:\Program Files (x86)\Stata15\ado\base/"
+  [3]  (SITE)      "C:\Program Files (x86)\Stata15\ado\site/"
+  [4]              "."
+  [5]  (PERSONAL)  "c:\ado\personal/"
+  [6]  (PLUS)      "c:\ado\plus/"
+  [7]  (OLDPLACE)  "c:\ado/"
+
+. 
+. /*MACHINE A: THE 50 ANCESTRY-FAMILYSEARCH STATE FILES THAT                  *
+> /
+. /*CODE/make_balance_exhibits.do READS, AS $REP_F/fixing_transcription_errors/
+>  */
+. /*DATA/INTERMEDIATE/merged_<name>1940.dta. ONE LIST, SO run_machineA.do'S    
+> */
+. /*PREFLIGHT AND THE SCRIPT CANNOT DISAGREE. ALASKA HAS NO FILE.              
+> */
+. global REP_A_STATES "alabama arizona arkansas california colorado connecticut
+>  delaware district_of_columbia florida georgia hawaii idaho illinois indiana 
+> iowa kansas kentucky louisiana maine maryland massachusetts michigan minnesot
+> a mississippi missouri montana nebraska nevada new_hampshire new_jersey new_m
+> exico new_york north_carolina north_dakota ohio oklahoma oregon pennsylvania 
+> rhode_island south_carolina south_dakota tennessee texas utah vermont virgini
+> a washington west_virginia wisconsin wyoming"
+
+. 
+. /*`version` SET IN A DO-FILE REVERTS WHEN THAT FILE ENDS, SO THE ONE ABOVE  *
+> /
+. /*COVERS ONLY THIS FILE. run_machineA.do SETS IT FOR THE SCRIPTS. Results    
+> */
+. /*were produced on Stata/MP 15.1; record what this run uses.                *
+> /
+. display as text "config: machine $REP_MACHINE (`c(hostname)'), Stata `c(stata
+> _version)' `c(edition_real)', `c(current_date)' `c(current_time)'"
+config: machine A (ARTS-ECON-CM), Stata 15.1 , 27 Nov 2026 04:14:21
+
+. 
+end of do-file
+
+. local fi "$REP_F/enum_date/DATA/INTERMEDIATE/"
+
+. local out `"`fi'for_mlp1930_v26_combined.dta"'
+
+. capture confirm file `"`out'"'
+
+. if !_rc {
+.         display as error "`out' exists; move it aside first"
+.         exit 602
+. }
+
+. use `"`fi'for_mlp1930_v26.dta"', clear
+
+. isid histid
+
+. confirm variable histid age sex bpl namefrst namelast mi
+
+. local N = _N
+
+. foreach s in true tgt {
+  2.         gen namefrst_`s'_cleaned = namefrst
+  3.         gen namelast_`s'_cleaned = namelast
+  4.         gen mi_`s'_cleaned = mi
+  5.         assert namefrst_`s'_cleaned==namefrst & namelast_`s'_cleaned==name
+> last & mi_`s'_cleaned==mi
+  6. }
+(47,792 missing values generated)
+(30,753 missing values generated)
+(76,641,828 missing values generated)
+(47,792 missing values generated)
+(30,753 missing values generated)
+(76,641,828 missing values generated)
+
+. assert _N==`N'
+
+. order histid age sex bpl namefrst namelast mi namefrst_true_cleaned namelast_
+> true_cleaned mi_true_cleaned namefrst_tgt_cleaned namelast_tgt_cleaned mi_tgt
+> _cleaned
+
+. sort histid
+
+. compress
+  (0 bytes saved)
+
+. save `"`out'"'
+file F:/enum_date/DATA/INTERMEDIATE/for_mlp1930_v26_combined.dta saved
+
+. display "records `N'"
+records 122771589
+
+. display "COMBINED MLP 1930 FILE DONE"
+COMBINED MLP 1930 FILE DONE
+
+. 
+end of do-file
+
+. display "RUN-STATA-RC: " _rc
+RUN-STATA-RC: 0
+

@@ -36,6 +36,7 @@ local m "$REP_REPO/MATCHING"
 /*                                  divided_file1940_v26_{true,tgt}_cleaned, */
 /*                                  for_mlp1930_v26, for_mlp1940_v26{,_tgt}  */
 /* 2  1h_for_mlp1940_v26_combined   for_mlp1940_v26_combined (to IPUMS)      */
+/* 2b 1i_for_mlp1930_v26_combined   for_mlp1930_v26_combined (to IPUMS)      */
 /* 3  verify_mlp_v26_independent    nothing; exit 9 on any difference        */
 /* 4  _v26_run                      check_v26_same_input (exit 9 on any      */
 /*                                  difference), then ABE Old/New/Target-only*/
@@ -43,7 +44,7 @@ local m "$REP_REPO/MATCHING"
 /* 6  _v26_fs_run                   1g_v26_fs_inputs, then FS (a),(c),(d)    */
 /* 7  _v26_fs_e_run                 FS (e)                                   */
 /* 8  score_v26_fs_links            MATCHING/results/v26_fs_linkage_abe.md   */
-local steps 1f_v26_inputs 1h_for_mlp1940_v26_combined verify_mlp_v26_independent _v26_run score_v26_links _v26_fs_run _v26_fs_e_run score_v26_fs_links
+local steps 1f_v26_inputs 1h_for_mlp1940_v26_combined 1i_for_mlp1930_v26_combined verify_mlp_v26_independent _v26_run score_v26_links _v26_fs_run _v26_fs_e_run score_v26_fs_links
 
 local t 0
 foreach s of local steps {

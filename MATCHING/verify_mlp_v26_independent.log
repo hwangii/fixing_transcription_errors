@@ -33,8 +33,8 @@ running c:\ado\personal\profile.do ...
 > .*/
 . /*Rebuilds, for three birthplaces (1930 and 1940), every column of           
 > */
-. /*for_mlp1930_v26.dta and for_mlp1940_v26_combined.dta from the raw sources *
-> /
+. /*for_mlp1930_v26_combined.dta and for_mlp1940_v26_combined.dta from the raw 
+> sources */
 . /*with logic written afresh (not copied from 1f_v26_inputs.do / 1h), and     
 > */
 . /*compares them cell by cell. Any difference: exit 9. Also tabulates, on the 
@@ -177,7 +177,7 @@ running c:\ado\personal\profile.do ...
 > /
 . display as text "config: machine $REP_MACHINE (`c(hostname)'), Stata `c(stata
 > _version)' `c(edition_real)', `c(current_date)' `c(current_time)'"
-config: machine A (ARTS-ECON-CM), Stata 15.1 , 27 Nov 2026 03:13:06
+config: machine A (ARTS-ECON-CM), Stata 15.1 , 27 Nov 2026 04:31:52
 
 . 
 end of do-file
@@ -226,7 +226,7 @@ Duplicates in terms of all variables
 . tempfile keys
 
 . save `keys'
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000001.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000001.tmp saved
 
 . clear
 
@@ -247,7 +247,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000001.tmp saved
     not matched                             0
     matched                         2,563,668  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000003.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000003.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -255,7 +255,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000003.tmp saved
     not matched                             0
     matched                            24,422  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000005.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000005.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -263,7 +263,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000005.tmp saved
     not matched                             0
     matched                             4,334  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000007.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000007.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -271,7 +271,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000007.tmp saved
     not matched                             0
     matched                            68,388  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000009.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000009.tmp saved
 (note: variable filename was str23, now str24 to accommodate using data's
        values)
 (note: variable namelast_ml_ditto was str15, now str22 to accommodate using
@@ -283,7 +283,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000009.tmp saved
     not matched                             0
     matched                             8,204  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000b.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -291,7 +291,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000b.tmp saved
     not matched                             0
     matched                             1,494  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000d.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -299,7 +299,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000d.tmp saved
     not matched                             0
     matched                             6,319  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000f.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -307,7 +307,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000f.tmp saved
     not matched                             0
     matched                               523  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000h.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -315,7 +315,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000h.tmp saved
     not matched                             0
     matched                           108,839  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000j.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -323,7 +323,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000j.tmp saved
     not matched                             0
     matched                            99,793  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000l.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -332,7 +332,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000l.tmp saved
     matched                                 0  
     -----------------------------------------
 (note: dataset contains 0 observations)
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000n.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -340,7 +340,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000n.tmp saved
     not matched                             0
     matched                            25,998  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000p.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -348,7 +348,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000p.tmp saved
     not matched                             0
     matched                             6,627  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000r.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -356,7 +356,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000r.tmp saved
     not matched                             0
     matched                            48,443  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000t.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -364,7 +364,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000t.tmp saved
     not matched                             0
     matched                            12,286  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000v.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -372,7 +372,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000v.tmp saved
     not matched                             0
     matched                             5,262  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00000x.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -380,7 +380,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00000x.tmp saved
     not matched                             0
     matched                            16,708  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000011.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000011.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -388,7 +388,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000011.tmp saved
     not matched                             0
     matched                            20,174  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000013.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000013.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -396,7 +396,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000013.tmp saved
     not matched                             0
     matched                             2,096  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000015.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000015.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -404,7 +404,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000015.tmp saved
     not matched                             0
     matched                             3,490  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000017.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000017.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -412,7 +412,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000017.tmp saved
     not matched                             0
     matched                               242  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000019.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000019.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -420,7 +420,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000019.tmp saved
     not matched                             0
     matched                            39,969  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001b.tmp saved
 (note: variable namefrst_ml was str20, now str21 to accommodate using data's
        values)
 (note: variable row was long, now double to accommodate using data's values)
@@ -430,7 +430,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001b.tmp saved
     not matched                             0
     matched                            43,551  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001d.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -438,7 +438,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001d.tmp saved
     not matched                             0
     matched                            17,141  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001f.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -446,7 +446,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001f.tmp saved
     not matched                             0
     matched                            62,174  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001h.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -454,7 +454,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001h.tmp saved
     not matched                             0
     matched                             9,807  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001j.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -462,7 +462,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001j.tmp saved
     not matched                             0
     matched                             8,394  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001l.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -470,7 +470,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001l.tmp saved
     not matched                             0
     matched                            15,555  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001n.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -478,7 +478,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001n.tmp saved
     not matched                             0
     matched                            13,829  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001p.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -486,7 +486,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001p.tmp saved
     not matched                             0
     matched                               229  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001r.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -494,7 +494,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001r.tmp saved
     not matched                             0
     matched                             8,081  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001t.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -502,7 +502,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001t.tmp saved
     not matched                             0
     matched                             3,296  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001v.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -510,7 +510,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001v.tmp saved
     not matched                             0
     matched                               874  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00001x.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -518,7 +518,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00001x.tmp saved
     not matched                             0
     matched                            18,986  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000021.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000021.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -526,7 +526,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000021.tmp saved
     not matched                             0
     matched                            49,030  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000023.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000023.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -534,7 +534,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000023.tmp saved
     not matched                             0
     matched                            24,513  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000025.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000025.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -542,7 +542,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000025.tmp saved
     not matched                             0
     matched                            17,160  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000027.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000027.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -550,7 +550,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000027.tmp saved
     not matched                             0
     matched                            20,601  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000029.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000029.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -558,7 +558,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000029.tmp saved
     not matched                             0
     matched                               278  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002b.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002b.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -566,7 +566,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002b.tmp saved
     not matched                             0
     matched                             5,758  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002d.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002d.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -574,7 +574,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002d.tmp saved
     not matched                             0
     matched                           415,029  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002f.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002f.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -582,7 +582,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002f.tmp saved
     not matched                             0
     matched                            59,027  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002h.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -590,7 +590,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002h.tmp saved
     not matched                             0
     matched                            79,500  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002j.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002j.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -598,7 +598,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002j.tmp saved
     not matched                             0
     matched                             1,066  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002l.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002l.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -606,7 +606,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002l.tmp saved
     not matched                             0
     matched                             7,958  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002n.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002n.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -614,7 +614,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002n.tmp saved
     not matched                             0
     matched                               198  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002p.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002p.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -622,7 +622,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002p.tmp saved
     not matched                             0
     matched                            25,615  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002r.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002r.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -630,7 +630,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002r.tmp saved
     not matched                             0
     matched                            11,939  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002t.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002t.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -638,7 +638,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002t.tmp saved
     not matched                             0
     matched                            14,653  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002v.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002v.tmp saved
 (note: variable row was long, now double to accommodate using data's values)
 
     Result                           # of obs.
@@ -646,7 +646,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002v.tmp saved
     not matched                             0
     matched                             5,714  
     -----------------------------------------
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_00002x.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_00002x.tmp saved
 
 . foreach v in namefrst_ml namelast_ml_ditto {
   2.         replace `v' = "" if lower(strtrim(`v'))=="invalidpred"
@@ -682,7 +682,7 @@ Duplicates in terms of filename row
 . tempfile model
 
 . save `model'
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000030.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000030.tmp saved
 
 . 
 . /*---------------- 1940 -------------------------------------------------- */
@@ -695,7 +695,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000030.tmp saved
 . tempfile comb
 
 . save `comb'
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000031.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000031.tmp saved
 
 . use `"`fi'for_mlp_original/for_mlp1940.dta"' if inlist(bpl, 1, 46, 435), clea
 > r
@@ -707,7 +707,7 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000031.tmp saved
 . tempfile orig
 
 . save `orig'
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000032.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000032.tmp saved
 
 . 
 . clear
@@ -722,11 +722,11 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000032.tmp saved
   7.         restore
   8.         append using `r`b''
   9. }
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000034.tmp saved
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000036.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000034.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000036.tmp saved
 (label sex_lbl already defined)
 (label age_lbl already defined)
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000038.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000038.tmp saved
 (label sex_lbl already defined)
 (label age_lbl already defined)
 
@@ -995,14 +995,14 @@ vs original: Ancestry first name differs and original is marshall: 11988
 
 . 
 . /*---------------- 1930 -------------------------------------------------- */
-. use `"`fi'for_mlp1930_v26.dta"' if inlist(bpl, 1, 46, 435), clear
+. use `"`fi'for_mlp1930_v26_combined.dta"' if inlist(bpl, 1, 46, 435), clear
 
 . foreach v of varlist _all {
   2.         if "`v'"!="histid" rename `v' C_`v'
   3. }
 
 . save `comb', replace
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000031.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000031.tmp saved
 
 . clear
 
@@ -1015,11 +1015,11 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000031.tmp saved
   6.         restore
   7.         append using `r`b''
   8. }
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000034.tmp saved
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000036.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000034.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000036.tmp saved
 (label age_lbl already defined)
 (label sex_lbl already defined)
-file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000038.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_7e1c_000038.tmp saved
 (label age_lbl already defined)
 (label sex_lbl already defined)
 
@@ -1050,6 +1050,20 @@ file C:\Users\munir_and_sam\AppData\Local\Temp\ST_819c_000038.tmp saved
 1930 namefrst differs: 0
 1930 namelast differs: 0
 1930 mi differs: 0
+
+. foreach t in true tgt {
+  2.         foreach v in namefrst namelast mi {
+  3.                 quietly count if `v' != C_`v'_`t'_cleaned
+  4.                 display "1930 `v'_`t'_cleaned differs: " r(N)
+  5.                 local bad = `bad' + r(N)
+  6.         }
+  7. }
+1930 namefrst_true_cleaned differs: 0
+1930 namelast_true_cleaned differs: 0
+1930 mi_true_cleaned differs: 0
+1930 namefrst_tgt_cleaned differs: 0
+1930 namelast_tgt_cleaned differs: 0
+1930 mi_tgt_cleaned differs: 0
 
 . display "1930 records checked: " _N
 1930 records checked: 3594764

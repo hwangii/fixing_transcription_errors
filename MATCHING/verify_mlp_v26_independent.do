@@ -1,6 +1,6 @@
 /*INDEPENDENT CHECK OF THE FILES FOR IPUMS (2026-11-27). MACHINE A. READ ONLY.*/
 /*Rebuilds, for three birthplaces (1930 and 1940), every column of           */
-/*for_mlp1930_v26.dta and for_mlp1940_v26_combined.dta from the raw sources */
+/*for_mlp1930_v26_combined.dta and for_mlp1940_v26_combined.dta from the raw sources */
 /*with logic written afresh (not copied from 1f_v26_inputs.do / 1h), and     */
 /*compares them cell by cell. Any difference: exit 9. Also tabulates, on the */
 /*same records, how the combined file differs from the file IPUMS linked     */
@@ -162,7 +162,7 @@ list histid O_namefrst C_namefrst if d & seq<=50, clean noobs
 drop seq
 
 /*---------------- 1930 -------------------------------------------------- */
-use `"`fi'for_mlp1930_v26.dta"' if inlist(bpl, 1, 46, 435), clear
+use `"`fi'for_mlp1930_v26_combined.dta"' if inlist(bpl, 1, 46, 435), clear
 foreach v of varlist _all {
 	if "`v'"!="histid" rename `v' C_`v'
 }
@@ -184,6 +184,13 @@ foreach v in age sex bpl namefrst namelast mi {
 	quietly count if `v' != C_`v'
 	display "1930 `v' differs: " r(N)
 	local bad = `bad' + r(N)
+}
+foreach t in true tgt {
+	foreach v in namefrst namelast mi {
+		quietly count if `v' != C_`v'_`t'_cleaned
+		display "1930 `v'_`t'_cleaned differs: " r(N)
+		local bad = `bad' + r(N)
+	}
 }
 display "1930 records checked: " _N
 
