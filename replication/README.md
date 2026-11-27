@@ -173,6 +173,9 @@ replication/
                        fixed 1940 initial; the decomposition the draft quotes), and
                        middle_initial_sources.do (where each link file's initials come from)
   claims_report.md     the latest check (generated)
+  build_v26_machineA.do  build master, v26 base: linking inputs, IPUMS MLP files, ABE links, scores
+  hash_ipums_v26.py    SHA-256 of the two files sent to IPUMS -> ipums_v26_manifest.md
+  ipums_v26_manifest.md  their checksums as sent
 ```
 
 ### Why `Run-Stata.ps1` exists
@@ -221,6 +224,44 @@ or "no producing code".
 | `compute_subgroup_linkage_rates.do` | `results/compute_subgroup_linkage_rates.tex` | foreign-born, no-schooling and non-English baselines and gains; the conclusion's "similar proportions" (each within 1 point of the overall gain); the abstract's higher disagreement for foreign-born and non-English speakers |
 | `verify_inmates_and_county_stats.do` | `results/verify_inmates_and_county_stats.tex` | inmates 15.0%, +7.3%; county p5/p95 18% / 43% |
 | `compute_legibility_quartiles.do` | `results/compute_legibility_quartiles.tex` | 46.2 vs 14.0; 16.9 vs 27.7; +20% vs +1.6%; gains in all four quartiles, behind "by most where the records are hardest to read" (lines 102, 783) |
+
+## v26 rebuild: linking inputs and the IPUMS MLP files (machine A)
+
+The paper's linking inputs used Ancestry names cleaned by an `abeclean` older than 0.25.
+That version turned about 285,000 men a year into "marshall" (raw lee, edgar, dock, abram, ...).
+The 1940 model-name file had the same defect, and the ABE inputs (extract 00450) and the MLP inputs (00656) also differed in age and birthplace for a few percent of men.
+The v26 rebuild cleans every name again from the raw 00655/00656 names with `abeclean` 0.26, so that every method links the same names: the ABE inputs are the men of the MLP inputs, record for record.
+
+```
+powershell -File replication/Run-Stata.ps1 replication/build_v26_machineA.do -TimeoutMinutes 2400
+```
+
+Every step refuses to overwrite its outputs, so a rebuild needs the v26 outputs moved aside first.
+`python replication/hash_ipums_v26.py --check` confirms the files on disk are the ones sent; a rebuild changes their bytes (Stata stamps the save time), so it is checked cell by cell by step 3, not by checksum.
+Each step can also be run on its own, in this order.
+
+| Step | Script (`MATCHING/`) | Writes | Check |
+|---|---|---|---|
+| 1 | `1f_v26_inputs.do` | `divided_file{1930,1940}_v26_ans_cleaned`, `divided_file1940_v26_{true,tgt}_cleaned`, `for_mlp1930_v26.dta`, `for_mlp1940_v26{,_tgt}.dta` | abeclean must be 0.26; no "marshall" from a raw name without "marsh" (`nmar`=0) |
+| 2 | `1h_for_mlp1940_v26_combined.do` | `for_mlp1940_v26_combined.dta` | the two 1940 files agree on all shared columns; Target-only equals New or Old on every record |
+| 3 | `verify_mlp_v26_independent.do` | nothing | rebuilds three birthplaces from the raw sources with separately written code; exit 9 on any cell difference |
+| 4 | `_v26_run.do` | ABE exact Old, New, Target-only links | runs `check_v26_same_input.do` first (ABE men = MLP men; exit 9 otherwise) |
+| 5 | `score_v26_links.do` | `MATCHING/results/v26_linkage_abe.md` | the paper's two columns must reproduce the main table |
+| 6 | `_v26_fs_run.do` | `1g_v26_fs_inputs.do` inputs, FamilySearch versions (a), (c), (d) | (b) equals (a) by construction and is not run |
+| 7 | `_v26_fs_e_run.do` | FamilySearch version (e) | |
+| 8 | `score_v26_fs_links.do` | `MATCHING/results/v26_fs_linkage_abe.md` | as step 5 |
+
+### Files sent to IPUMS for MLP linking
+
+Two files, both sexes, in `F:/enum_date/DATA/INTERMEDIATE/`; their checksums are in `ipums_v26_manifest.md`.
+
+- `for_mlp1930_v26.dta`: `histid age sex bpl namefrst namelast mi` (Ancestry, cleaned).
+- `for_mlp1940_v26_combined.dta`: the same, plus two more name versions for the same records.
+  - Old: `namefrst namelast mi` (Ancestry).
+  - New: `namefrst_true_cleaned namelast_true_cleaned mi_true_cleaned name_true_cleaned_exists` (the model's names on every record; Ancestry's where the model gives none).
+  - Target-only: `namefrst_tgt_cleaned namelast_tgt_cleaned mi_tgt_cleaned name_tgt_cleaned_exists` (the model's names on target records, Ancestry's elsewhere).
+
+The layout is that of the file IPUMS linked before (`for_mlp_original/for_mlp1940.dta`), plus the four Target-only columns.
 
 ## Two machines
 
