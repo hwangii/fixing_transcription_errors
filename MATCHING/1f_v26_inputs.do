@@ -11,8 +11,10 @@
 /*                                                                           */
 /*WHAT. One source for every method: the women-added divided files          */
 /*(divided_file<yr>_women_added: IPUMS 00655 for 1930, 00656 for 1940, both */
-/*sexes, race 1|2, bpl<900, made by 0_create), which hold Ancestry's RAW    */
-/*names (namefrst_ans, namelast_ans, from name_only<yr>.dta). Every name is */
+/*sexes, bpl<900, made by 0_create), which hold Ancestry's RAW names. All  */
+/*races: 0_create:159 limits only the birthplace list to race 1|2 and      */
+/*reloads each birthplace with every race (2026-11-27 correction).         */
+/*Raw names: (namefrst_ans, namelast_ans, from name_only<yr>.dta). Every name is */
 /*cleaned here with the installed abeclean (0.26; `which` below). ABE       */
 /*inputs are the men of these files; MLP inputs are all records. The men    */
 /*in an ABE input and in the matching MLP input are therefore identical.    */

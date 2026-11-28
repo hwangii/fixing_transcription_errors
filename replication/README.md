@@ -246,6 +246,7 @@ Each step can also be run on its own, in this order.
 | 2 | `1h_for_mlp1940_v26_combined.do` | `for_mlp1940_v26_combined.dta` | the two 1940 files agree on all shared columns; Target-only equals New or Old on every record |
 | 2b | `1i_for_mlp1930_v26_combined.do` | `for_mlp1930_v26_combined.dta` | the two copies equal the Ancestry columns |
 | 3 | `verify_mlp_v26_independent.do` | nothing | rebuilds three birthplaces from the raw sources with separately written code; exit 9 on any cell difference |
+| 3b | `1j_v26_jw_census_vars.do` | `jw_census_vars{1930,1940}_v26.dta` (`histid bpl birthyr race sex`, for B's JW rerun; checksums with the shards in `jw_v26_manifest.md`) | every v26 man in the source once, same birthplace and age as his shard |
 | 4 | `_v26_run.do` | ABE exact Old, New, Target-only links | runs `check_v26_same_input.do` first (ABE men = MLP men; exit 9 otherwise) |
 | 5 | `score_v26_links.do` | `MATCHING/results/v26_linkage_abe.md` | the paper's two columns must reproduce the main table |
 | 6 | `_v26_fs_run.do` | `1g_v26_fs_inputs.do` inputs, FamilySearch versions (a), (c), (d) | (b) equals (a) by construction and is not run |

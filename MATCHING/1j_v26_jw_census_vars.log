@@ -1,0 +1,921 @@
+
+  ___  ____  ____  ____  ____ (R)
+ /__    /   ____/   /   ____/
+___/   /   /___/   /   /___/   15.1   Copyright 1985-2017 StataCorp LLC
+  Statistics/Data Analysis            StataCorp
+                                      4905 Lakeway Drive
+     MP - Parallel Edition            College Station, Texas 77845 USA
+                                      800-STATA-PC        http://www.stata.com
+                                      979-696-4600        stata@stata.com
+                                      979-696-4601 (fax)
+
+Single-user 8-core Stata perpetual license:
+       Serial number:  501506330335
+         Licensed to:  Munir and sam
+                       UBC
+
+Notes:
+      1.  Stata is running in batch mode.
+      2.  Unicode is supported; see help unicode_advice.
+      3.  More than 2 billion observations are allowed; see help obs_advice.
+      4.  Maximum number of variables is set to 5000; see help set_maxvar.
+
+
+running c:\ado\personal\profile.do ...
+
+. do D:\repos\fixing_transcription_errors\MATCHING\_run_1j_v26_jw_census_vars.d
+> o 
+
+. capture noisily do "D:\repos\fixing_transcription_errors\MATCHING\1j_v26_jw_c
+> ensus_vars.do"
+
+. /*CENSUS VARIABLES FOR MACHINE B'S JARO-WINKLER RERUN, v26 BASE (2026-11-27).
+> */
+. /*MACHINE A. Read only on its inputs.                                        
+> */
+. /*                                                                           
+> */
+. /*B's LINKAGE/code/01_abe_jw/linkage/00_merge_names_to_census.do merges the  
+> */
+. /*name shards 1:1 on histid with matching_intgen<yr>.dta for bpl birthyr     
+> */
+. /*race sex and keeps _merge==3. B's copies predate the v26 base (1940 from   
+> */
+. /*extract 00450), so the merge would drop or relabel v26 men. This writes,   
+> */
+. /*for exactly the men of the v26 shards, the same variables from the source *
+> /
+. /*the v26 base was built from (matching_intgen<yr>_women_added, IPUMS        
+> */
+. /*00655/00656; review/handoff_jw_inputs_machineA.md item 2):                 
+> */
+. /*  F:/enum_date/DATA/INTERMEDIATE/jw_census_vars<yr>_v26.dta                
+> */
+. /*      histid bpl birthyr race sex, one row per v26 man, sorted by histid   
+> */
+. /*Checks: every shard man is in the source once; his bpl is the shard's      
+> */
+. /*birthplace, his age the shard's age, sex 1, race non-missing. Exit 9     */
+. /*otherwise.                                                                *
+> /
+. /*The three 1940 shard sets (ans/true/tgt) hold the same men                 
+> */
+. /*(check_v26_same_input.do), so one 1940 file serves all three.              
+> */
+. /*Refuses to overwrite.                                                      
+> */
+. /*                                                                           
+> */
+. /*  powershell -File replication/Run-Stata.ps1 MATCHING/1j_v26_jw_census_vars
+> .do */
+. 
+. clear all
+
+. set more off
+
+. if `"$REP_REPO"'=="" do "D:/repos/fixing_transcription_errors/replication/con
+> fig.do"
+
+. /****************************************************************************
+> */
+. /*REPLICATION PACKAGE CONFIGURATION -- THE ONE PLACE PATHS ARE SET.          
+>  */
+. /*                                                                           
+> */
+. /*Run by replication/run_machineA.do. A script run on its own loads this     
+> */
+. /*file itself if $REP_REPO is empty (globals survive `clear all`; tested on  
+> */
+. /*Stata/MP 15.1, 2026-10-15).                                                
+> */
+. /*                                                                           
+> */
+. /*The analysis scripts in CODE/ still carry their own hardcoded data paths.  
+> */
+. /*Those have NOT been rewritten to use the globals below -- CLAUDE.md asks   
+> */
+. /*that path changes across files be agreed first. The globals here are used  
+> */
+. /*by the package's own files and by the preflight check, which confirms that 
+> */
+. /*every frozen input the scripts read exists before anything runs.           
+> */
+. /****************************************************************************
+> */
+. 
+. version 15.1
+
+. 
+. /*ONE BLOCK PER MACHINE. A machine with no block stops here, rather than     
+> */
+. /*running with paths that silently point at nothing.                         
+> */
+. if c(hostname) == "ARTS-ECON-CM" {
+.         global REP_MACHINE "A"
+.         global REP_REPO    "D:/repos/fixing_transcription_errors"
+.         global REP_PAPER   "D:/repos/6638fa0fd89fbec05130caeb"
+.         global REP_SNU     "D:/SNU ECON Dropbox/sam hwang"
+.         global REP_F       "F:"
+. }
+
+. else if c(hostname) == "ARTS-ECON-SHSRV" {
+.         /*MACHINE B: DEAGLAN'S LINKAGE PACKAGE. CODE IS THIS REPO'S LINKAGE/c
+> ode; */
+.         /*DATA STAYS IN HIS FOLDER ON F:, WHICH NOW HOLDS DATA ONLY. LINKAGE'
+> S OWN */
+.         /*paths.do READS $ROOT (DATA) AND $LCODE (CODE), SET HERE FROM THESE.
+>      */
+.         global REP_MACHINE "B"
+.         global REP_REPO    "F:/github_repos/fixing_transcription_errors"
+.         global REP_PAPER   "F:/github_repos/6638fa0fd89fbec05130caeb"
+.         global REP_LINK    "F:/Deaglan/Census_Transcriptions"
+.         global ROOT        "$REP_LINK"
+.         global LCODE       "$REP_REPO/LINKAGE/code"
+. }
+
+. else {
+.         display as error "replication/config.do: no paths for machine `c(host
+> name)'."
+.         display as error "Add a block for it at the top of this file."
+.         exit 198
+. }
+
+. 
+. global REP_RESULTS "$REP_REPO/replication/results"
+
+. adopath ++ "$REP_REPO/replication/stata"
+  [1]              "D:/repos/fixing_transcription_errors/replication/stata"
+  [2]  (BASE)      "C:\Program Files (x86)\Stata15\ado\base/"
+  [3]  (SITE)      "C:\Program Files (x86)\Stata15\ado\site/"
+  [4]              "."
+  [5]  (PERSONAL)  "c:\ado\personal/"
+  [6]  (PLUS)      "c:\ado\plus/"
+  [7]  (OLDPLACE)  "c:\ado/"
+
+. 
+. /*MACHINE A: THE 50 ANCESTRY-FAMILYSEARCH STATE FILES THAT                  *
+> /
+. /*CODE/make_balance_exhibits.do READS, AS $REP_F/fixing_transcription_errors/
+>  */
+. /*DATA/INTERMEDIATE/merged_<name>1940.dta. ONE LIST, SO run_machineA.do'S    
+> */
+. /*PREFLIGHT AND THE SCRIPT CANNOT DISAGREE. ALASKA HAS NO FILE.              
+> */
+. global REP_A_STATES "alabama arizona arkansas california colorado connecticut
+>  delaware district_of_columbia florida georgia hawaii idaho illinois indiana 
+> iowa kansas kentucky louisiana maine maryland massachusetts michigan minnesot
+> a mississippi missouri montana nebraska nevada new_hampshire new_jersey new_m
+> exico new_york north_carolina north_dakota ohio oklahoma oregon pennsylvania 
+> rhode_island south_carolina south_dakota tennessee texas utah vermont virgini
+> a washington west_virginia wisconsin wyoming"
+
+. 
+. /*`version` SET IN A DO-FILE REVERTS WHEN THAT FILE ENDS, SO THE ONE ABOVE  *
+> /
+. /*COVERS ONLY THIS FILE. run_machineA.do SETS IT FOR THE SCRIPTS. Results    
+> */
+. /*were produced on Stata/MP 15.1; record what this run uses.                *
+> /
+. display as text "config: machine $REP_MACHINE (`c(hostname)'), Stata `c(stata
+> _version)' `c(edition_real)', `c(current_date)' `c(current_time)'"
+config: machine A (ARTS-ECON-CM), Stata 15.1 , 27 Nov 2026 16:49:35
+
+. 
+end of do-file
+
+. local fi "$REP_F/enum_date/DATA/INTERMEDIATE/"
+
+. local orig "$REP_SNU/enum_date/DATA/ORIGINAL/"
+
+. foreach yr in 1930 1940 {
+  2.         capture confirm file `"`fi'jw_census_vars`yr'_v26.dta"'
+  3.         if !_rc {
+  4.                 display as error "jw_census_vars`yr'_v26.dta exists; move 
+> it aside first"
+  5.                 exit 602
+  6.         }
+  7. }
+
+. 
+. foreach yr in 1930 1940 {
+  2.         /*THE v26 MEN, WITH THE BIRTHPLACE OF THEIR SHARD                 
+>        */
+.         local d `"`fi'divided_file`yr'_v26_ans_cleaned"'
+  3.         local fl : dir `"`d'"' files "norace*.dta"
+  4.         if `"`fl'"'=="" {
+  5.                 display as error "no shards in `d'"
+  6.                 exit 601
+  7.         }
+  8.         clear
+  9.         local k 0
+ 10.         foreach f of local fl {
+ 11.                 local b = subinstr(subinstr("`f'", "norace", "", 1), ".dta
+> ", "", 1)
+ 12.                 confirm integer number `b'
+ 13.                 local ++k
+ 14.                 preserve
+ 15.                 use id age using `"`d'/`f'"', clear
+ 16.                 gen int sbpl = `b'
+ 17.                 tempfile s
+ 18.                 save `s'
+ 19.                 restore
+ 20.                 append using `s'
+ 21.         }
+ 22.         rename (id age) (histid sage)
+ 23.         isid histid
+ 24.         local N = _N
+ 25.         tempfile men
+ 26.         save `men'
+ 27. 
+.         use histid bpl birthyr race sex age using `"`orig'matching_intgen`yr'
+> _women_added.dta"', clear
+ 28.         /*ONE ROW PER histid IN THE SOURCE FOR THE MEN WE KEEP (CHECKED BE
+> LOW).  */
+.         merge m:1 histid using `men', keep(2 3)
+ 29.         local bad 0
+ 30.         quietly count if _merge==2
+ 31.         display "`yr': v26 men not in the source: " r(N)
+ 32.         local bad = `bad' + r(N)
+ 33.         keep if _merge==3
+ 34.         drop _merge
+ 35.         duplicates tag histid, gen(dup)
+ 36.         quietly count if dup
+ 37.         display "`yr': v26 men on more than one source row: " r(N)
+ 38.         local bad = `bad' + r(N)
+ 39.         drop dup
+ 40.         quietly count if bpl != sbpl
+ 41.         display "`yr': birthplace differs from the shard's: " r(N)
+ 42.         local bad = `bad' + r(N)
+ 43.         quietly count if age != sage
+ 44.         display "`yr': age differs from the shard's: " r(N)
+ 45.         local bad = `bad' + r(N)
+ 46.         quietly count if sex != 1
+ 47.         display "`yr': not sex 1: " r(N)
+ 48.         local bad = `bad' + r(N)
+ 49.         /*EVERY RACE: 0_create...:159 LIMITS ONLY THE LIST OF BIRTHPLACES 
+> TO RACE  */
+.         /*1|2, AND EACH BIRTHPLACE FILE IS RELOADED WITH ALL RACES (LINE 167)
+> .    */
+.         tab race, missing
+ 50.         quietly count if missing(race)
+ 51.         display "`yr': race missing: " r(N)
+ 52.         local bad = `bad' + r(N)
+ 53.         quietly count if missing(birthyr)
+ 54.         display "`yr': birthyr missing (reported, not an error): " r(N)
+ 55.         if `bad' {
+ 56.                 display as error "`yr': CHECK FAILED"
+ 57.                 exit 9
+ 58.         }
+ 59.         assert _N==`N'
+ 60.         keep histid bpl birthyr race sex
+ 61.         order histid bpl birthyr race sex
+ 62.         sort histid
+ 63.         compress
+ 64.         save `"`fi'jw_census_vars`yr'_v26.dta"'
+ 65.         display "`yr': `k' shards, `N' men written"
+ 66. }
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000002.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000004.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000006.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000008.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000g.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000i.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000k.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000m.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000o.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000q.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000s.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000u.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00000w.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000010.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000012.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000014.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000016.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000018.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001g.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001i.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001k.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001m.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001o.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001q.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001s.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001u.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00001w.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000020.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000022.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000024.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000026.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000028.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002g.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002i.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002k.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002m.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002o.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002q.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002s.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002u.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00002w.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000030.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000032.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000034.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000036.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000038.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003g.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003i.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003k.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003m.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003o.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003q.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003s.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003u.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00003w.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000040.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000042.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000044.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000046.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000048.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004g.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004i.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004k.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004m.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004o.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004q.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004s.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004u.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00004w.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000050.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000052.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000054.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000056.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000058.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005g.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005i.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005k.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005m.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005o.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005q.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005s.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005u.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00005w.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000060.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000062.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000064.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000066.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000068.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006g.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006i.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006k.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006m.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006o.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006q.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006s.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006u.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00006w.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000070.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000072.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000074.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000076.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000078.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007g.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007i.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007k.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007m.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007o.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007q.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007s.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007u.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00007w.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000080.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000082.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000084.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000086.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000088.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008a.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008c.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008e.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008f.tmp saved
+(label age_lbl already defined)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                        62,079,010  (_merge==3)
+    -----------------------------------------
+1930: v26 men not in the source: 0
+(0 observations deleted)
+
+Duplicates in terms of histid
+1930: v26 men on more than one source row: 0
+1930: birthplace differs from the shard's: 0
+1930: age differs from the shard's: 0
+1930: not sex 1: 0
+
+          Race [general version] |      Freq.     Percent        Cum.
+---------------------------------+-----------------------------------
+                           White | 55,873,635       90.00       90.00
+          Black/African American |  5,853,566        9.43       99.43
+American Indian or Alaska Native |    167,701        0.27       99.70
+                         Chinese |     59,243        0.10       99.80
+                        Japanese |     81,866        0.13       99.93
+ Other Asian or Pacific Islander |     42,999        0.07      100.00
+---------------------------------+-----------------------------------
+                           Total | 62,079,010      100.00
+1930: race missing: 0
+1930: birthyr missing (reported, not an error): 0
+  (0 bytes saved)
+file F:/enum_date/DATA/INTERMEDIATE/jw_census_vars1930_v26.dta saved
+1930: 143 shards, 62079010 men written
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008h.tmp saved
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008j.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008l.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008n.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008p.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008r.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008t.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008v.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00008x.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000091.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000093.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000095.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000097.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_000099.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009b.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009d.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009f.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009h.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009j.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009l.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009n.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009p.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009r.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009t.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009v.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_00009x.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000a1.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000a3.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000a5.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000a7.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000a9.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ab.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ad.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000af.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ah.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000aj.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000al.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000an.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ap.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ar.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000at.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000av.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ax.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000b1.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000b3.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000b5.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000b7.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000b9.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bb.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bd.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bf.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bh.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bj.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bl.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bn.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bp.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000br.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bt.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bv.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000bx.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000c1.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000c3.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000c5.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000c7.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000c9.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cb.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cd.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cf.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ch.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cj.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cl.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cn.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cp.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cr.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ct.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cv.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000cx.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000d1.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000d3.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000d5.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000d7.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000d9.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000db.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dd.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000df.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dh.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dj.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dl.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dn.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dp.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dr.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dt.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dv.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000dx.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000e1.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000e3.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000e5.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000e7.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000e9.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000eb.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ed.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ef.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000eh.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ej.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000el.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000en.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ep.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000er.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000et.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ev.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ex.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000f1.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000f3.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000f5.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000f7.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000f9.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fb.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fd.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ff.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fh.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fj.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fl.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fn.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fp.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fr.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000ft.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fv.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000fx.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000g1.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000g3.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000g5.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000g7.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000g9.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gb.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gd.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gf.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gh.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gj.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gl.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gn.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gp.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gr.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gt.tmp saved
+(label age_lbl already defined)
+file C:\Users\munir_and_sam\AppData\Local\Temp\ST_4e98_0000gu.tmp saved
+(label age_lbl already defined)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                        66,134,357  (_merge==3)
+    -----------------------------------------
+1940: v26 men not in the source: 0
+(0 observations deleted)
+
+Duplicates in terms of histid
+1940: v26 men on more than one source row: 0
+1940: birthplace differs from the shard's: 0
+1940: age differs from the shard's: 0
+1940: not sex 1: 0
+
+          Race [general version] |      Freq.     Percent        Cum.
+---------------------------------+-----------------------------------
+                           White | 59,516,520       89.99       89.99
+          Black/African American |  6,275,082        9.49       99.48
+American Indian or Alaska Native |    169,633        0.26       99.74
+                         Chinese |     57,440        0.09       99.83
+                        Japanese |     71,729        0.11       99.93
+ Other Asian or Pacific Islander |     43,624        0.07      100.00
+                 Other race, nec |        329        0.00      100.00
+---------------------------------+-----------------------------------
+                           Total | 66,134,357      100.00
+1940: race missing: 0
+1940: birthyr missing (reported, not an error): 0
+  (0 bytes saved)
+file F:/enum_date/DATA/INTERMEDIATE/jw_census_vars1940_v26.dta saved
+1940: 143 shards, 66134357 men written
+
+. display "JW CENSUS VARS DONE"
+JW CENSUS VARS DONE
+
+. 
+end of do-file
+
+. display "RUN-STATA-RC: " _rc
+RUN-STATA-RC: 0
+

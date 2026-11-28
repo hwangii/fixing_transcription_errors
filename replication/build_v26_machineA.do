@@ -38,13 +38,14 @@ local m "$REP_REPO/MATCHING"
 /* 2  1h_for_mlp1940_v26_combined   for_mlp1940_v26_combined (to IPUMS)      */
 /* 2b 1i_for_mlp1930_v26_combined   for_mlp1930_v26_combined (to IPUMS)      */
 /* 3  verify_mlp_v26_independent    nothing; exit 9 on any difference        */
+/* 3b 1j_v26_jw_census_vars         jw_census_vars{1930,1940}_v26 (to B, JW) */
 /* 4  _v26_run                      check_v26_same_input (exit 9 on any      */
 /*                                  difference), then ABE Old/New/Target-only*/
 /* 5  score_v26_links               MATCHING/results/v26_linkage_abe.md      */
 /* 6  _v26_fs_run                   1g_v26_fs_inputs, then FS (a),(c),(d)    */
 /* 7  _v26_fs_e_run                 FS (e)                                   */
 /* 8  score_v26_fs_links            MATCHING/results/v26_fs_linkage_abe.md   */
-local steps 1f_v26_inputs 1h_for_mlp1940_v26_combined 1i_for_mlp1930_v26_combined verify_mlp_v26_independent _v26_run score_v26_links _v26_fs_run _v26_fs_e_run score_v26_fs_links
+local steps 1f_v26_inputs 1h_for_mlp1940_v26_combined 1i_for_mlp1930_v26_combined verify_mlp_v26_independent 1j_v26_jw_census_vars _v26_run score_v26_links _v26_fs_run _v26_fs_e_run score_v26_fs_links
 
 local t 0
 foreach s of local steps {
@@ -56,4 +57,5 @@ foreach s of local steps {
 	display as text "DONE `s' in " %6.1f (`t1'-`t0')/60000 " min"
 }
 display as text _n "build_v26_machineA.do finished: `t' steps. Next:"
+display as text "  python replication/hash_jw_v26.py --force   (only if B is to get the shards again)"
 display as text "  python replication/hash_ipums_v26.py --force   (only if these files are to be sent again)"
